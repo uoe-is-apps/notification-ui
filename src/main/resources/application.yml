@@ -21,8 +21,8 @@ spring:
     client:
       accessTokenUri: http://localhost:8080/uaa/oauth/token
       userAuthorizationUri: http://localhost:8080/uaa/oauth/authorize
-      clientId: my-client-with-registered-redirect
-      #clientSecret: secret
+      clientId: user
+      clientSecret: acmesecret
     resource:
       userInfoUri: http://localhost:8080/uaa/user
     #  jwt:
@@ -33,3 +33,11 @@ spring:
 logging:
   level:
     org.springframework.security: DEBUG
+quartz:
+  enabled: true
+learnPullJob:
+  frequency:  2000
+office365PullJob:
+  frequency: 2000
+office365PushSubscriptionJob:
+  frequency: 2000
