@@ -78,6 +78,16 @@
             <artifactId>hsqldb</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>ckeditor</artifactId>
+            <version>4.5.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>ng-ckeditor</artifactId>
+            <version>0.2</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -170,8 +180,7 @@
             <name>Maven 2 repository</name>
         </repository>
     </repositories>
-    <name>central-auth-ms</name>
-
+    <name>notification-ui</name>
 
     <profiles>
         <profile>
@@ -180,7 +189,7 @@
                 <packaging.type>war</packaging.type>
             </properties>
             <build>
-                <finalName>splus-ms</finalName>
+                <finalName>notification-ui</finalName>
             </build>
             <dependencies>
                 <dependency>

@@ -1,9 +1,14 @@
-angular.module('hello', [ 'ngRoute' ]).config(function($routeProvider, $httpProvider) {
+angular.module('hello', [ 'ngRoute' , 'ngCkeditor']).config(function($routeProvider, $httpProvider) {
 
 	$routeProvider.when('/', {
 		templateUrl : 'home.html',
-		controller : 'home'
-	}).otherwise('/');
+		controller : 'homeController'
+	}).
+	when('/create-emergency-notification',{
+		templateUrl : 'createEmergencyNotification.html',
+		controller : 'createEmergencyNotificationController'
+	}).
+	otherwise('/');
 
 	$httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
@@ -37,8 +42,14 @@ function($rootScope, $scope, $http, $location, $route) {
 		});
 	}
 
-}).controller('home', function($scope, $http) {
-	$http.get('resource/1').success(function(data) {
+}).controller('homeController', function($scope, $http) {
+	$http.get('notification/1').success(function(data) {
 		$scope.notification = data;
 	})
+
+}).controller('createEmergencyNotificationController', function($scope, $http) {
+
+$scope.editorOptions = { };
+
+
 });
