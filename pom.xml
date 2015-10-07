@@ -19,7 +19,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <wro4j.version>1.7.6</wro4j.version>
+        <wro4j.version>1.7.9</wro4j.version>
     </properties>
 
     <dependencies>
@@ -88,16 +88,17 @@
             <artifactId>ng-ckeditor</artifactId>
             <version>0.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+            <version>3.3.5</version>
+        </dependency>
     </dependencies>
 
     <build>
         <resources>
             <resource>
                 <directory>${project.basedir}/src/main/resources</directory>
-                <!-- <includes>
-                      <include>**.properties</include>
-                      <include>**.xml</include>
-                  </includes>-->
             </resource>
             <resource>
                 <directory>${project.build.directory}/generated-resources</directory>
@@ -164,8 +165,8 @@
                     </dependency>
                     <dependency>
                         <groupId>org.webjars</groupId>
-                        <artifactId>bootstrap</artifactId>
-                        <version>3.2.0</version>
+                        <artifactId>angular-ui-bootstrap</artifactId>
+                        <version>0.13.3</version>
                     </dependency>
                 </dependencies>
             </plugin>

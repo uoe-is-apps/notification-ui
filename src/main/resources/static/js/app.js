@@ -1,4 +1,4 @@
-angular.module('hello', [ 'ngRoute' , 'ngCkeditor']).config(function($routeProvider, $httpProvider) {
+angular.module('hello', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap']).config(function($routeProvider, $httpProvider) {
 
 	$routeProvider.when('/', {
 		templateUrl : 'home.html',
@@ -51,5 +51,48 @@ function($rootScope, $scope, $http, $location, $route) {
 
 $scope.editorOptions = { };
 
+$scope.today = function() {
+    $scope.dt = new Date();
+  };
+  $scope.today();
 
+  $scope.clear = function () {
+    $scope.dt = null;
+  };
+
+  $scope.toggleMin = function() {
+    $scope.minDate = $scope.minDate ? null : $scope.today();
+  };
+  $scope.toggleMin();
+
+  var sixMonthsFromNow = $scope.dt.setMonth($scope.dt.getMonth()+6);
+  var dd = sixMonthsFromNow.getDay;
+  var mm = sixMonthsFromNow.getMonth;
+  var yyyy = sixMonthsFromNow.getFullYear;
+  $scope.maxDate = new Date(dd,mm,yyyy);
+
+  $scope.openStartDate = function($event) {
+    $scope.startDateStatus.opened = true;
+  };
+
+  $scope.openEndDate = function($event) {
+      $scope.endDateStatus.opened = true;
+    };
+
+  $scope.dateOptions = {
+    formatYear: 'yy',
+    startingDay: 1
+  };
+
+  $scope.format = 'dd-MMMM-yyyy';
+
+  $scope.startDateStatus = {
+    opened: false
+  };
+
+  $scope.endDateStatus = {
+    opened: false
+  };
+
+WEB
 });
