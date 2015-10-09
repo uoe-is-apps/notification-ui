@@ -1,12 +1,13 @@
 server:
   port: 8090
-debug:
 security:
   user:
     password: none
+  sessions: always
+  ignored: /favicon.ico,/js/**,/css/**,/webjars/**,/**/*.html
 zuul:
   routes:
-    resource:
+    notification:
       path: /notification/**
       url: http://localhost:8085/notification
     user:
@@ -14,20 +15,22 @@ zuul:
       url: http://localhost:8080/uaa/user
 spring:
   oauth2:
-    sso:
-      home:
-        secure: false
-        path: /,/**/*.html
+   # sso:
+   #   loginPath: /login
+    #sso:
+      #home:
+        #secure: false
+        #path: /,/**/*.html,/webjars/**
     client:
       accessTokenUri: http://localhost:8080/uaa/oauth/token
       userAuthorizationUri: http://localhost:8080/uaa/oauth/authorize
       clientId: my-client-with-registered-redirect
-      #clientSecret: acmesecret
+      clientSecret: s1llycrash3s
     resource:
       userInfoUri: http://localhost:8080/uaa/user
 logging:
   level:
-    org.springframework.security: DEBUG
+    org.springframework.security: INFO
 quartz:
   enabled: false
 learnPullJob:

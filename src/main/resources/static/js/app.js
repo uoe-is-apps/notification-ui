@@ -1,39 +1,68 @@
 angular.module('hello', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap']).config(function($routeProvider, $httpProvider) {
 
 	$routeProvider.when('/', {
-		templateUrl : 'home.html',
-		controller : 'homeController'
+		templateUrl : 'listEmergencyNotification.html',
+		controller : 'listEmergencyNotificationController',
+		activetab : 'emergency-notifications'
 	}).
-	when('/create-emergency-notification',{
-		templateUrl : 'createEmergencyNotification.html',
-		controller : 'createEmergencyNotificationController'
+	when('/edit-emergency-notification',{
+		templateUrl : 'editEmergencyNotification.html',
+		controller : 'editEmergencyNotificationController',
+		activetab : 'emergency-notifications'
 	}).
 	otherwise('/');
 
 	$httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
-}).controller('navigation',
+})
 
-function($rootScope, $scope, $http, $location, $route) {
+.service("notification",function Notification()
+{
+
+   this.notificationData = { category: "Emergency", startDate: new Date()};
+
+   this.setNotification = function(notification)
+   {
+     this.notificationData = notification;
+   }
+
+   this.notification = function()
+   {
+     return this.notificationData;
+   }
+})
+
+.controller('navigation',function($rootScope, $scope, $http, $location, $route) {
+
+    $scope.route = $route;
 
 	$scope.tab = function(route) {
 		return $route.current && route === $route.current.controller;
 	};
 
-	$http.get('user').success(function(data) {
-		if (data.name) {
-			$rootScope.authenticated = true;
-		} else {
-			$rootScope.authenticated = false;
-		}
-	}).error(function() {
-		$rootScope.authenticated = false;
-	});
+	$rootScope.getUser = function()
+	{
+	    $http.get('user').success(function(data) {
+    		if (data.name) {
+
+    			$rootScope.authenticated = true;
+    		} else {
+
+    			$rootScope.authenticated = false;
+    		}
+    	}).error(function() {
+    		$rootScope.authenticated = false;
+    	});
+
+	}
+
+	$rootScope.getUser();
 
 	$scope.credentials = {};
 
 	$scope.logout = function() {
 		$http.post('logout', {}).success(function() {
+		    alert("logout called");
 			$rootScope.authenticated = false;
 			$location.path("/");
 		}).error(function(data) {
@@ -42,18 +71,37 @@ function($rootScope, $scope, $http, $location, $route) {
 		});
 	}
 
-}).controller('homeController', function($scope, $http) {
-	$http.get('notification/1').success(function(data) {
-		$scope.notification = data;
-	})
+})
 
-}).controller('createEmergencyNotificationController', function($scope, $http) {
+.controller('listEmergencyNotificationController', function($rootScope,$scope, $http,$route,notification,$location) {
+    $scope.route = $route;
+    $rootScope.getUser();
+	$http.get('notification/publisher/notification-ui').success(function(data) {
+		$scope.notificationList = data;
+	});
 
-$scope.editorOptions = { };
+	$scope.editNotification = function(notificationToEdit)
+	{
+	   notification.setNotification(notificationToEdit);
+	   $location.path("/edit-emergency-notification");
+	};
 
-$scope.today = function() {
-    $scope.dt = new Date();
-  };
+})
+
+.controller('editEmergencyNotificationController', function($rootScope,$scope, $http,$route,notification) {
+
+    $scope.route = $route;
+
+    $rootScope.getUser();
+
+    // Set up default notification
+    $scope.notification = notification.notification();
+
+    $scope.editorOptions = { };
+
+    $scope.today = function() {
+        $scope.dt = new Date();
+    };
   $scope.today();
 
   $scope.clear = function () {
@@ -94,5 +142,19 @@ $scope.today = function() {
     opened: false
   };
 
-WEB
+  $scope.reset = function() {
+
+    $scope.notification = { category: "Emergency", startDate: new Date() };
+  }
+
+  $scope.update = function(notification)
+  {
+    //TODO add validation on variables being set
+     $http.post("notification/",notification).then(function successCallback(response) {
+                                                 $scope.successMessage="Notification Saved";
+                                               }, function errorCallback(response) {
+                                                 $scope.errorMessage="Error saving notification:"+response.status+response.statusText;
+                                               });
+  }
+
 });
