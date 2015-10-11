@@ -46,11 +46,13 @@ public class Application {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            http.logout().and().antMatcher("/**").authorizeRequests()
-                    .antMatchers("/login","/logout").permitAll()
-                    .anyRequest().authenticated().and().csrf()
-                    .csrfTokenRepository(csrfTokenRepository()).and()
-                    .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
+            http.logout()
+                    .and().httpBasic().disable()
+                    .antMatcher("/**").authorizeRequests()
+                    .antMatchers("/notification/**","/user","/favicon.ico","/js/**","/css/**","/webjars/**","/**/*.html").permitAll()
+                    .anyRequest().authenticated().and().csrf().disable();
+                   /* .csrfTokenRepository(csrfTokenRepository()).and()
+                    .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);*/
         }
 
 

@@ -56,7 +56,11 @@ angular.module('hello', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap']).config(fun
 
 	}
 
-	$rootScope.getUser();
+    if ($rootScope.authenticated ==null)
+    {
+        $rootScope.getUser();
+    }
+
 
 	$scope.credentials = {};
 
@@ -75,7 +79,7 @@ angular.module('hello', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap']).config(fun
 
 .controller('listEmergencyNotificationController', function($rootScope,$scope, $http,$route,notification,$location) {
     $scope.route = $route;
-    $rootScope.getUser();
+    //$rootScope.getUser();
 	$http.get('notification/publisher/notification-ui').success(function(data) {
 		$scope.notificationList = data;
 	});
@@ -92,7 +96,7 @@ angular.module('hello', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap']).config(fun
 
     $scope.route = $route;
 
-    $rootScope.getUser();
+    //$rootScope.getUser();
 
     // Set up default notification
     $scope.notification = notification.notification();
