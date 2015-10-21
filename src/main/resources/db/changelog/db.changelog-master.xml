@@ -20,11 +20,16 @@
                  path="db/changelog/sql/notification_table_grants_oracle.sql"
                  splitStatements="true"
                  stripComments="true"/>
-        <rollback changeSetId="notificationl_tables_rollback" changeSetAuthor="rgood">
+        <rollback>
             <sqlFile encoding="utf8"
                      path="db/changelog/sql/notification_tables_rollback_oracle.sql"
                      splitStatements="true"
                      stripComments="true"/>
         </rollback>
+    </changeSet>
+    <changeSet id="add_audit_description_column" dbms="oracle" author="rgood">
+        <addColumn tableName="USER_NOTIFICATION_AUDIT">
+            <column name="AUDIT_DESCRIPTION" type="NVARCHAR2(255)" remarks="Description of the audit entry"/>
+        </addColumn>
     </changeSet>
 </databaseChangeLog>

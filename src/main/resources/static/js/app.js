@@ -19,7 +19,7 @@ angular.module('hello', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap']).config(fun
 .service("notification",function Notification()
 {
 
-   this.notificationData = { category: "Emergency", startDate: new Date()};
+   this.notificationData = { publisherId: "notify-ui", category: "Emergency", startDate: new Date()};
 
    this.setNotification = function(notification)
    {
