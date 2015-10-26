@@ -1,4 +1,4 @@
-package uk.ac.ed.notify;
+package uk.ac.ed.notify.config;
 
 import org.quartz.JobDetail;
 import org.quartz.SimpleTrigger;

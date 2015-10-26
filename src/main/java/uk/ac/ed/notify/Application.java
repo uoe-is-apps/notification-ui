@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
+import uk.ac.ed.notify.config.RemoteUserAuthenticationFilter;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -50,8 +51,8 @@ public class Application extends SpringBootServletInitializer {
             http.logout()
                     .and().httpBasic().disable()
                     .antMatcher("/**").authorizeRequests()
-                    .antMatchers("/notification/**","/user","/favicon.ico","/js/**","/css/**","/webjars/**","/**/*.html").permitAll()
-                    .anyRequest().authenticated().and().csrf().disable();
+                    .antMatchers("/notification/**", "/user", "/favicon.ico", "/js/**", "/css/**", "/webjars/**", "/**/*.html").permitAll()
+                    .anyRequest().authenticated().and().csrf().disable().addFilter(new RemoteUserAuthenticationFilter());
                    /* .csrfTokenRepository(csrfTokenRepository()).and()
                     .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);*/
         }
