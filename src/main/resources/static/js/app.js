@@ -80,7 +80,7 @@ angular.module('hello', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap']).config(fun
 .controller('listEmergencyNotificationController', function($rootScope,$scope, $http,$route,notification,$location) {
     $scope.route = $route;
     //$rootScope.getUser();
-	$http.get('notification/publisher/notification-ui').success(function(data) {
+	$http.get('notification/publisher/notify-ui').success(function(data) {
 		$scope.notificationList = data;
 	});
 
