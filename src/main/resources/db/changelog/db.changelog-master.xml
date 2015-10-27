@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.7"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.7
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.7.xsd">
+    <changeSet id="quartz_tables_oracle" author="rgood" dbms="oracle">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/quartz_tables_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+    <changeSet id="notification_tables_oracle" author="rgood" dbms="oracle">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/notification_tables_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/notification_table_grants_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+        <rollback>
+            <sqlFile encoding="utf8"
+                     path="db/changelog/sql/notification_tables_rollback_oracle.sql"
+                     splitStatements="true"
+                     stripComments="true"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="add_audit_description_column" dbms="oracle" author="rgood">
+        <addColumn tableName="USER_NOTIFICATION_AUDIT">
+            <column name="AUDIT_DESCRIPTION" type="NVARCHAR2(255)" remarks="Description of the audit entry"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

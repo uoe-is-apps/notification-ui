@@ -24,6 +24,8 @@
 
 <form name="editNotificationForm" novalidate class="form-horizontal">
 
+    <input type="hidden" ng-model="notification.publisherId" value="notification-ui"/>
+
     <div class="form-group" ng-class="{ 'has-error': editNotificationForm.title.$touched && editNotificationForm.title.$invalid }" >
         <label class="col-sm-2 control-label">Title:</label>
         <div class="col-sm-10">
