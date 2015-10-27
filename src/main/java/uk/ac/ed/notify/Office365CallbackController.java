@@ -34,7 +34,8 @@ public class Office365CallbackController {
     @RequestMapping(value="/office365NewEmailCallback/", method=RequestMethod.POST)
     public @ResponseBody void office365NewEmailCallback(@RequestBody String json)
     {
-        logger.debug("office365NewEmailCallback - " + json);      
+        logger.debug("office365NewEmailCallback - " + json); 
+        
         String token = office365ApiService.acquireAccessToken();             
         String newEmailId = office365JsonService.parseOffice365NewEmailCallbackEmailId(json);
         logger.debug("newEmailId - " + newEmailId);
