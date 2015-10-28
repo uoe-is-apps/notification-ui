@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ed.notify.entity.Office365Subscription;
 import uk.ac.ed.notify.repository.Office365Repository;
-import uk.ac.ed.notify.service.LearnService;
 import uk.ac.ed.notify.service.Office365ApiService;
 import uk.ac.ed.notify.service.Office365JsonService;
 
@@ -36,10 +35,19 @@ public class Office365CallbackController {
     {
         logger.debug("office365NewEmailCallback - " + json); 
         
-        String token = office365ApiService.acquireAccessToken();             
-        String newEmailId = office365JsonService.parseOffice365NewEmailCallbackEmailId(json);
-        logger.debug("newEmailId - " + newEmailId);
-        office365ApiService.processEmailById(token, newEmailId);
+        if(json.indexOf("Acknowledgment") != -1){
+            logger.debug("office365NewSubscriptionCallback - " + json);
+                  
+            Office365Subscription newSubscription = office365JsonService.parseOffice365NewSubscriptionCallbackSubscriptionId(json); 
+            logger.debug("newSubscription - " + newSubscription);
+            office365Repository.save(newSubscription);
+            logger.debug("subscription successful");
+        }else{        
+            String token = office365ApiService.acquireAccessToken();             
+            String newEmailId = office365JsonService.parseOffice365NewEmailCallbackEmailId(json);
+            logger.debug("newEmailId - " + newEmailId);
+            office365ApiService.processEmailById(token, newEmailId);
+        }
     }    
     
     @RequestMapping(value="/office365NewSubscriptionCallback/", method=RequestMethod.POST)

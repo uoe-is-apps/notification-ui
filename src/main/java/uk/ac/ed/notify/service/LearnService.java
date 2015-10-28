@@ -19,12 +19,14 @@ import org.springframework.stereotype.Service;
 import uk.ac.ed.notify.entity.Notification;
 import uk.ac.ed.notify.learn.entity.Announcements;
 import uk.ac.ed.notify.learn.entity.CourseUsers;
+import uk.ac.ed.notify.learn.entity.GradebookGrade;
 import uk.ac.ed.notify.learn.entity.GradebookMain;
 import uk.ac.ed.notify.learn.entity.Tasks;
 import uk.ac.ed.notify.learn.entity.Users;
 import uk.ac.ed.notify.learn.repository.LearnAnnouncementRepository;
 import uk.ac.ed.notify.learn.repository.LearnAssessmentRepository;
 import uk.ac.ed.notify.learn.repository.LearnCourseUserRepository;
+import uk.ac.ed.notify.learn.repository.LearnGradebookGradeRepository;
 import uk.ac.ed.notify.learn.repository.LearnTaskRepository;
 import uk.ac.ed.notify.learn.repository.LearnUserRepository;
 import uk.ac.ed.notify.repository.NotificationRepository;
@@ -55,6 +57,9 @@ public class LearnService {
     @Autowired
     LearnCourseUserRepository learnCourseUserRepository;
 
+    @Autowired
+    LearnGradebookGradeRepository learnGradebookGradeRepository;
+    
     @Autowired
     private MacService macService;
     private static final String announceForwardUrl = "/webapps/blackboard/execute/announcement?method=search&context=course&course_id=courseidtoreplace&handle=cp_announcements";
@@ -94,6 +99,20 @@ public class LearnService {
         return notification;
     }
 
+    private boolean ifInsertLearnNotification(String publisherId, String publisherNotificationId, String uun, Notification notification) {
+        List<Notification> existingNotifications = notificationRepository.findByPublisherIdAndPublisherNotificationIdAndUun(publisherId, publisherNotificationId, uun);
+        if (existingNotifications.size() == 0) {
+            return true;
+        } else {
+            Notification existingNotification = existingNotifications.get(0);
+            if (!notification.equals(existingNotification)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
     private boolean ifInsertLearnNotification(String publisherId, String publisherNotificationId, Notification notification) {
         List<Notification> existingNotifications = notificationRepository.findByPublisherIdAndPublisherNotificationId(publisherId, publisherNotificationId);
         if (existingNotifications.size() == 0) {
@@ -191,8 +210,8 @@ public class LearnService {
     
     public void pullLearnNotifications() {
         logger.debug("pullLearnNotifications");
-
-        System.out.println("1.----------task----------");
+       
+        logger.debug("1.----------task----------");
         List<Tasks> listOfTasks = learnTaskRepository.findTasks();
         for (int i = 0; i < listOfTasks.size(); i++) {
             Tasks task = listOfTasks.get(i);            
@@ -206,16 +225,16 @@ public class LearnService {
             String url = getTaskForwardUrl(uun, "_" + task.getCrsmainPk1() + "_1", "_" + task.getPk1() + "_1");
             Notification notification = constructLearnNotification(publisherNotificationId, category, title, body, url, startDate, endDate, uun);
             
-            System.out.println(category + " - " + i + " " + uun + " " + task.getSubject());
+            logger.debug(category + " - " + i + " " + uun + " " + task.getSubject());
 
-            if (ifInsertLearnNotification(publisherId, publisherNotificationId, notification)) {
+            if (ifInsertLearnNotification(publisherId, publisherNotificationId, uun, notification)) {
                 notificationRepository.save(notification);
             }
         }
 
 
 
-        System.out.println("2.----------system announcements----------");
+        logger.debug("2.----------system announcements----------");
         List<Announcements> listOfSystemAnnouncements = learnAnnouncementRepository.findSystemAnnouncements();
         for (int i = 0; i < listOfSystemAnnouncements.size(); i++) {
             Announcements announcement = (Announcements) listOfSystemAnnouncements.get(i);            
@@ -223,12 +242,12 @@ public class LearnService {
             String category = "learn_system_annoucement";
             String title = announcement.getSubject() + "";
             String body = announcement.getAnnouncement() + "";
-            String url = "url";
+            String url = "";
             Date startDate = announcement.getStartDate();
             Date endDate = announcement.getEndDate();
-            Notification notification = constructLearnNotification(publisherNotificationId, category, title, body, url, startDate, endDate, null);
+            Notification notification = constructLearnNotification(publisherNotificationId, category, title, body, "ignore", startDate, endDate, "ignore");
 
-            System.out.println(category + " - " + i + " " +  announcement.getSubject());
+            logger.debug(category + " - " + i + " " +  announcement.getSubject());
 
             if (ifInsertLearnNotification(publisherId, publisherNotificationId, notification)) {
                 List<Users> allUsers = learnUserRepository.findAll();
@@ -243,7 +262,7 @@ public class LearnService {
 
 
 
-        System.out.println("3.----------course announcements----------");
+        logger.debug("3.----------course announcements----------");
         List<Announcements> listOfCourseAnnouncements = learnAnnouncementRepository.findCourseAnnouncements();
         for (int i = 0; i < listOfCourseAnnouncements.size(); i++) {
             Announcements announcement = (Announcements) listOfCourseAnnouncements.get(i);
@@ -256,11 +275,11 @@ public class LearnService {
             Date endDate = announcement.getEndDate();
             Notification notification = constructLearnNotification(publisherNotificationId, category, title, body, "ignore", startDate, endDate, "ignore");
 
-            System.out.println(category + " - " + i + " " +  announcement.getAnnouncement());
+            logger.debug(category + " - " + i + " " +  announcement.getAnnouncement());
             
             if (ifInsertLearnNotification(publisherId, publisherNotificationId, notification)) {
                 List<CourseUsers> courseUsers = learnCourseUserRepository.findByCrsmainPk1(announcement.getCrsmainPk1());
-                System.out.println("insert for all these users --- " + announcement.getCrsmainPk1() + " " + courseUsers.size());
+                logger.debug("insert for all these users --- " + announcement.getCrsmainPk1() + " " + courseUsers.size());
 
                 for (int r = 0; r < courseUsers.size(); r++) {
                     String uun = learnUserRepository.findByPk1(courseUsers.get(r).getUsersPk1()).get(0).getUserId();
@@ -275,31 +294,58 @@ public class LearnService {
 
 
 
-        System.out.println("4.----------assessment----------");
+        logger.debug("4.----------assessment----------");
         List<GradebookMain> listOfAssessment = learnAssessmentRepository.findGradebookMain();
+        logger.debug("listOfAssessment - " + listOfAssessment.size());
+        
+
         for (int i = 0; i < listOfAssessment.size(); i++) {
             GradebookMain assessment = listOfAssessment.get(i);
-            String publisherNotificationId = assessment.getPk1() + "";
-            String category = "learn_assessment";
-            String title = assessment.getTitle() + "";
-            String body = assessment.getTitle() + "";
-            Date startDate = null;
-            Date endDate = assessment.getDueDate();
+            
+            List<CourseUsers> courseUsers = learnCourseUserRepository.findByCrsmainPk1(assessment.getCrsmainPk1());
+            logger.debug("insert for all these users ---" + assessment.getCrsmainPk1() + " " + courseUsers.size());
 
-            Notification notification = constructLearnNotification(publisherNotificationId, category, title, body, "ignore", startDate, endDate, "ignore");
+            for (int r = 0; r < courseUsers.size(); r++) {
+            
+                //CASE WHEN ( NOT gg.MANUAL_SCORE IS NULL) AND ( NOT gg.MANUAL_GRADE  IS NULL) THEN gg.MANUAL_SCORE ELSE NVL(gg.AVERAGE_SCORE,0)
+                List<GradebookGrade> grades = learnGradebookGradeRepository.findByGradebookMainPk1(assessment.getPk1());
+                String grade = "";
+                if(grades.size() == 0){
+                    grade = "";
+                }else{
+                    GradebookGrade gg = grades.get(0);
+                    if( gg.getManualScore() != null && gg.getManualGrade() != null){
+                        grade = gg.getManualScore() + "";
+                    }else{
+                        if(gg.getAverageScore() != null){
+                            grade = gg.getAverageScore() + "";
+                        }
+                    }
+                }                           
+                String publisherNotificationId = assessment.getPk1() + "";
+                String category = "learn_assessment";
+                String title = "Assessment Notification: " + assessment.getTitle() + "";
+                String body = "Assessment: " + assessment.getTitle() + " Possible Score:(" + assessment.getPossible() + ")";
+                if(grade.equals("")){
+                    body =  body + " Your assessment hasn't been marked yet";
+                }else{
+                    body =  body + " Your score is (" + grade + ")";
+                }          
+                Date startDate = null;
+                Date endDate = assessment.getDueDate();
+                String uun = learnUserRepository.findByPk1(courseUsers.get(r).getUsersPk1()).get(0).getUserId();
+                String url = getAssignForwardUrl(uun, "_" + assessment.getCourseContentsPk1() + "_1", "_" + assessment.getCrsmainPk1() + "_1");                                   
+                
+                Notification notification = constructLearnNotification(publisherNotificationId, category, title, body, url, startDate, endDate, uun);
+                
+                System.out.println(i + " " + category + " - " + assessment.getCrsmainPk1() + " " + assessment.getTitle() + " " + assessment.getPk1() + " " + assessment.getPossible() + " " + grade);                 
 
-            System.out.println(category + " - " + i + " " +  assessment.getTitle());
-
-            if (ifInsertLearnNotification(publisherId, publisherNotificationId, notification)) {
-                List<CourseUsers> courseUsers = learnCourseUserRepository.findByCrsmainPk1(assessment.getCrsmainPk1());
-                System.out.println("insert for all these users ---" + assessment.getCrsmainPk1() + " " + courseUsers.size());
-
-                for (int r = 0; r < courseUsers.size(); r++) {
-                    String uun = learnUserRepository.findByPk1(courseUsers.get(r).getUsersPk1()).get(0).getUserId();
-                    String url = getAssignForwardUrl(uun, "_" + assessment.getCourseContentsPk1() + "_1", "_" + assessment.getCrsmainPk1() + "_1");
-                    notificationRepository.save(constructLearnNotification(publisherNotificationId, category, title, body, url, startDate, endDate, uun));
+                if (ifInsertLearnNotification(publisherId, publisherNotificationId, uun, notification)) {                
+                    logger.debug("insert");
+                    notificationRepository.save(notification);
                 }
             }
+
 
         }
 

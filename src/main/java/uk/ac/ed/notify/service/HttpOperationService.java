@@ -47,7 +47,7 @@ public class HttpOperationService {
             return json;
     }
     
-    public void post(String token, String url, String input) throws Exception{
+    public String post(String token, String url, String input) throws Exception{
             HttpURLConnection con = (HttpURLConnection) (new URL(url)).openConnection(); 
             
             con.setDoOutput(true);
@@ -65,15 +65,19 @@ public class HttpOperationService {
                 throw new RuntimeException("Failed : HTTP error code : " + con.getResponseCode());
             }
 
+            System.out.println("server response code - " + con.getResponseCode());
+            
             BufferedReader br = new BufferedReader(new InputStreamReader((con.getInputStream())));
-            String output;
-
-            while ((output = br.readLine()) != null) {
-                //ignore, not used
-                //System.out.println(output);
+            String output = "";
+            String json = "";
+            while ((output = br.readLine()) != null) {                
+                if(output.indexOf("json") != -1){
+                    json = output;
+                }
             }
 
-            con.disconnect();               
+            con.disconnect();     
+            return json;
     }
 
     public void delete(String token, String url) throws Exception{

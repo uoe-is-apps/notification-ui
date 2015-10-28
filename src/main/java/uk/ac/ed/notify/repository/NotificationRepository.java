@@ -12,6 +12,8 @@ public interface NotificationRepository extends CrudRepository<Notification,Stri
 
     public List<Notification> findByPublisherIdAndPublisherNotificationId (String publisherId, String publisherNotificationId);
     
+    public List<Notification> findByPublisherIdAndPublisherNotificationIdAndUun (String publisherId, String publisherNotificationId, String uun);
+    
     public List<Notification> findByPublisherId (String publisherId);
 
     public List<Notification> findByUun (String uun);

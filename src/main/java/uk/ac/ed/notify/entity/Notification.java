@@ -16,7 +16,8 @@ import java.util.Objects;
 @Table(name="NOTIFICATIONS")
 @NamedQueries({
        @NamedQuery(name = "Notification.findByPublisherId", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1)"),
-       @NamedQuery(name = "Notification.findByPublisherIdAndPublisherNotificationId", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and a.publisherNotificationId  = (?2)")
+       @NamedQuery(name = "Notification.findByPublisherIdAndPublisherNotificationId", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and a.publisherNotificationId  = (?2)"),
+        @NamedQuery(name = "Notification.findByPublisherIdAndPublisherNotificationIdAndUun", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and a.publisherNotificationId  = (?2) and a.uun = (?3)")       
 })
 public class Notification {
 
@@ -215,6 +216,7 @@ public class Notification {
         }
         return true;
     }
+    
         
         
         

@@ -27,15 +27,17 @@ public class Office365PushSubscriptionJob implements Job {
     
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        logger.debug("Office365PullJob");        
         if(true) return;
-        
-        String token = office365ApiService.acquireAccessToken();
-        
+        logger.debug("Office365PullJob");        
+                
+        String token = office365ApiService.acquireAccessToken();    
+        logger.debug("token - " + token);        
         //if no previous subscription, subscribe
         if(office365Repository.count() == 0){
+            logger.debug("no prevous subscription found, subscribe now");       
             office365ApiService.subscribeToNotification(token);
         }else{//if found previous subscription, renew
+            logger.debug("prevous subscription found, renew now");     
             Iterable<Office365Subscription> existingSubscriptions = office365Repository.findAll();
             if(existingSubscriptions.iterator().hasNext()){
                 Office365Subscription office365Subscription = existingSubscriptions.iterator().next();                                        

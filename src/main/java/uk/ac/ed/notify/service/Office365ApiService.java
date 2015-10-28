@@ -110,6 +110,9 @@ public class Office365ApiService {
     public void subscribeToNotification(String token){
         String url = "https://outlook.office.com/api/beta/users/" + account + "/subscriptions";
         
+        System.out.println("subscribeToNotification - " + url);            
+        
+        /*
         String input = 
                     "  {                                                                                                                " +
                     "  \"@odata.type\":\"#Microsoft.OutlookServices.PushSubscription\",                                                 " +           
@@ -118,11 +121,43 @@ public class Office365ApiService {
                     "  \"ChangeType\": \"Created\",                                                                                     " +
                     "  \"ClientState\": \"" + clientState + "\"                                                                         " +
                     "  }                                                                                                                ";                
+        */
+        
+        callbackUrl = "https://www-test.myed.ed.ac.uk/BlackboardVCPortlet/callback";
+        //callbackUrl = "https://dev.notifyadm.is.ed.ac.uk1/office365NewEmailCallback11/";
+        
+        String input = 
+                    "  {                                                                                                                " +
+                    "  \"@odata.type\":\"#Microsoft.OutlookServices.PushSubscription\",                                                 " +           
+                    "  \"resource\": \"https://outlook.office.com/api/beta/users/" + account + "/folders/inbox/messages\",              " +
+                    "  \"notificationURL\": \"" + callbackUrl + "\",                                                                    " +
+                    "  \"changeType\": \"Created\",                                                                                     " +
+                    "  \"subscriptionExpirationDateTime\": \"2015-11-02T18:40:00.0Z\",                                                  " +
+                    "  \"context\": \"" + clientState + "\"                                                                             " +
+                    "  }                                                                                                                ";     
+
+        /*
+        //http://blogs.msdn.com/b/exchangedev/archive/2015/10/21/outlook-rest-api-changes-to-beta-endpoint-part-iii.aspx        
+Current         Interim                         Final
+ResourceURL	resource                        Resource
+CallbackURL	notificationURL                 NotificationURL
+ClientState	context                         ClientState
+ExpirationTime	subscriptionExpirationDateTime	SubscriptionExpirationDateTime
+ChangeType	changeType                      ChangeType
+        */
         
         try {
-            httpOperationService.post(token, url, input);
+            System.out.println("input - " + input);   
+            
+            logger.debug("url - " + url);       
+            logger.debug("input - " + input);       
+            
+            String json = httpOperationService.post(token, url, input);
+            System.out.println("success " + json); 
+            logger.debug("success " + input);       
         }catch(Exception e){
             e.printStackTrace();
+            logger.error("e " + e.toString());       
         }
 
     }
@@ -163,6 +198,8 @@ public class Office365ApiService {
             String url = "https://outlook.office365.com/api/v1.0/users/" + account + "/folders/inbox/messages?$filter=IsRead%20eq%20false";
             String json = httpOperationService.get(token, url);
 
+            System.out.println("processUnreadEmail - " + json);
+            
             Hashtable<String, Notification> table = office365JsonService.parseTableOfNotification(json);
             System.out.println("fetchUnreadEmail - " + table.size());
             
@@ -171,7 +208,7 @@ public class Office365ApiService {
                 String id = iterator.next();
                 Notification notification = table.get(id);
                 
-                System.out.println(notification.getTitle());
+                System.out.println("save notification..." + notification.getTitle());
                 
                 notificationRepository.save(notification);
                 
@@ -225,4 +262,11 @@ public class Office365ApiService {
             logger.error(e.toString());
         }
     }    
+    
+//new subscription - {"value":[{"@odata.type":"#Microsoft.OutlookServices.Notification","Id":null,"subscriptionId":"OUJCOEMwQUYtMzk5OS00QUNBLUJBQzAtQzNFRTNDMzQzNDg3XzMzQkFDRkM5LURDNzEtNDNCNS1CMDE4LUJDNERFRDBFNDI5Nw==","subscriptionExpirationDateTime":"2015-10-30T17:52:32.1693974Z","sequenceNumber":0,"changeType":"Acknowledgment"}]}    
+//new email - {"value":[{"@odata.type":"#Microsoft.OutlookServices.Notification","Id":null,"subscriptionId":"RTEyRUVBOTUtMjI4NS00MEE0LUFGQ0UtOTgxNkNBRDAyQzkwXzQ1MTU4OEJFLTczQzQtNDBFOS1BN0E1LUYyOTdENkEzM0NBMQ==","subscriptionExpirationDateTime":"2015-10-30T17:32:37.4526939Z","sequenceNumber":1,"changeType":"Created","resource":"https://outlook.office.com/api/beta/Users('scotapps@scotapps.onmicrosoft.com')/Messages('AAMkADQ1MTU4OGJlLTczYzQtNDBlOS1hN2E1LWYyOTdkNmEzM2NhMQBGAAAAAAAQSU6klR_CS7f2u_Zotqz3BwCK45XT6t02QqdGHEQt1wAjAAAAAAEMAACK45XT6t02QqdGHEQt1wAjAAAAAAF6AAA=')","resourceData":{"@odata.type":"#Microsoft.OutlookServices.Message","@odata.id":"https://outlook.office.com/api/beta/Users('scotapps@scotapps.onmicrosoft.com')/Messages('AAMkADQ1MTU4OGJlLTczYzQtNDBlOS1hN2E1LWYyOTdkNmEzM2NhMQBGAAAAAAAQSU6klR_CS7f2u_Zotqz3BwCK45XT6t02QqdGHEQt1wAjAAAAAAEMAACK45XT6t02QqdGHEQt1wAjAAAAAAF6AAA=')","@odata.etag":"W/\"CQAAABYAAACK45XT6t02QqdGHEQt1wAjAAAAAAGj\"","Id":"AAMkADQ1MTU4OGJlLTczYzQtNDBlOS1hN2E1LWYyOTdkNmEzM2NhMQBGAAAAAAAQSU6klR_CS7f2u_Zotqz3BwCK45XT6t02QqdGHEQt1wAjAAAAAAEMAACK45XT6t02QqdGHEQt1wAjAAAAAAF6AAA="}}]}
+    
+    
+    
+    
 }

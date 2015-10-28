@@ -28,10 +28,9 @@ public class Office365PullJob implements Job {
     Office365ApiService office365Service;
 
     @Override
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        logger.debug("Office365PullJob");        
-        //if(true) return;
-        
+    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {            
+        if(true) return;
+        logger.debug("Office365PullJob");    
         String token = office365Service.acquireAccessToken();
         office365Service.processUnreadEmail(token); 
     }

@@ -88,7 +88,7 @@ and u.user_id='"+uun+"'
     @NamedQuery(name = "GradebookMain.findGradebookMain", 
      query = 
 
-" select gm " +           
+" select distinct gm " +           
 " from  " +
 
 //" GradebookMain gm,  " +
@@ -113,10 +113,10 @@ and u.user_id='"+uun+"'
 " and gm.crsmainPk1=cm.pk1 " +   
 " and gm.visibleInd = 'Y' " +
 " and u.rowStatus = 0 " +
-" and cu.rowStatus=0 " +
-" and gg.gradebookMainPk1=gm.pk1 " +
+" and cu.rowStatus=0 "
+////// + " and gg.gradebookMainPk1=gm.pk1 "
 //" and att.gradebookGradePk1=gg.pk1 " +      
-" and u.userId='admin.hsun1' "
++ " and u.userId='admin.hsun1' "
 /*
 " and gg.gradebookMainPk1(+)=gm.pk1 " +
 " and att.gradebookGradePk1(+)=gg.pk1 " +      

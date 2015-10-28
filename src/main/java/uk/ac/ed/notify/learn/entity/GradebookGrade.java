@@ -24,7 +24,7 @@ import javax.persistence.TemporalType;
 @Table(name = "gradebook_grade")
 @NamedQueries({
 
-    
+
     @NamedQuery(name = "GradebookGrade.findAll", query = "SELECT v FROM GradebookGrade v"),
     @NamedQuery(name = "GradebookGrade.findByGradebookMainPk1", query = "SELECT v FROM GradebookGrade v WHERE v.gradebookMainPk1 = (?1)")
 
@@ -46,7 +46,6 @@ public class GradebookGrade implements Serializable{
 
     @Basic(optional = false)
     @Column(name = "gradebook_main_pk1")
-    @Id
     private Integer gradebookMainPk1;
 
     @Basic(optional = false)
@@ -60,12 +59,10 @@ public class GradebookGrade implements Serializable{
       
     @Basic(optional = false)
     @Column(name = "average_score")
-    @Id
     private Integer averageScore;
     
     @Basic(optional = false)
     @Column(name = "manual_score")
-    @Id
     private Integer manualScore;   
 
     public Integer getPk1() {

@@ -29,8 +29,8 @@ import javax.persistence.TemporalType;
      "SELECT v from Users u, CourseUsers cu, CourseMain m, " +    
      "Tasks v " +     
      "where " +     
-     "u.pk1 = cu.usersPk1 and m.pk1 = cu.crsmainPk1 and (m.startDate <= sysdate and sysdate <= m.endDate or m.endDate is null) and " +     
-     "u.userId='admin.hsun1' " +     
+     "u.pk1 = cu.usersPk1 and m.pk1 = cu.crsmainPk1 and (m.startDate <= sysdate and sysdate <= m.endDate or m.endDate is null) " +     
+     //"and u.userId='admin.hsun1' " +     
      "and v.crsmainPk1=m.pk1 " +     
      "order by m.dtcreated desc "
      ),    
