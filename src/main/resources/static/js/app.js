@@ -19,7 +19,7 @@ angular.module('hello', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap']).config(fun
 .service("notification",function Notification()
 {
 
-   this.notificationData = { publisherId: "notify-ui", category: "Emergency", startDate: new Date()};
+   this.notificationData = { publisherId: "notify-ui", topic: "Emergency", startDate: new Date(), lastUpdated: new Date()};
 
    this.setNotification = function(notification)
    {
@@ -148,7 +148,7 @@ angular.module('hello', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap']).config(fun
 
   $scope.reset = function() {
 
-    $scope.notification = { category: "Emergency", startDate: new Date() };
+    $scope.notification = { topic: "Emergency", startDate: new Date() };
   }
 
   $scope.update = function(notification)
