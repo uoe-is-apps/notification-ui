@@ -10,7 +10,7 @@ import java.util.Date;
 /**
  * Created by rgood on 18/09/2015.
  */
-public class Notification {
+public class JsonNotification {
 
         private String notificationId;
 
