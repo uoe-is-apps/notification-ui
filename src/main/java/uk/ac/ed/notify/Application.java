@@ -49,7 +49,6 @@ import java.io.IOException;
  * Created by rgood on 18/09/2015.
  */
 @SpringBootApplication
-//@EnableZuulProxy
 @EntityScan("uk.ac.ed.notify.entity")
 @ComponentScan({"uk.ac.ed.notify"})
 @EnableOAuth2Resource
@@ -113,99 +112,4 @@ public class Application extends SpringBootServletInitializer {
         }
     }
 
-    /*@Value("${oauth.resource:http://localhost:8080}")
-    private String baseUrl;*/
-
-
-   /* @Component
-    @EnableOAuth2Sso
-    public static class LoginConfigurer extends OAuth2SsoConfigurerAdapter {
-
-        @Autowired
-        AuthenticationManager authenticationManager;
-
-       // @Autowired
-       // private UiUserDetailsService userDetailsService;
-
-        @Autowired
-        UiUserRepository uiUserRepository;
-
-        @Override
-        public void configure(HttpSecurity http) throws Exception {
-
-          //  RemoteUserAuthenticationFilter filter = new RemoteUserAuthenticationFilter();
-           // filter.setAuthenticationManager(authenticationManager);
-
-            http.logout().and().httpBasic().disable()
-                    .antMatcher("/**").authorizeRequests()
-                    .antMatchers("/notification/**", "/user").permitAll()
-                    //.antMatchers("/").hasRole("EMERGENCY")
-                    .anyRequest().authenticated().and().csrf().disable();
-                   /* .csrfTokenRepository(csrfTokenRepository()).and()
-                    .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);*/
-        //}
-
-       /* @Bean
-        public UserDetailsByNameServiceWrapper<OAuth2Authentication> userDetailsServiceWrapper() {
-            UserDetailsByNameServiceWrapper<OAuth2Authentication> wrapper =
-                    new UserDetailsByNameServiceWrapper<OAuth2Authentication>();
-            wrapper.setUserDetailsService(new UiUserDetailsService(uiUserRepository));
-            return wrapper;
-        }*/
-
-        /*@Bean
-        public PreAuthenticatedAuthenticationProvider preauthAuthProvider() {
-            PreAuthenticatedAuthenticationProvider preauthAuthProvider =
-                    new PreAuthenticatedAuthenticationProvider();
-            //preauthAuthProvider.setPreAuthenticatedUserDetailsService(userDetailsServiceWrapper());
-            return preauthAuthProvider;
-        }*/
-
-        /*@Bean
-        public RemoteUserAuthenticationFilter remoteUserAuthenticationFilter() throws Exception {
-            RemoteUserAuthenticationFilter filter = new RemoteUserAuthenticationFilter();
-            filter.setAuthenticationManager(authenticationManager);
-            return filter;
-        }*/
-
-
-      /*  private Filter csrfHeaderFilter() {
-            return new OncePerRequestFilter() {
-                @Override
-                protected void doFilterInternal(HttpServletRequest request,
-                                                HttpServletResponse response, FilterChain filterChain)
-                        throws ServletException, IOException {
-                    CsrfToken csrf = (CsrfToken) request
-                            .getAttribute(CsrfToken.class.getName());
-                    if (csrf != null) {
-                        Cookie cookie = new Cookie("XSRF-TOKEN",
-                                csrf.getToken());
-                        cookie.setPath("/");
-                        response.addCookie(cookie);
-                    }
-                    filterChain.doFilter(request, response);
-                }
-            };
-        }
-
-        private CsrfTokenRepository csrfTokenRepository() {
-            HttpSessionCsrfTokenRepository repository = new HttpSessionCsrfTokenRepository();
-            repository.setHeaderName("X-XSRF-TOKEN");
-            return repository;
-        }
-    }*/
-
-   /* @Bean
-    public OAuth2RestOperations restTemplate(OAuth2ClientContext oauth2ClientContext) {
-        return new OAuth2RestTemplate(resource(), oauth2ClientContext);
-    }*/
-
-   /* @Bean
-    protected OAuth2ProtectedResourceDetails resource() {
-        AuthorizationCodeResourceDetails resource = new AuthorizationCodeResourceDetails();
-        resource.setAccessTokenUri(tokenUrl);
-        resource.setUserAuthorizationUri(authorizeUrl);
-        resource.setClientId("my-trusted-client");
-        return resource ;
-    }*/
 }
