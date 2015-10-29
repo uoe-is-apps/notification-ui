@@ -1,5 +1,30 @@
+
+
 <h3>View emergency notifications</h3>
-<a href="#/edit-emergency-notification" class="btn btn-primary btn-md">Create Emergency Notification</a>
+
+<div ng-if="successMessage" id="successMessage" ng-cloak>
+    <!--  Save error occurred -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-success">
+                <strong>Sucess:</strong>  {{successMessage}}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div ng-if="errorMessage" id="errorMessage" ng-cloak>
+    <!--  system or patron error occurred -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                <strong>Warning:</strong>  {{errorMessage}}
+            </div>
+        </div>
+    </div>
+</div>
+
+<button type="button" ng-click="createNotification()" class="btn btn-primary btn-md">Create Emergency Notification</button>
 
 <div class="table-responsive">
     <table class="table" ng-if="notificationList" ng-cloak>
@@ -16,7 +41,7 @@
                 <td>{{notification.startDate}}</td>
                 <td>{{notification.endDate}}</td>
                 <td><button type="button" ng-click="editNotification(notification)" class="btn btn-warning">Edit</button></td>
-                <td><button type="button" ng-click="editNotification(notification)" class="btn btn-danger">Delete</button></td>
+                <td><button type="button" ng-click="deleteNotification(notification)" class="btn btn-danger">Delete</button></td>
             </tr>
         </tbody>
     </table>

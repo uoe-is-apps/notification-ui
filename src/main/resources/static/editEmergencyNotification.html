@@ -1,6 +1,6 @@
 <h3 >Create/Edit Emergency Notification:</h3>
 
-<div ng-if="successMessage" id="${n}error" ng-cloak>
+<div ng-if="successMessage" id="successMessage" ng-cloak>
     <!--  Save error occurred -->
     <div class="row">
         <div class="col-md-12">
@@ -11,7 +11,7 @@
     </div>
 </div>
 
-<div ng-if="errorMessage" id="${n}error" ng-cloak>
+<div ng-if="errorMessage" id="errorMessage" ng-cloak>
     <!--  system or patron error occurred -->
     <div class="row">
         <div class="col-md-12">
@@ -62,7 +62,7 @@
         <label class="col-sm-2 control-label">Start Date:</label>
         <div class="col-sm-10">
             <p class="input-group">
-                <input name="startDate" type="text" class="form-control" datepicker-popup="{{format}}" ng-model="notification.startDate" is-open="startDateStatus.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" required close-text="Close" />
+                <input name="startDate" type="text" class="form-control" datepicker-popup="{{format}}" ng-model="notification.startDate" is-open="startDateStatus.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
                 <span class="input-group-btn">
                     <button type="button" class="btn btn-default" ng-click="openStartDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
                 </span>
@@ -72,11 +72,11 @@
             </p>
         </div>
     </div>
-    <div class="form-group" ng-class="{ 'has-error': editNotificationForm.endDate.$touched && editNotificationForm.endDate.$invalid }">
+    <div class="form-group" ng-class="{ 'has-error': editNotificationForm.startDate.$touched && editNotificationForm.endDate.$invalid }">
         <label class="col-sm-2 control-label">End Date:</label>
         <div class="col-sm-10">
             <p class="input-group">
-                <input name="endDate" type="text" class="form-control" datepicker-popup="{{format}}" ng-model="notification.endDate" is-open="endDateStatus.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" required close-text="Close" />
+                <input name="endDate" type="text" class="form-control" datepicker-popup="{{format}}" ng-model="notification.endDate" is-open="endDateStatus.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
                 <span class="input-group-btn">
                     <button type="button" class="btn btn-default" ng-click="openEndDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
                 </span>

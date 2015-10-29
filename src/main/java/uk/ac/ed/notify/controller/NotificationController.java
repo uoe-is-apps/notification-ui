@@ -1,4 +1,4 @@
-package uk.ac.ed.notify;
+package uk.ac.ed.notify.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -85,19 +85,29 @@ public class NotificationController {
 
     @RequestMapping(value="/notification/", method=RequestMethod.POST)
     public @ResponseBody Notification setNotification(@RequestBody String notification) throws ServletException, JsonProcessingException {
-
-        System.out.println("I've been called");
-
-        System.out.println(notification);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
         HttpEntity request= new HttpEntity(notification, headers);
-
         ResponseEntity<Notification> response = restTemplate.exchange(notificationMsUrl + "/", HttpMethod.POST, request, Notification.class);
-        System.out.println("Got repsonse");
         return response.getBody();
 
+    }
+
+    @RequestMapping(value="/notification/{notification-id}",method=RequestMethod.PUT)
+    public void updateNotification(@PathVariable("notification-id") String notificationId, @RequestBody String notification) throws ServletException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity request= new HttpEntity(notification, headers);
+        ResponseEntity<Notification> response = restTemplate.exchange(notificationMsUrl + "/"+notificationId, HttpMethod.PUT, request, Notification.class);
+    }
+
+    @RequestMapping(value="/notification/{notification-id}",method=RequestMethod.DELETE)
+    public void deleteNotification(@PathVariable("notification-id") String notificationId) throws ServletException {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity request= new HttpEntity("", headers);
+        ResponseEntity<String> response = restTemplate.exchange(notificationMsUrl + "/"+notificationId, HttpMethod.DELETE, request, String.class);
     }
 
 }

@@ -15,7 +15,39 @@ angular.module('hello', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap']).config(fun
 	$httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 })
+.service("message", function ErrorMessage ($rootScope)
+{
 
+  this.successMessageData="";
+  this.errorMessageData="";
+
+  this.setSuccessMessage = function(message)
+  {
+    this.successMessageData = message;
+    $rootScope.$broadcast("successMessageUpdated");
+  }
+
+  this.successMessage = function()
+  {
+    return this.successMessageData;
+
+  }
+
+
+  this.setErrorMessage = function(message)
+  {
+      this.errorMessageData = message;
+       $rootScope.$broadcast("errorMessageUpdated");
+  }
+
+  this.errorMessage = function()
+  {
+      return this.errorMessageData;
+  }
+
+
+
+})
 .service("notification",function Notification()
 {
 
@@ -77,26 +109,67 @@ angular.module('hello', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap']).config(fun
 
 })
 
-.controller('listEmergencyNotificationController', function($rootScope,$scope, $http,$route,notification,$location) {
+.controller('listEmergencyNotificationController', function($rootScope,$scope, $http,$route,notification,message,$location) {
+
+
+    console.log("called listEmergencyController");
+    console.log(message.successMessage());
+    $scope.successMessage =
+    $scope.errorMessage = message.errorMessage();
+    $scope.$on('successMessageUpdated', function() {
+        $scope.successMessage = message.successMessage();
+
+      });
+    $scope.$on('errorMessageUpdated', function() {
+            $scope.errorMessage = message.errorMessage();
+
+          });
     $scope.route = $route;
     //$rootScope.getUser();
 	$http.get('notification/publisher/notify-ui').success(function(data) {
 		$scope.notificationList = data;
 	});
 
+	$scope.createNotification = function()
+	{
+	  newNotification = { publisherId: "notify-ui", topic: "Emergency", startDate: new Date(), lastUpdated: new Date()};
+	  message.setSuccessMessage("");
+      message.setErrorMessage("");
+	  notification.setNotification(newNotification);
+	  $location.path("/edit-emergency-notification");
+	}
+
 	$scope.editNotification = function(notificationToEdit)
 	{
+	   message.setSuccessMessage("");
+       message.setErrorMessage("");
 	   notification.setNotification(notificationToEdit);
 	   $location.path("/edit-emergency-notification");
 	};
 
+	$scope.deleteNotification = function(notification)
+    {
+
+        $http.delete("notification/"+notification.notificationId,notification)
+         .then(function successCallback(response)
+                        {
+                            message.setSuccessMessage("Notification Deleted");
+                            $http.get('notification/publisher/notify-ui').success(function(data) {
+                            		$scope.notificationList = data;
+                            	});
+                        },
+                        function errorCallback(response)
+                        {
+                            message.setErrorMessage("Error deleting notification:"+response.status+response.statusText);
+                        });
+
+    }
+
 })
 
-.controller('editEmergencyNotificationController', function($rootScope,$scope, $http,$route,notification) {
+.controller('editEmergencyNotificationController', function($rootScope,$scope, $http,$route,$location,message,notification) {
 
     $scope.route = $route;
-
-    //$rootScope.getUser();
 
     // Set up default notification
     $scope.notification = notification.notification();
@@ -153,12 +226,34 @@ angular.module('hello', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap']).config(fun
 
   $scope.update = function(notification)
   {
-    //TODO add validation on variables being set
-     $http.post("notification/",notification).then(function successCallback(response) {
-                                                 $scope.successMessage="Notification Saved";
+     if (notification.notificationId == null)
+     {
+        console.log("Insert called");
+        //TODO add validation on variables being set
+        $http.post("notification/",notification).then(function successCallback(response) {
+                                                 message.setSuccessMessage("Notification Saved");
+                                                 console.log(message.successMessage());
                                                }, function errorCallback(response) {
-                                                 $scope.errorMessage="Error saving notification:"+response.status+response.statusText;
+                                                 message.setErrorMessage("Error saving notification:"+response.status+response.statusText);
                                                });
+     }
+     else
+     {
+        console.log("Update called");
+        $http.put("notification/"+notification.notificationId,notification)
+                .then(function successCallback(response)
+                {
+                    message.setSuccessMessage("Notification Saved");
+                },
+                function errorCallback(response)
+                {
+                    message.setErrorMessage("Error saving notification:"+response.status+response.statusText);
+                });
+     }
+
+     $location.path("/");
+
+
   }
 
 });
