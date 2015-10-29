@@ -15,7 +15,6 @@
 <div ng-controller="navigation" class="container">
     <ul class="nav nav-pills" role="tablist">
         <li ng-class="{active:route.current.activetab=='emergency-notifications'}"><a href="#/">Emergency Notification</a></li>
-        <li ng-hide="authenticated" ><a href="login">login</a></li>
         <li ng-show="authenticated"><a href="" ng-click="logout()">logout</a></li>
     </ul>
 </div>
