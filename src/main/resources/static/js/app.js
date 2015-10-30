@@ -260,7 +260,6 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
      }
      else
      {
-        console.log("Update called");
         $http.put("notification/"+notification.notificationId,notification)
                 .then(function successCallback(response)
                 {
@@ -292,7 +291,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
            });
      $scope.route = $route;
 
- $http.get('/ui-users').success(function(data) {
+    $http.get('/ui-users').success(function(data) {
 		$scope.userList = data;
 	});
 
@@ -321,7 +320,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
                             {
                                 message.setSuccessMessage("User Deleted");
                                 $http.get('ui-users').success(function(data) {
-                                		$scope.notificationList = data;
+                                		$scope.userList = data;
                                 	});
                             },
                             function errorCallback(response)
