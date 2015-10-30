@@ -1,14 +1,15 @@
 package uk.ac.ed.notify.entity;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Created by rgood on 24/10/15.
  */
 @Entity
 @Table(name="NOTIFICATION_UI_USER_ROLES",schema = "NOTIFY")
+@NamedQueries({
+        @NamedQuery(name = "UiUserRole.findByUun", query = "select a from UiUserRole a where a.uiUserRoleId.uun = (?1)")
+})
 public class UiUserRole {
 
     @EmbeddedId

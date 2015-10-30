@@ -1,5 +1,3 @@
-<h3 >Create/Edit Emergency Notification:</h3>
-
 <div ng-if="successMessage" id="successMessage" ng-cloak>
     <!--  Save error occurred -->
     <div class="row">
@@ -21,72 +19,79 @@
         </div>
     </div>
 </div>
+<br/>
+<div class="panel panel-default panel-primary">
+    <div class="panel-heading">Create/Edit Emergency Notification</div>
+    <div class="panel-body">
+        <form name="editNotificationForm" novalidate class="form-horizontal">
 
-<form name="editNotificationForm" novalidate class="form-horizontal">
+            <input type="hidden" ng-model="notification.publisherId" value="notification-ui"/>
 
-    <input type="hidden" ng-model="notification.publisherId" value="notification-ui"/>
+            <div class="form-group" ng-class="{ 'has-error': editNotificationForm.title.$touched && editNotificationForm.title.$invalid }" >
+                <label class="col-sm-2 control-label">Title:</label>
+                <div class="col-sm-10">
+                    <input name="title" type="text" ng-model="notification.title" placeholder="Title" required>
+                    <p class="help-block" ng-show="editNotificationForm.title.$touched && editNotificationForm.title.$invalid">
+                        Title is required.
+                    </p>
+                </div>
+            </div>
 
-    <div class="form-group" ng-class="{ 'has-error': editNotificationForm.title.$touched && editNotificationForm.title.$invalid }" >
-        <label class="col-sm-2 control-label">Title:</label>
-        <div class="col-sm-10">
-            <input name="title" type="text" ng-model="notification.title" placeholder="Title" required>
-        <p class="help-block" ng-show="editNotificationForm.title.$touched && editNotificationForm.title.$invalid">
-                Title is required.
-        </p>
-        </div>
-    </div>
+            <div class="form-group" ng-class="{ 'has-error': editNotificationForm.notification-body.$touched && editNotificationForm.notification-body.$invalid }">
+                <label class="col-sm-2 control-label">Body:</label>
+                <div class="col-sm-10">
+                    <textarea name="notification-body" ng-model="notification.body" ckeditor="editorOptions" required></textarea>
 
-    <div class="form-group" ng-class="{ 'has-error': editNotificationForm.notification-body.$touched && editNotificationForm.notification-body.$invalid }">
-        <label class="col-sm-2 control-label">Body:</label>
-        <div class="col-sm-10">
-            <textarea name="notification-body" ng-model="notification.body" ckeditor="editorOptions" required></textarea>
-
-        <p class="help-block" ng-show="editNotificationForm.notification-body.$touched && editNotificationForm.notification-body.$invalid">
-            Notification Body is required.
-        </p>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label">URL:</label>
-        <div class="col-sm-10">
-            <input type="url" ng-model="notification.url" placeholder="URL">
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label">Topic:</label>
-        <div class="col-sm-10">
-            <input type="text" ng-model="notification.topic" required readonly>
-        </div>
-    </div>
-    <div class="form-group" ng-class="{ 'has-error': editNotificationForm.startDate.$touched && editNotificationForm.startDate.$invalid }">
-        <label class="col-sm-2 control-label">Start Date:</label>
-        <div class="col-sm-10">
-            <p class="input-group">
-                <input name="startDate" type="text" class="form-control" datepicker-popup="{{format}}" ng-model="notification.startDate" is-open="startDateStatus.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+                    <p class="help-block" ng-show="editNotificationForm.notification-body.$touched && editNotificationForm.notification-body.$invalid">
+                        Notification Body is required.
+                    </p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">URL:</label>
+                <div class="col-sm-10">
+                    <input type="url" ng-model="notification.url" placeholder="URL">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Topic:</label>
+                <div class="col-sm-10">
+                    <input type="text" ng-model="notification.topic" required readonly>
+                </div>
+            </div>
+            <div class="form-group" ng-class="{ 'has-error': editNotificationForm.startDate.$touched && editNotificationForm.startDate.$invalid }">
+                <label class="col-sm-2 control-label">Start Date:</label>
+                <div class="col-sm-10">
+                    <p class="input-group">
+                        <input name="startDate" type="text" class="form-control" datepicker-popup="{{format}}" ng-model="notification.startDate" is-open="startDateStatus.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
                 <span class="input-group-btn">
                     <button type="button" class="btn btn-default" ng-click="openStartDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
                 </span>
-                <p class="help-block" ng-show="editNotificationForm.startDate.$touched && editNotificationForm.startDate.$invalid">
-                    Start Date is required.
-                </p>
-            </p>
-        </div>
-    </div>
-    <div class="form-group" ng-class="{ 'has-error': editNotificationForm.startDate.$touched && editNotificationForm.endDate.$invalid }">
-        <label class="col-sm-2 control-label">End Date:</label>
-        <div class="col-sm-10">
-            <p class="input-group">
-                <input name="endDate" type="text" class="form-control" datepicker-popup="{{format}}" ng-model="notification.endDate" is-open="endDateStatus.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+                    <p class="help-block" ng-show="editNotificationForm.startDate.$touched && editNotificationForm.startDate.$invalid">
+                        Start Date is required.
+                    </p>
+                    </p>
+                </div>
+            </div>
+            <div class="form-group" ng-class="{ 'has-error': editNotificationForm.startDate.$touched && editNotificationForm.endDate.$invalid }">
+                <label class="col-sm-2 control-label">End Date:</label>
+                <div class="col-sm-10">
+                    <p class="input-group">
+                        <input name="endDate" type="text" class="form-control" datepicker-popup="{{format}}" ng-model="notification.endDate" is-open="endDateStatus.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
                 <span class="input-group-btn">
                     <button type="button" class="btn btn-default" ng-click="openEndDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
                 </span>
-                <p class="help-block" ng-show="editNotificationForm.endDate.$touched && editNotificationForm.endDate.$invalid">
-                End Date is required.
-                </p>
-            </p>
-        </div>
-    </div>
-    <input type="button" ng-click="reset()" value="Reset" class="btn btn-warning"/>
-    <input type="submit" ng-disabled="editNotificationForm.$invalid" ng-click="update(notification)" class="btn btn-primary" value="Save" />
+                    <p class="help-block" ng-show="editNotificationForm.endDate.$touched && editNotificationForm.endDate.$invalid">
+                        End Date is required.
+                    </p>
+                    </p>
+                </div>
+            </div>
+            <input type="button" ng-click="reset()" value="Reset" class="btn btn-warning"/>
+            <input type="submit" ng-disabled="editNotificationForm.$invalid" ng-click="update(notification)" class="btn btn-primary" value="Save" />
 
-</form>
+        </form>
+    </div>
+</div>
+
+

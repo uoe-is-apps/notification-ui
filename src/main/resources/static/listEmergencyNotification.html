@@ -1,7 +1,5 @@
 
 
-<h3>View emergency notifications</h3>
-
 <div ng-if="successMessage" id="successMessage" ng-cloak>
     <!--  Save error occurred -->
     <div class="row">
@@ -24,25 +22,47 @@
     </div>
 </div>
 
-<button type="button" ng-click="createNotification()" class="btn btn-primary btn-md">Create Emergency Notification</button>
 
-<div class="table-responsive">
-    <table class="table" ng-if="notificationList" ng-cloak>
-        <thead>
-            <th>Notification Title</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th></th>
-            <th></th>
-        </thead>
-        <tbody>
-            <tr ng-repeat="notification in notificationList">
-                <td>{{notification.title}}</td>
-                <td>{{notification.startDate}}</td>
-                <td>{{notification.endDate}}</td>
-                <td><button type="button" ng-click="editNotification(notification)" class="btn btn-warning">Edit</button></td>
-                <td><button type="button" ng-click="deleteNotification(notification)" class="btn btn-danger">Delete</button></td>
-            </tr>
-        </tbody>
-    </table>
+
+<br/>
+<div class="panel panel-default panel-primary">
+    <div class="panel-heading">Create new notification</div>
+    <div class="panel-body">
+        <button type="button" ng-click="createNotification()" class="btn btn-primary btn-md">Create Emergency Notification</button>
+    </div>
 </div>
+
+<div class="panel panel-default panel-primary">
+    <div class="panel-heading">Edit/Delete existing notifications</div>
+    <div class="panel-body">
+        <div ng-if="!notificationList" class="progress">
+            <div class="progress-bar progress-bar-striped active" role="progressbar"
+                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                Loading
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table" ng-if="notificationList" ng-cloak>
+                <thead>
+                <th>Notification Title</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th></th>
+                <th></th>
+                </thead>
+                <tbody>
+                <tr ng-repeat="notification in notificationList">
+                    <td>{{notification.title}}</td>
+                    <td>{{notification.startDate}}</td>
+                    <td>{{notification.endDate}}</td>
+                    <td><button type="button" ng-click="editNotification(notification)" class="btn btn-warning">Edit</button></td>
+                    <td><button type="button" ng-click="deleteNotification(notification)" class="btn btn-danger">Delete</button></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
