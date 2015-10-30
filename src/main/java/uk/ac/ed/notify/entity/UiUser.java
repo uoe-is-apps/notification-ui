@@ -34,4 +34,5 @@ public class UiUser {
     public void setUiRoles(Collection<UiRole> uiRoles) {
         this.uiRoles = uiRoles;
     }
+
 }
