@@ -123,8 +123,8 @@ public class Office365ApiService {
                     "  }                                                                                                                ";                
         */
         
-        callbackUrl = "https://www-test.myed.ed.ac.uk/BlackboardVCPortlet/callback";
-        //callbackUrl = "https://dev.notifyadm.is.ed.ac.uk1/office365NewEmailCallback11/";
+        //callbackUrl = "https://www-test.myed.ed.ac.uk/BlackboardVCPortlet/callback";
+        callbackUrl = "https://dev.notifyadm.is.ed.ac.uk1/office365NewEmailCallback/";
         
         String input = 
                     "  {                                                                                                                " +
