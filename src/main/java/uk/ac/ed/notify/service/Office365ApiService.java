@@ -124,7 +124,7 @@ public class Office365ApiService {
         */
         
         //callbackUrl = "https://www-test.myed.ed.ac.uk/BlackboardVCPortlet/callback";
-        callbackUrl = "https://dev.notifyadm.is.ed.ac.uk/office365NewEmailCallback/";
+        //callbackUrl = "https://dev.notifyadm.is.ed.ac.uk/office365NewEmailCallback/";
         
         String input = 
                     "  {                                                                                                                " +
@@ -154,7 +154,7 @@ ChangeType	changeType                      ChangeType
             
             String json = httpOperationService.post(token, url, input);
             System.out.println("success " + json); 
-            logger.debug("success " + input);       
+            logger.debug("success " + json);       
         }catch(Exception e){
             e.printStackTrace();
             logger.error("e " + e.toString());       

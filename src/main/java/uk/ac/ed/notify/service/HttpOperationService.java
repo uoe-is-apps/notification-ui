@@ -29,6 +29,8 @@ public class HttpOperationService {
             con.setRequestProperty("User-Agent","Testing/1.0 abc/1.1");
             con.setRequestProperty("Authorization","Bearer "+token);
 
+            logger.debug("get, server response code - " + con.getResponseCode());
+            
             if (con.getResponseCode() != 200) {
                 throw new RuntimeException("Failed : HTTP error code : "
                         + con.getResponseCode());
@@ -65,7 +67,7 @@ public class HttpOperationService {
                 throw new RuntimeException("Failed : HTTP error code : " + con.getResponseCode());
             }
 
-            System.out.println("server response code - " + con.getResponseCode());
+            logger.debug("post, server response code - " + con.getResponseCode());
             
             BufferedReader br = new BufferedReader(new InputStreamReader((con.getInputStream())));
             String output = "";
@@ -96,6 +98,8 @@ public class HttpOperationService {
             os.write(input.getBytes());
             os.flush();
 
+            logger.debug("delete, server response code - " + con.getResponseCode());
+            
             if (con.getResponseCode() != HttpURLConnection.HTTP_CREATED && con.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new RuntimeException("Failed : HTTP error code : " + con.getResponseCode());
             }
