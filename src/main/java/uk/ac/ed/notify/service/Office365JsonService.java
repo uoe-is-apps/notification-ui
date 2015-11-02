@@ -32,8 +32,8 @@ public class Office365JsonService {
          if(array.length() == 1){ //should always be 1
              office365Subscription = new Office365Subscription();
              
-             String id = ((JSONObject)array.get(0)).get("SubscriptionId").toString();  
-             String expiryDate = ((JSONObject)array.get(0)).get("SubscriptionExpirationTime").toString();  
+             String id = ((JSONObject)array.get(0)).get("subscriptionId").toString();   //SubscriptionId
+             String expiryDate = ((JSONObject)array.get(0)).get("subscriptionExpirationDateTime").toString();  //SubscriptionExpirationTime
              
              office365Subscription.setSubscriptionId(id);
              office365Subscription.setSubscriptionExpiry((new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).parse(expiryDate)); //"2015-10-23T10:32:23.0363654Z"
@@ -50,7 +50,7 @@ public class Office365JsonService {
          JSONObject jsonObj = new JSONObject(json);
          JSONArray array = jsonObj.getJSONArray("value");
          if(array.length() == 1){ //should always be 1
-             String entity = ((JSONObject)array.get(0)).get("Entity").toString();   
+             String entity = ((JSONObject)array.get(0)).get("resourceData").toString();  //Entity
              id = new JSONObject(entity).get("Id").toString();
          }
          
