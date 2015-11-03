@@ -1,0 +1,50 @@
+<div ng-if="successMessage" id="successMessage" ng-cloak>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-success">
+                <strong>Success:</strong>  {{successMessage}}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div ng-if="errorMessage" id="errorMessage" ng-cloak>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                <strong>Warning:</strong>  {{errorMessage}}
+            </div>
+        </div>
+    </div>
+</div>
+
+<br/>
+<div class="panel panel-default uoe-overview-high">
+    <div class="panel-heading">Create/Edit User</div>
+    <div class="panel-body">
+        <form name="editUserForm" novalidate class="form-horizontal">
+
+            <div class="form-group" ng-class="{ 'has-error': editUserForm.uun.$touched && editUserForm.uun.$invalid }" >
+                <label class="col-sm-2 control-label">UUN:</label>
+                <div class="col-sm-10">
+                    <input name="uun" type="text" ng-model="user.uun" placeholder="UUN" ng-required="true"/>
+                    <p class="help-block" ng-show="editUserForm.uun.$touched && editUserForm.uun.$invalid">
+                        UUN is required.
+                    </p>
+                </div>
+            </div>
+
+            <div ng-repeat="role in roles" class="form-group" >
+                <label class="col-sm-2 control-label">{{role.roleDescription}}</label>
+
+                <div  class="col-sm-10">
+                    <input type="checkbox" checklist-model="user.uiRoles" checklist-value="role">
+                </div>
+            </div>
+
+            <input type="button" ng-click="reset()" value="Reset" class="btn btn-warning"/>
+            <input type="submit" ng-disabled="editUserForm.$invalid" ng-click="update(user)" class="btn btn-primary" value="Save" />
+
+        </form>
+    </div>
+</div>
