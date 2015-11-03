@@ -70,10 +70,12 @@ public class Application extends SpringBootServletInitializer {
                     .authenticationProvider(
                             preauthAuthProvider())
                     .csrf().disable()
-                    .authorizeRequests().anyRequest().authenticated()
+                    .authorizeRequests()
+                    .antMatchers("/office365NewEmailCallback/**","/office365NewSubscriptionCallback/**","/office365RenewSubscriptionCallback/**").permitAll()
+                    .anyRequest().authenticated()
             .antMatchers("/").hasRole("EMERGENCY");
         }
-
+        
         @Autowired
         public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
             auth.authenticationProvider(preauthAuthProvider());
