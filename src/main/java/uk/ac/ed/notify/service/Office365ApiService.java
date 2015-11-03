@@ -252,9 +252,8 @@ ChangeType	changeType                      ChangeType
     }    
     
     
-    public void deleteSubscriptionById(String token){
-        try {
-            String id = "REE3Mzk1RTAtNzI1Mi00QTEyLTk5MkItQThGNTBCQzZFQTQ4XzMzQkFDRkM5LURDNzEtNDNCNS1CMDE4LUJDNERFRDBFNDI5Nw==";
+    public void deleteSubscriptionById(String token, String id){
+        try {            
             String url = "https://outlook.office365.com/api/v1.0/users/" + account + "/subscriptions/" + id + "";            
             httpOperationService.delete(token, url);
         }catch(Exception e){

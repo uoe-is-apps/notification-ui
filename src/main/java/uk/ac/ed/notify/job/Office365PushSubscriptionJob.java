@@ -27,10 +27,10 @@ public class Office365PushSubscriptionJob implements Job {
     
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        //if(true) return;
+        if(true) return;
         logger.debug("Office365PullJob");        
                 
-        String token = office365ApiService.acquireAccessToken();    
+        String token = office365ApiService.acquireAccessToken();  
         logger.debug("token - " + token);        
         //if no previous subscription, subscribe
         if(office365Repository.count() == 0){
