@@ -28,7 +28,7 @@ public class Office365PushSubscriptionJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         //if(true) return;
-        logger.debug("Office365PullJob");        
+        logger.debug("Office365PullJob");         
                 
         String token = office365ApiService.acquireAccessToken();  
         logger.debug("token - " + token);        
@@ -46,6 +46,7 @@ public class Office365PushSubscriptionJob implements Job {
             
             logger.debug("create new subscription now");
             office365ApiService.subscribeToNotification(token);
+            logger.debug("success");
             
             /*
             logger.debug("prevous subscription found, renew now");     
