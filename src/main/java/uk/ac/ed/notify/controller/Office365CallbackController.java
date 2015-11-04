@@ -42,8 +42,7 @@ public class Office365CallbackController {
     {
         
         logger.debug("office365NewEmailCallback request - " + request); 
-        
-        
+                
         String validationtoken = request.getParameter("validationtoken");
         if(validationtoken != null && validationtoken.length() > 0){ //1st time callback validation from office365
             response.setStatus(HttpServletResponse.SC_OK);            
@@ -52,7 +51,7 @@ public class Office365CallbackController {
             response.getWriter().flush();
             response.getWriter().close();
             
-            logger.debug("1st time callback validation from office365 - " + validationtoken);
+            logger.debug("1st time callback validation from office365 - " + validationtoken + " " + response.getStatus());
         }else{
             String json = getBody(request);
             logger.debug("office365NewEmailCallback json - " + json); 
