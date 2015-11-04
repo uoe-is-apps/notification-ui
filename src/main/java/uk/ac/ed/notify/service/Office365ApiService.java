@@ -325,9 +325,12 @@ Final version
             //works in fiddler
             url = "https://outlook.office.com/api/beta/users/" + account + "/subscriptions/" + id + ""; //ODYzNUJEMjQtRDJFMi00RDA3LTlENUYtNjZBMzExMkYwN0VEXzQ1MTU4OEJFLTczQzQtNDBFOS1BN0E1LUYyOTdENkEzM0NBMQ=="
             
-            
+             
             System.out.println(url);
             httpOperationService.delete(token, url);
+            
+            office365Repository.delete(id);
+            
         }catch(Exception e){
             e.printStackTrace();
             logger.error(e.toString());

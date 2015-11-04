@@ -122,7 +122,9 @@ success
 
             logger.debug("delete, server response code - " + con.getResponseCode());
             
-            if (con.getResponseCode() != HttpURLConnection.HTTP_CREATED && con.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            if (con.getResponseCode() != HttpURLConnection.HTTP_CREATED 
+                    && con.getResponseCode() != HttpURLConnection.HTTP_OK 
+                    && con.getResponseCode() != HttpURLConnection.HTTP_NO_CONTENT ) {
                 throw new RuntimeException("Failed : HTTP error code : " + con.getResponseCode());
             }
             con.disconnect();               

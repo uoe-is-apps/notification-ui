@@ -37,6 +37,16 @@ public class Office365PushSubscriptionJob implements Job {
             logger.debug("no prevous subscription found, subscribe now");       
             office365ApiService.subscribeToNotification(token);
         }else{//if found previous subscription, renew
+            logger.debug("prevous subscription found, delete it now");     
+            Iterable<Office365Subscription> existingSubscriptions = office365Repository.findAll();
+            if(existingSubscriptions.iterator().hasNext()){
+                Office365Subscription office365Subscription = existingSubscriptions.iterator().next();              
+                office365ApiService.deleteSubscriptionById(token, office365Subscription.getSubscriptionId());
+            }
+            
+            logger.debug("create new subscription now");
+            office365ApiService.subscribeToNotification(token);
+            
             /*
             logger.debug("prevous subscription found, renew now");     
             Iterable<Office365Subscription> existingSubscriptions = office365Repository.findAll();

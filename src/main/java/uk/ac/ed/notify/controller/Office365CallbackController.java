@@ -34,9 +34,6 @@ public class Office365CallbackController {
     Office365Repository office365Repository;
     
     
-    //@RequestMapping(value="/csvDownload" , method = RequestMethod.POST)
-    //public void csvDownload(HttpServletRequest request, HttpServletResponse response)    
-    
     @RequestMapping(value="/office365NewEmailCallback/", method=RequestMethod.POST)
     public void office365NewEmailCallback(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
