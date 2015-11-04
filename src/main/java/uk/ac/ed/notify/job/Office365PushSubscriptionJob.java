@@ -48,7 +48,7 @@ public class Office365PushSubscriptionJob implements Job {
             office365ApiService.subscribeToNotification(token);
             logger.debug("success");
             
-            /*
+            /* delete later, renew API is broken on office 365
             logger.debug("prevous subscription found, renew now");     
             Iterable<Office365Subscription> existingSubscriptions = office365Repository.findAll();
             if(existingSubscriptions.iterator().hasNext()){

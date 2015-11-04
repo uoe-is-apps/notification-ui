@@ -53,6 +53,7 @@ public class Office365CallbackController {
             String json = getBody(request);
             logger.debug("office365NewEmailCallback json - " + json); 
 
+            /* delete later, office 365 is no longer use Acknowledgment callback to return subscription id
             if(json.indexOf("Acknowledgment") != -1){
                 logger.debug("office365NewSubscriptionCallback - " + json);
 
@@ -66,6 +67,12 @@ public class Office365CallbackController {
                 logger.debug("newEmailId - " + newEmailId);
                 office365ApiService.processEmailById(token, newEmailId);
             }
+            */
+            
+            String token = office365ApiService.acquireAccessToken();             
+            String newEmailId = office365JsonService.parseOffice365NewEmailCallbackEmailId(json);
+            logger.debug("newEmailId - " + newEmailId);
+            office365ApiService.processEmailById(token, newEmailId);
         }
         
         

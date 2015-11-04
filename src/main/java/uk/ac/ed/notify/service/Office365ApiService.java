@@ -290,13 +290,25 @@ Final version
     
     public void processEmailById(String token, String id){
         try {
-            //String id = "AAMkADMzYmFjZmM5LWRjNzEtNDNiNS1iMDE4LWJjNGRlZDBlNDI5NwBGAAAAAADQ1fbd9u-oS6EUMm8vRMp5BwCfJe3G2ZDPT54eZMk1kgk2AAAAAAEMAACfJe3G2ZDPT54eZMk1kgk2AAAATKXbAAA=";
+            
             String url = "https://outlook.office365.com/api/v1.0/users/" + account + "/folders/inbox/messages/" + id;
+            
+            logger.debug("processEmailById - " + id);
             
             String json = httpOperationService.get(token, url);            
             Notification notification = office365JsonService.parseNotification(json);
            
-            notificationRepository.save(notification);           
+            logger.debug("notification from email - " + notification);
+            
+            String publisherId = notification.getPublisherId();
+            String publisherNotificationId = notification.getPublisherNotificationId();
+            String uun = notification.getUun();
+            if(notificationRepository.findByPublisherIdAndPublisherNotificationIdAndUun(publisherId, publisherNotificationId, uun).size() == 0){
+                logger.debug("notification not exist in db, save");
+                notificationRepository.save(notification);    
+            }else{
+                logger.debug("existing notification found, ignore");
+            }         
         }catch(Exception e){
             e.printStackTrace();
             logger.error(e.toString());
