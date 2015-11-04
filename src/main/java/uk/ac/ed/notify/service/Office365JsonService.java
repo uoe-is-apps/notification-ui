@@ -37,6 +37,7 @@ public class Office365JsonService {
              
              office365Subscription.setSubscriptionId(id);
              office365Subscription.setSubscriptionExpiry((new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).parse(expiryDate)); //"2015-10-23T10:32:23.0363654Z"
+             office365Subscription.setSubscriptionRenew(new Date());
          }
          }catch(Exception e){
              e.printStackTrace();

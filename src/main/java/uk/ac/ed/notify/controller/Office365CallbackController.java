@@ -38,27 +38,44 @@ public class Office365CallbackController {
     //public void csvDownload(HttpServletRequest request, HttpServletResponse response)    
     
     @RequestMapping(value="/office365NewEmailCallback/", method=RequestMethod.POST)
-    public void office365NewEmailCallback(HttpServletRequest request, HttpServletResponse response) throws IOException
+    public HttpServletResponse office365NewEmailCallback(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
-        logger.debug("office365NewEmailCallback request - " + request); 
-        String json = getBody(request);
-        logger.debug("office365NewEmailCallback json - " + json); 
         
-        if(json.indexOf("Acknowledgment") != -1){
-            logger.debug("office365NewSubscriptionCallback - " + json);
-                  
-            Office365Subscription newSubscription = office365JsonService.parseOffice365NewSubscriptionCallbackSubscriptionId(json); 
-            logger.debug("newSubscription - " + newSubscription);
-            office365Repository.save(newSubscription);
-            logger.debug("subscription successful");
-        }else{        
-            String token = office365ApiService.acquireAccessToken();             
-            String newEmailId = office365JsonService.parseOffice365NewEmailCallbackEmailId(json);
-            logger.debug("newEmailId - " + newEmailId);
-            office365ApiService.processEmailById(token, newEmailId);
+        logger.debug("office365NewEmailCallback request - " + request); 
+        
+        
+        String validationtoken = request.getParameter("validationtoken");
+        if(validationtoken != null && validationtoken.length() > 0){ //1st time callback validation from office365
+            response.setStatus(HttpServletResponse.SC_OK);            
+            response.setHeader("Content-Type", "plain/text");            
+            response.getWriter().write(validationtoken);
+            response.getWriter().flush();
+            response.getWriter().close();
+            
+            logger.debug("1st time callback validation from office365 - " + validationtoken);
+        }else{
+            String json = getBody(request);
+            logger.debug("office365NewEmailCallback json - " + json); 
+
+            if(json.indexOf("Acknowledgment") != -1){
+                logger.debug("office365NewSubscriptionCallback - " + json);
+
+                Office365Subscription newSubscription = office365JsonService.parseOffice365NewSubscriptionCallbackSubscriptionId(json); 
+                logger.debug("newSubscription - " + newSubscription);
+                office365Repository.save(newSubscription);
+                logger.debug("subscription successful");
+            }else{        
+                String token = office365ApiService.acquireAccessToken();             
+                String newEmailId = office365JsonService.parseOffice365NewEmailCallbackEmailId(json);
+                logger.debug("newEmailId - " + newEmailId);
+                office365ApiService.processEmailById(token, newEmailId);
+            }
         }
+        
+        return response;
     }    
     
+    /*
     @RequestMapping(value="/office365NewSubscriptionCallback/", method=RequestMethod.POST)
     public @ResponseBody void office365NewSubscriptionCallback(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
@@ -81,7 +98,7 @@ public class Office365CallbackController {
         office365Repository.deleteAll();
         office365Repository.save(newSubscription);
     }    
-    
+    */
     
     public String getBody(HttpServletRequest request) throws java.io.IOException {
         String body = null;

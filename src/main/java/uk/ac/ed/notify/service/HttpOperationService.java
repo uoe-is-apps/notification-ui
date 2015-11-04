@@ -5,10 +5,24 @@
 package uk.ac.ed.notify.service;
 
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -106,5 +120,70 @@ public class HttpOperationService {
             con.disconnect();               
     }
         
+    
+    public void patch(String token, String url){
+
+        try {
+            HttpClient httpclient = HttpClients.createDefault();
+            
+            org.apache.http.client.methods.HttpPatch httppatch = new org.apache.http.client.methods.HttpPatch();
+            httppatch.setURI(new URI(url));
+        
+            httppatch.setHeader("Accept","application/json"); 
+            httppatch.setHeader("Content-Type", "application/json");
+            httppatch.setHeader("User-Agent","Testing/1.0 abc/1.1");
+            httppatch.setHeader("Authorization","Bearer "+token);             
+          
+            
+            //List<NameValuePair> params = new ArrayList<NameValuePair>(2);
+            //params.add(new BasicNameValuePair("", ""));
+            //httppatch.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+            
+            
+            HttpResponse response = httpclient.execute(httppatch);
+            HttpEntity entity = response.getEntity();
+
+            if (entity != null) {                
+                InputStream is = entity.getContent();
+                StringBuilder sb = new StringBuilder();
+                try {
+                    System.out.println("ok");
+                    
+                    BufferedReader br = null;
+                    String line;
+                    try {
+
+                            br = new BufferedReader(new InputStreamReader(is));
+                            while ((line = br.readLine()) != null) {
+                                    sb.append(line);
+                            }
+
+                    } catch (IOException e) {
+                            e.printStackTrace();
+                    } finally {
+                            if (br != null) {
+                                    try {
+                                            br.close();
+                                    } catch (IOException e) {
+                                            e.printStackTrace();
+                                    }
+                            }
+                    }
+                    
+                    
+                } finally {
+                    is.close();
+                }
+                
+                System.out.println(sb.toString());
+            }            
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+
+        
+    }
     
 }

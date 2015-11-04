@@ -71,7 +71,7 @@ public class Application extends SpringBootServletInitializer {
                             preauthAuthProvider())
                     .csrf().disable()
                     .authorizeRequests()
-                    .antMatchers("/office365NewEmailCallback/**","/office365NewSubscriptionCallback/**","/office365RenewSubscriptionCallback/**").permitAll()
+                    .antMatchers("/office365NewEmailCallback/**").permitAll()
                     .anyRequest().authenticated()
             .antMatchers("/").hasRole("EMERGENCY");
         }

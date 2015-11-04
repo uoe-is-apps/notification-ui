@@ -162,8 +162,31 @@ ChangeType	changeType                      ChangeType
 
     }
         
+    /*
+Interim version     
+{
+     @odata.type:"#Microsoft.OutlookServices.PushSubscription",
+     subscriptionExpirationDateTime: "2015-10-24T20:00:00.0Z"
+ } 
+  
+{"@odata.type":"#Microsoft.OutlookServices.PushSubscription", "subscriptionExpirationDateTime": "2015-11-08T17:17:45.9028722Z"}       
+{"@odata.type":"#Microsoft.OutlookServices.PushSubscription", "subscriptionExpirationDateTime": "2015-11-08T20:00:00.0Z"}  
+{"@odata.type":"#Microsoft.OutlookServices.PushSubscription", "subscriptionExpirationDateTime": "2015-11-08T20:00:00.0Z"}  
+     
+Final version  
+ {
+   @odata.type:"#Microsoft.OutlookServices.PushSubscription",
+   SubscriptionExpirationDateTime: "2015-10-24T20:00:00.0Z"
+ } 
+     */
     
     public void renewSubscriptionToNotification(String token, String subscriptionId){
+        if(true){
+            deleteSubscriptionById(token, subscriptionId);
+            return;
+        }
+        
+        
         try {
             
             //subscript result json
@@ -179,11 +202,20 @@ ChangeType	changeType                      ChangeType
             //String subscriptionId = "MjNEMEUzNUQtNDU0MC00OUJDLUEyNDYtNDI3NDE1MDc5ODhGXzMzQkFDRkM5LURDNzEtNDNCNS1CMDE4LUJDNERFRDBFNDI5Nw==";
             //String subscriptionId = readSubscriptionId();
             String url = "https://outlook.office.com/api/beta/users/" + account + "/subscriptions/" + subscriptionId + "/renew";
-            String json  = "  {}  ";            
-            httpOperationService.post(token, url, json);
+            
+            System.out.println("renew url - " + url);
+                      
+            //String json  = "  {  \"@odata.type\":\"#Microsoft.OutlookServices.PushSubscription\", \"subscriptionExpirationDateTime\": \"2015-11-04T20:00:00.0Z\"}  ";   
+            //System.out.println(json);
+            
+            
+            //httpOperationService.post(token, url, json);
+            //{"error":{"code":"RequestBrokerOld-ParseUri","message":"Resource not found for the segment 'renew'."}}
+            
+            httpOperationService.patch(token, url);
+            
     
         }catch(Exception e){
-            e.printStackTrace();
             logger.error(e.toString());
         }         
     }    
@@ -254,7 +286,13 @@ ChangeType	changeType                      ChangeType
     
     public void deleteSubscriptionById(String token, String id){
         try {            
-            String url = "https://outlook.office365.com/api/v1.0/users/" + account + "/subscriptions/" + id + "";            
+            String url = "https://outlook.office365.com/api/v1.0/users/" + account + "/subscriptions/" + id + "";       
+            
+            //works in fiddler
+            url = "https://outlook.office.com/api/beta/users/" + account + "/subscriptions/" + id + ""; //ODYzNUJEMjQtRDJFMi00RDA3LTlENUYtNjZBMzExMkYwN0VEXzQ1MTU4OEJFLTczQzQtNDBFOS1BN0E1LUYyOTdENkEzM0NBMQ=="
+            
+            
+            System.out.println(url);
             httpOperationService.delete(token, url);
         }catch(Exception e){
             e.printStackTrace();
