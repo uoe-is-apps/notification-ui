@@ -126,6 +126,8 @@ public class Office365ApiService {
         //callbackUrl = "https://www-test.myed.ed.ac.uk/BlackboardVCPortlet/callback";
         //callbackUrl = "https://dev.notifyadm.is.ed.ac.uk/office365NewEmailCallback/";
         
+        
+        /*
         String input = 
                     "  {                                                                                                                " +
                     "  \"@odata.type\":\"#Microsoft.OutlookServices.PushSubscription\",                                                 " +           
@@ -135,7 +137,19 @@ public class Office365ApiService {
                     "  \"subscriptionExpirationDateTime\": \"2015-11-02T18:40:00.0Z\",                                                  " +
                     "  \"context\": \"" + clientState + "\"                                                                             " +
                     "  }                                                                                                                ";     
-
+        */
+        
+        String input = 
+                    "  {                                                                                                                " +
+                    "  \"@odata.type\":\"#Microsoft.OutlookServices.PushSubscription\",                                                 " +           
+                    //"  \"Resource\": \"https://outlook.office.com/api/beta/users/" + account + "/folders/inbox/messages\",              " +
+                    "  \"Resource\": \"https://outlook.office.com/api/beta/users/" + account + "/messages\",              " +
+                    "  \"NotificationURL\": \"" + callbackUrl + "\",                                                                    " +
+                    "  \"ChangeType\": \"Created\",                                                                                     " +
+                    "  \"SubscriptionExpirationDateTime\": \"2015-11-02T18:40:00.0Z\",                                                  " +
+                    "  \"ClientState\": \"" + clientState + "\"                                                                             " +
+                    "  }                                                                                                                ";    
+        
         /*
         //http://blogs.msdn.com/b/exchangedev/archive/2015/10/21/outlook-rest-api-changes-to-beta-endpoint-part-iii.aspx        
 Current         Interim                         Final
@@ -154,7 +168,27 @@ ChangeType	changeType                      ChangeType
             
             String json = httpOperationService.post(token, url, input);
             System.out.println("success " + json); 
-            logger.debug("success " + json);       
+            logger.debug("success " + json);     
+            
+            
+            logger.debug("office365NewSubscriptionCallback - " + json);
+
+            //2015-11-04 14:14:54.711 DEBUG 17168 --- [ryBean_Worker-3] u.a.e.n.service.HttpOperationService     : post, server response code - 201
+            //server output: 
+            //{"@odata.context":"https://outlook.office.com/api/beta/$metadata#Users('scotapps%40scotapps.onmicrosoft.com')/Subscriptions/$entity",
+            //"@odata.type":"#Microsoft.OutlookServices.PushSubscription",
+            //"@odata.id":"https://outlook.office.com/api/beta/Users('scotapps@scotapps.onmicrosoft.com')/Subscriptions('QkRDMjgwQUEtQjExNi00NjA5LTkyMjAtMEJFOTVBQTNCQjU3XzQ1MTU4OEJFLTczQzQtNDBFOS1BN0E1LUYyOTdENkEzM0NBMQ==')",
+            //"Id":"QkRDMjgwQUEtQjExNi00NjA5LTkyMjAtMEJFOTVBQTNCQjU3XzQ1MTU4OEJFLTczQzQtNDBFOS1BN0E1LUYyOTdENkEzM0NBMQ==",
+            //"Resource":"https://outlook.office.com/api/beta/users/scotapps@scotapps.onmicrosoft.com/messages","ChangeType":"Created, Acknowledgment, Missed","ClientState":"c75831bd-fad3-4191-9a66-280a48528679","NotificationURL":"https://dev.notifyadm.is.ed.ac.uk/office365NewEmailCallback/",
+            //"SubscriptionExpirationDateTime":"2015-11-07T14:14:54.4142775Z"}
+            //success  
+            
+            
+            Office365Subscription newSubscription = office365JsonService.parseOffice365NewSubscriptionCallbackSubscriptionId(json); 
+            logger.debug("newSubscription - " + newSubscription);
+            office365Repository.save(newSubscription);
+            logger.debug("subscription saved successfully");        
+                    
         }catch(Exception e){
             e.printStackTrace();
             logger.error("e " + e.toString());       
