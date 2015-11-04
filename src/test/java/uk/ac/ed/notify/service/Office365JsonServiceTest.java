@@ -18,7 +18,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ed.notify.TestApplication;
 import uk.ac.ed.notify.entity.Notification;
 
-public class Office365JsonServiceTest {}
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = TestApplication.class)
+public class Office365JsonServiceTest {
+    @Test
+    public void parseNotification(){
+        assertEquals(1, 1);
+    }
+}
 
 /*
 @RunWith(SpringJUnit4ClassRunner.class)
