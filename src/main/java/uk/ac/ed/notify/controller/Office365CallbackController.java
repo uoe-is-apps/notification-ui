@@ -38,7 +38,7 @@ public class Office365CallbackController {
     //public void csvDownload(HttpServletRequest request, HttpServletResponse response)    
     
     @RequestMapping(value="/office365NewEmailCallback/", method=RequestMethod.POST)
-    public HttpServletResponse office365NewEmailCallback(HttpServletRequest request, HttpServletResponse response) throws IOException
+    public void office365NewEmailCallback(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         
         logger.debug("office365NewEmailCallback request - " + request); 
@@ -71,7 +71,7 @@ public class Office365CallbackController {
             }
         }
         
-        return response;
+        
     }    
     
     /*
