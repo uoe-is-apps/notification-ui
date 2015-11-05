@@ -1,4 +1,4 @@
-angular.module('hello', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap']).config(function($routeProvider, $httpProvider) {
+angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'checklist-model']).config(function($routeProvider, $httpProvider) {
 
 	$routeProvider.when('/', {
 		templateUrl : 'listEmergencyNotification.html',
@@ -10,16 +10,58 @@ angular.module('hello', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap']).config(fun
 		controller : 'editEmergencyNotificationController',
 		activetab : 'emergency-notifications'
 	}).
+	when('/user-administration',{
+    		templateUrl : 'listUiUsers.html',
+    		controller : 'listUiUsersController',
+    		activetab : 'user-administration'
+    }).
+    when('/edit-user',{
+        		templateUrl : 'editUiUser.html',
+        		controller : 'editUiUsersController',
+        		activetab : 'user-administration'
+    }).
 	otherwise('/');
 
 	$httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 })
+.service("message", function ErrorMessage ($rootScope)
+{
 
+  this.successMessageData="";
+  this.errorMessageData="";
+
+  this.setSuccessMessage = function(message)
+  {
+    this.successMessageData = message;
+    $rootScope.$broadcast("successMessageUpdated");
+  }
+
+  this.successMessage = function()
+  {
+    return this.successMessageData;
+
+  }
+
+
+  this.setErrorMessage = function(message)
+  {
+      this.errorMessageData = message;
+       $rootScope.$broadcast("errorMessageUpdated");
+  }
+
+  this.errorMessage = function()
+  {
+      return this.errorMessageData;
+  }
+
+
+
+})
 .service("notification",function Notification()
 {
 
-   this.notificationData = { publisherId: "notify-ui", category: "Emergency", startDate: new Date()};
+   this.notificationData = { publisherId: "notify-ui", topic: "Emergency", startDate: new Date(), lastUpdated: new Date()};
 
    this.setNotification = function(notification)
    {
@@ -31,7 +73,21 @@ angular.module('hello', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap']).config(fun
      return this.notificationData;
    }
 })
+.service("user",function User()
+{
+  this.userData = { uun: ""};
 
+  this.setUser = function(user)
+  {
+    this.userData = user;
+  }
+
+  this.user = function()
+  {
+     return this.userData;
+  }
+
+})
 .controller('navigation',function($rootScope, $scope, $http, $location, $route) {
 
     $scope.route = $route;
@@ -77,26 +133,64 @@ angular.module('hello', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap']).config(fun
 
 })
 
-.controller('listEmergencyNotificationController', function($rootScope,$scope, $http,$route,notification,$location) {
+.controller('listEmergencyNotificationController', function($rootScope,$scope, $http,$route,notification,message,$location) {
+
+    $scope.successMessage =
+    $scope.errorMessage = message.errorMessage();
+    $scope.$on('successMessageUpdated', function() {
+        $scope.successMessage = message.successMessage();
+
+      });
+    $scope.$on('errorMessageUpdated', function() {
+            $scope.errorMessage = message.errorMessage();
+
+          });
     $scope.route = $route;
     //$rootScope.getUser();
-	$http.get('notification/publisher/notification-ui').success(function(data) {
+	$http.get('notification/publisher/notify-ui').success(function(data) {
 		$scope.notificationList = data;
 	});
 
+	$scope.createNotification = function()
+	{
+	  newNotification = { publisherId: "notify-ui", topic: "Emergency", startDate: new Date(), lastUpdated: new Date()};
+	  message.setSuccessMessage("");
+      message.setErrorMessage("");
+	  notification.setNotification(newNotification);
+	  $location.path("/edit-emergency-notification");
+	}
+
 	$scope.editNotification = function(notificationToEdit)
 	{
+	   message.setSuccessMessage("");
+       message.setErrorMessage("");
 	   notification.setNotification(notificationToEdit);
 	   $location.path("/edit-emergency-notification");
 	};
 
+	$scope.deleteNotification = function(notification)
+    {
+
+        $http.delete("notification/"+notification.notificationId,notification)
+         .then(function successCallback(response)
+                        {
+                            message.setSuccessMessage("Notification Deleted");
+                            $http.get('notification/publisher/notify-ui').success(function(data) {
+                            		$scope.notificationList = data;
+                            	});
+                        },
+                        function errorCallback(response)
+                        {
+                            message.setErrorMessage("Error deleting notification:"+response.status+response.statusText);
+                        });
+
+    }
+
 })
 
-.controller('editEmergencyNotificationController', function($rootScope,$scope, $http,$route,notification) {
+.controller('editEmergencyNotificationController', function($rootScope,$scope, $http,$route,$location,message,notification) {
 
     $scope.route = $route;
-
-    //$rootScope.getUser();
 
     // Set up default notification
     $scope.notification = notification.notification();
@@ -148,17 +242,135 @@ angular.module('hello', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap']).config(fun
 
   $scope.reset = function() {
 
-    $scope.notification = { category: "Emergency", startDate: new Date() };
+    $scope.notification = { publisherId: "notify-ui", topic: "Emergency", startDate: new Date(), lastUpdated: new Date()};
   }
 
   $scope.update = function(notification)
   {
-    //TODO add validation on variables being set
-     $http.post("notification/",notification).then(function successCallback(response) {
-                                                 $scope.successMessage="Notification Saved";
+     if (notification.notificationId == null)
+     {
+        console.log("Insert called");
+        //TODO add validation on variables being set
+        $http.post("notification/",notification).then(function successCallback(response) {
+                                                 message.setSuccessMessage("Notification Saved");
+                                                 console.log(message.successMessage());
                                                }, function errorCallback(response) {
-                                                 $scope.errorMessage="Error saving notification:"+response.status+response.statusText;
+                                                 message.setErrorMessage("Error saving notification:"+response.status+response.statusText);
                                                });
+     }
+     else
+     {
+        $http.put("notification/"+notification.notificationId,notification)
+                .then(function successCallback(response)
+                {
+                    message.setSuccessMessage("Notification Saved");
+                },
+                function errorCallback(response)
+                {
+                    message.setErrorMessage("Error saving notification:"+response.status+response.statusText);
+                });
+     }
+
+     $location.path("/");
+
+
   }
+
+})
+.controller('listUiUsersController', function($rootScope,$scope, $http,$route,$location,message,user) {
+
+     $scope.successMessage = message.successMessage();
+     $scope.errorMessage = message.errorMessage();
+     $scope.$on('successMessageUpdated', function() {
+         $scope.successMessage = message.successMessage();
+
+       });
+     $scope.$on('errorMessageUpdated', function() {
+             $scope.errorMessage = message.errorMessage();
+
+           });
+     $scope.route = $route;
+
+    $http.get('/ui-users').success(function(data) {
+		$scope.userList = data;
+	});
+
+	$scope.createUser = function()
+    	{
+    	  newUser = { uun: "" };
+    	  message.setSuccessMessage("");
+          message.setErrorMessage("");
+    	  user.setUser(newUser);
+    	  $location.path("/edit-user");
+    	}
+
+    	$scope.editUser = function(userToEdit)
+    	{
+    	   message.setSuccessMessage("");
+           message.setErrorMessage("");
+    	   user.setUser(userToEdit);
+    	   $location.path("/edit-user");
+    	};
+
+    	$scope.deleteUser = function(user)
+        {
+
+            $http.delete("ui-user/"+user.uun,user)
+             .then(function successCallback(response)
+                            {
+                                message.setSuccessMessage("User Deleted");
+                                $http.get('ui-users').success(function(data) {
+                                		$scope.userList = data;
+                                	});
+                            },
+                            function errorCallback(response)
+                            {
+                                message.setErrorMessage("Error deleting user:"+response.status+response.statusText);
+                            });
+
+        }
+
+})
+.controller('editUiUsersController', function($rootScope,$scope, $http,$route,$location,message,user) {
+
+    $scope.successMessage = message.successMessage();
+    $scope.errorMessage = message.errorMessage();
+    $scope.$on('successMessageUpdated', function() {
+        $scope.successMessage = message.successMessage();
+
+      });
+    $scope.$on('errorMessageUpdated', function() {
+            $scope.errorMessage = message.errorMessage();
+
+          });
+    $scope.route = $route;
+    $scope.user = user.user();
+
+    $http.get('/ui-roles').success(function(data) {
+    		$scope.roles = data;
+    	});
+
+    $scope.update = function(user)
+    {
+       $http.put("ui-user/"+user.uun,user)
+                       .then(function successCallback(response)
+                       {
+                           message.setSuccessMessage("User Saved");
+                       },
+                       function errorCallback(response)
+                       {
+                           message.setErrorMessage("Error saving user:"+response.status+response.statusText);
+                       });
+
+       $location.path("/user-administration");
+
+    }
+
+      $scope.checkAll = function() {
+        $scope.user.uiRoles = angular.copy($scope.roles);
+      };
+      $scope.uncheckAll = function() {
+        $scope.user.uiRoles = [];
+      };
 
 });

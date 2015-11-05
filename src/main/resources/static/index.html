@@ -2,27 +2,27 @@
 <html>
 <head>
     <title>Notification Backbone</title>
-    <link href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
-    <!--<link href="css/angular-jquery.css" rel="stylesheet">-->
-   <!-- <style type="text/css">
-        [ng\:cloak], [ng-cloak], .ng-cloak {
-        display: none !important;
-        }
-    </style>-->
+   <!-- <link href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">-->
+    <link href="/webjars/edgel-webjar/1.1.0/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/webjars/edgel-webjar/1.1.0/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="/webjars/edgel-webjar/1.1.0/gel/css/style-green-dark.css" rel="stylesheet">
 </head>
 
-<body ng-app="hello" ng-cloak class="ng-cloak">
+<body ng-app="notify-ui-app" ng-cloak class="ng-cloak">
 <div ng-controller="navigation" class="container">
     <ul class="nav nav-pills" role="tablist">
         <li ng-class="{active:route.current.activetab=='emergency-notifications'}"><a href="#/">Emergency Notification</a></li>
-        <li ng-hide="authenticated" ><a href="login">login</a></li>
+        <li ng-class="{active:route.current.activetab=='user-administration'}"><a href="#/user-administration">User Administration</a></li>
         <li ng-show="authenticated"><a href="" ng-click="logout()">logout</a></li>
     </ul>
 </div>
 <div ng-view class="container"></div>
 <script src="js/angular-jquery.js" type="text/javascript"></script>
+<script src="js/checklist-model.js" type="text/javascript"></script>
 <script src="js/app.js"></script>
-<script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<!--<script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>-->
+<script src="/webjars/edgel-webjar/1.1.0/bootstrap/js/bootstrap.min.js"></script>
+<script src="/webjars/edgel-webjar/1.1.0/gel/js/uoe.js"></script>
 <script src="/webjars/ng-ckeditor/0.2/ng-ckeditor.js"></script>
 <script src="/webjars/ckeditor/4.5.3/basic/ckeditor.js"></script>
 </body>
