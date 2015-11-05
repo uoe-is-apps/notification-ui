@@ -1,15 +1,13 @@
-package uk.ac.ed.notify;
+package uk.ac.ed.notify.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
 import uk.ac.ed.notify.entity.UiRole;
 import uk.ac.ed.notify.entity.UiUser;
 import uk.ac.ed.notify.repository.UiUserRepository;
@@ -20,7 +18,6 @@ import java.util.Collection;
 /**
  * Created by rgood on 26/10/2015.
  */
-//@Service
 public class UiUserDetailsService implements UserDetailsService {
 
     private static final Logger logger = LoggerFactory.getLogger(UiUserDetailsService.class);

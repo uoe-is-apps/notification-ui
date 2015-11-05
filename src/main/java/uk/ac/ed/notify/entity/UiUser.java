@@ -7,7 +7,7 @@ import java.util.Collection;
  * Created by rgood on 24/10/15.
  */
 @Entity
-@Table(name="NOTIFICATION_UI_USERS",schema = "NOTIFY")
+@Table(name="NOTIFICATION_UI_USERS")
 public class UiUser {
 
     @Id
@@ -15,8 +15,8 @@ public class UiUser {
     private String uun;
 
     @OneToMany(fetch = FetchType.EAGER)
-    @JoinTable(name="NOTIFICATION_UI_USER_ROLES", joinColumns = {@JoinColumn (name="uun")},
-            inverseJoinColumns = {@JoinColumn(name="roleCode",nullable = false,updatable = false)})
+    @JoinTable(name="NOTIFICATION_UI_USER_ROLES", joinColumns = {@JoinColumn (name="UUN")},
+            inverseJoinColumns = {@JoinColumn(name="ROLE_CODE",nullable = false,updatable = false)})
     private Collection<UiRole> uiRoles;
 
     public String getUun() {

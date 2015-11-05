@@ -1,3 +1,5 @@
+package uk.ac.ed.notify.repository;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -5,18 +7,16 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.ac.ed.notify.TestApplication;
 import uk.ac.ed.notify.entity.UiRole;
 import uk.ac.ed.notify.entity.UiUser;
 import uk.ac.ed.notify.entity.UiUserRole;
 import uk.ac.ed.notify.entity.UiUserRoleId;
-import uk.ac.ed.notify.repository.UiRoleRepository;
-import uk.ac.ed.notify.repository.UiUserRepository;
-import uk.ac.ed.notify.repository.UiUserRoleRepository;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by rgood on 24/10/15.
+ * Created by rgood on 05/11/2015.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = TestApplication.class)
@@ -86,4 +86,5 @@ public class UiUserRepositoryTest {
     {
 
     }
+
 }
