@@ -43,8 +43,9 @@ public class SchedulerConfig {
     public SchedulerFactoryBean schedulerFactoryBean(@Qualifier("notifyDataSource") DataSource dataSource,
                                                      JobFactory jobFactory,
                                                      @Qualifier("learnPullJobTrigger") Trigger learnPullJobTrigger,
-                                                     @Qualifier("office365PullJobTrigger") Trigger office365PullJobTrigger,
-                                                     @Qualifier("office365PushSubscriptionJobTrigger") Trigger office365PushSubscriptionJobTrigger) throws IOException {
+                                                     @Qualifier("office365PullJobTrigger") Trigger office365PullJobTrigger
+                                                     //@Qualifier("office365PushSubscriptionJobTrigger") Trigger office365PushSubscriptionJobTrigger
+            ) throws IOException {
         SchedulerFactoryBean factory = new SchedulerFactoryBean();
         // this allows to update triggers in DB when updating settings in config file:
         factory.setOverwriteExistingJobs(true);
@@ -52,7 +53,7 @@ public class SchedulerConfig {
         factory.setJobFactory(jobFactory);
 
         factory.setQuartzProperties(quartzProperties());
-        factory.setTriggers(new Trigger[] {learnPullJobTrigger,office365PullJobTrigger,office365PushSubscriptionJobTrigger});
+        factory.setTriggers(new Trigger[] {learnPullJobTrigger,office365PullJobTrigger}); //office365PushSubscriptionJobTrigger
 
         return factory;
     }
@@ -95,11 +96,11 @@ public class SchedulerConfig {
 
     }
 
-    @Bean(name = "office365PushSubscriptionJobTrigger")
-    public SimpleTriggerFactoryBean office365PushSubscriptionJobTrigger(@Qualifier("office365PushSubscriptionJobDetail") JobDetail jobDetail,
-                                                        @Value("${office365PushSubscriptionJob.frequency}") long frequency) {
-        return createTrigger(jobDetail, frequency);
-    }
+//    @Bean(name = "office365PushSubscriptionJobTrigger")
+//    public SimpleTriggerFactoryBean office365PushSubscriptionJobTrigger(@Qualifier("office365PushSubscriptionJobDetail") JobDetail jobDetail,
+//                                                        @Value("${office365PushSubscriptionJob.frequency}") long frequency) {
+//        return createTrigger(jobDetail, frequency);
+//    }
 
     private static JobDetailFactoryBean createJobDetail(Class jobClass) {
         JobDetailFactoryBean factoryBean = new JobDetailFactoryBean();
