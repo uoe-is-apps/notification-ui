@@ -9,7 +9,7 @@ import javax.persistence.Table;
  * Created by rgood on 24/10/15.
  */
 @Entity
-@Table(name="NOTIFICATION_UI_ROLES", schema="NOTIFY")
+@Table(name="NOTIFICATION_UI_ROLES")
 public class UiRole {
 
     @Id

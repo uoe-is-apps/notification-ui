@@ -6,7 +6,7 @@ import javax.persistence.*;
  * Created by rgood on 24/10/15.
  */
 @Entity
-@Table(name="NOTIFICATION_UI_USER_ROLES",schema = "NOTIFY")
+@Table(name="NOTIFICATION_UI_USER_ROLES")
 @NamedQueries({
         @NamedQuery(name = "UiUserRole.findByUun", query = "select a from UiUserRole a where a.uiUserRoleId.uun = (?1)")
 })

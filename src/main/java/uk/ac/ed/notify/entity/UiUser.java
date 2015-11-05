@@ -7,7 +7,7 @@ import java.util.Collection;
  * Created by rgood on 24/10/15.
  */
 @Entity
-@Table(name="NOTIFICATION_UI_USERS",schema = "NOTIFY")
+@Table(name="NOTIFICATION_UI_USERS")
 public class UiUser {
 
     @Id

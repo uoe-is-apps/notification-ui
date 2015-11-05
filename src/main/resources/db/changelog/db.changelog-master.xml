@@ -32,4 +32,16 @@
             <column name="AUDIT_DESCRIPTION" type="NVARCHAR2(255)" remarks="Description of the audit entry"/>
         </addColumn>
     </changeSet>
+    <changeSet id="create_synonyms_oracle" dbms="oracle" author="rgood">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/create_synonyms_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+    <changeSet id="quartz_grants_oracle" dbms="oracle" author="rgood">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/quartz_grants_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
 </databaseChangeLog>
