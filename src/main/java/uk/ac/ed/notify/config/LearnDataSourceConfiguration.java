@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.orm.jpa.EntityManagerFactoryBuilde
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -18,30 +19,34 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+
 @Configuration
-@EnableJpaRepositories(basePackages = "uk.ac.ed.notify.repository", entityManagerFactoryRef = "notifyEntityManagerFactory", transactionManagerRef = "notifyTransactionManager")
+@EnableJpaRepositories(basePackages = "uk.ac.ed.notify.learn.repository", entityManagerFactoryRef = "learnEntityManagerFactory", transactionManagerRef = "learnTransactionManager")
 @EnableTransactionManagement
-public class NotifyConfiguration
+public class LearnDataSourceConfiguration
 {
   @Bean
-  @ConfigurationProperties(prefix = "datasource.notify")
-  public DataSource notifyDataSource()
+  @ConfigurationProperties(prefix = "datasource.learn")
+  @Primary
+  public DataSource learnDataSource()
   {
     return DataSourceBuilder.create().build();
   }
 
   @Bean
-  public LocalContainerEntityManagerFactoryBean notifyEntityManagerFactory(final EntityManagerFactoryBuilder builder)
+  @Primary
+  public LocalContainerEntityManagerFactoryBean learnEntityManagerFactory(final EntityManagerFactoryBuilder builder)
   {
     return builder
-        .dataSource(notifyDataSource())
-        .packages("uk.ac.ed.notify.entity")
-        .persistenceUnit("notifyPersistenceUnit")
+        .dataSource(learnDataSource())
+        .packages("uk.ac.ed.notify.learn.entity")
+        .persistenceUnit("learnPersistenceUnit")
         .build();
   }
 
   @Bean
-  public JpaTransactionManager notifyTransactionManager(@Qualifier("notifyEntityManagerFactory") final EntityManagerFactory factory)
+  @Primary
+  public JpaTransactionManager learnTransactionManager(@Qualifier("learnEntityManagerFactory") final EntityManagerFactory factory)
   {
     return new JpaTransactionManager(factory);
   }

@@ -40,7 +40,7 @@ public class SchedulerConfig {
     }
 
     @Bean
-    public SchedulerFactoryBean schedulerFactoryBean(DataSource dataSource,
+    public SchedulerFactoryBean schedulerFactoryBean(@Qualifier("notifyDataSource") DataSource dataSource,
                                                      JobFactory jobFactory,
                                                      @Qualifier("learnPullJobTrigger") Trigger learnPullJobTrigger,
                                                      @Qualifier("office365PullJobTrigger") Trigger office365PullJobTrigger,
@@ -48,7 +48,7 @@ public class SchedulerConfig {
         SchedulerFactoryBean factory = new SchedulerFactoryBean();
         // this allows to update triggers in DB when updating settings in config file:
         factory.setOverwriteExistingJobs(true);
-        //factory.setDataSource(dataSource);
+        factory.setDataSource(dataSource);
         factory.setJobFactory(jobFactory);
 
         factory.setQuartzProperties(quartzProperties());
