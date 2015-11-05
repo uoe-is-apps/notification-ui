@@ -216,7 +216,7 @@ public class LearnService {
         for (int i = 0; i < listOfTasks.size(); i++) {
             Tasks task = listOfTasks.get(i);            
             String publisherNotificationId = task.getPk1() + "";
-            String category = "learn_task";
+            String category = "Learn Task";
             String title = task.getSubject() + "";
             String body = task.getSubject() + "";
             Date startDate = null;
@@ -239,7 +239,7 @@ public class LearnService {
         for (int i = 0; i < listOfSystemAnnouncements.size(); i++) {
             Announcements announcement = (Announcements) listOfSystemAnnouncements.get(i);            
             String publisherNotificationId = announcement.getPk1() + "";
-            String category = "learn_system_annoucement";
+            String category = "Learn System Announcement";
             String title = announcement.getSubject() + "";
             String body = announcement.getAnnouncement() + "";
             String url = "";
@@ -268,7 +268,7 @@ public class LearnService {
             Announcements announcement = (Announcements) listOfCourseAnnouncements.get(i);
 
             String publisherNotificationId = announcement.getPk1() + "";
-            String category = "learn_course_annoucement";
+            String category = "Learn Course Announcement";
             String title = announcement.getSubject() + "";
             String body = announcement.getAnnouncement() + "";
             Date startDate = announcement.getStartDate();
@@ -323,7 +323,7 @@ public class LearnService {
                     }
                 }                           
                 String publisherNotificationId = assessment.getPk1() + "";
-                String category = "learn_assessment";
+                String category = "Learn Assessment";
                 String title = "Assessment Notification: " + assessment.getTitle() + "";
                 String body = "Assessment: " + assessment.getTitle() + " Possible Score:(" + assessment.getPossible() + ")";
                 if(grade.equals("")){

@@ -60,9 +60,5 @@ public class UiUserController {
     {
         return (List<UiRole>)uiRoleRepository.findAll();
     }
-   /* @RequestMapping(value="/ui-user", method=RequestMethod.POST)
-    public @ResponseBody UiUser insertUser(@RequestBody UiUser uiUser)
-    {
-        return uiUserRepository.save(uiUser);
-    }*/
+
 }

@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  * Created by rgood on 23/10/2015.
  */
 @EnableAutoConfiguration
-@EntityScan("uk.ac.ed.notify.entity")
-@EnableJpaRepositories("uk.ac.ed.notify.repository")
+@EntityScan("uk.ac.ed.notify")
+@EnableJpaRepositories("uk.ac.ed.notify")
 public class TestApplication {
 
     public static void main(String[] args) {
