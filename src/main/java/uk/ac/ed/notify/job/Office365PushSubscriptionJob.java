@@ -27,22 +27,35 @@ public class Office365PushSubscriptionJob implements Job {
     
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        if(true) return;
-        logger.debug("Office365PullJob");        
+        //if(true) return;
+        logger.debug("Office365PullJob");         
                 
-        String token = office365ApiService.acquireAccessToken();    
+        String token = office365ApiService.acquireAccessToken();  
         logger.debug("token - " + token);        
         //if no previous subscription, subscribe
         if(office365Repository.count() == 0){
             logger.debug("no prevous subscription found, subscribe now");       
             office365ApiService.subscribeToNotification(token);
         }else{//if found previous subscription, renew
+            logger.debug("prevous subscription found, delete it now");     
+            Iterable<Office365Subscription> existingSubscriptions = office365Repository.findAll();
+            if(existingSubscriptions.iterator().hasNext()){
+                Office365Subscription office365Subscription = existingSubscriptions.iterator().next();              
+                office365ApiService.deleteSubscriptionById(token, office365Subscription.getSubscriptionId());
+            }
+            
+            logger.debug("create new subscription now");
+            office365ApiService.subscribeToNotification(token);
+            logger.debug("success");
+            
+            /* delete later, renew API is broken on office 365
             logger.debug("prevous subscription found, renew now");     
             Iterable<Office365Subscription> existingSubscriptions = office365Repository.findAll();
             if(existingSubscriptions.iterator().hasNext()){
                 Office365Subscription office365Subscription = existingSubscriptions.iterator().next();                                        
                 office365ApiService.renewSubscriptionToNotification(token, office365Subscription.getSubscriptionId());
-            }           
+            } 
+            */
         }
     }
 }

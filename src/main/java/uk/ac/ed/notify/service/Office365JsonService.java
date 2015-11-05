@@ -24,6 +24,7 @@ public class Office365JsonService {
     private static final Logger logger = LoggerFactory.getLogger(Office365JsonService.class); 
     
     public Office365Subscription parseOffice365NewSubscriptionCallbackSubscriptionId(String json) {
+         /*
          Office365Subscription office365Subscription = null;
          JSONObject jsonObj = new JSONObject(json);
          JSONArray array = jsonObj.getJSONArray("value");
@@ -32,17 +33,35 @@ public class Office365JsonService {
          if(array.length() == 1){ //should always be 1
              office365Subscription = new Office365Subscription();
              
-             String id = ((JSONObject)array.get(0)).get("SubscriptionId").toString();  
-             String expiryDate = ((JSONObject)array.get(0)).get("SubscriptionExpirationTime").toString();  
+             String id = ((JSONObject)array.get(0)).get("SubscriptionId").toString(); //subscriptionId  //SubscriptionId
+             String expiryDate = ((JSONObject)array.get(0)).get("SubscriptionExpirationDateTime").toString(); //subscriptionExpirationDateTime //SubscriptionExpirationTime
              
              office365Subscription.setSubscriptionId(id);
              office365Subscription.setSubscriptionExpiry((new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).parse(expiryDate)); //"2015-10-23T10:32:23.0363654Z"
+             office365Subscription.setSubscriptionRenew(new Date());
          }
          }catch(Exception e){
              e.printStackTrace();
          }
          
          return office365Subscription;
+         */
+        
+         Office365Subscription office365Subscription = null;
+         JSONObject jsonObj = new JSONObject(json);
+
+         try{
+             office365Subscription = new Office365Subscription();             
+             String id = jsonObj.get("Id").toString(); //subscriptionId  //SubscriptionId
+             String expiryDate = jsonObj.get("SubscriptionExpirationDateTime").toString(); //subscriptionExpirationDateTime //SubscriptionExpirationTime             
+             office365Subscription.setSubscriptionId(id);
+             office365Subscription.setSubscriptionExpiry((new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).parse(expiryDate)); //"2015-10-23T10:32:23.0363654Z"
+             office365Subscription.setSubscriptionRenew(new Date());
+         }catch(Exception e){
+             e.printStackTrace();
+         }
+         
+         return office365Subscription;        
     }    
     
     public String parseOffice365NewEmailCallbackEmailId(String json) {
@@ -50,7 +69,7 @@ public class Office365JsonService {
          JSONObject jsonObj = new JSONObject(json);
          JSONArray array = jsonObj.getJSONArray("value");
          if(array.length() == 1){ //should always be 1
-             String entity = ((JSONObject)array.get(0)).get("Entity").toString();   
+             String entity = ((JSONObject)array.get(0)).get("ResourceData").toString();  //resourceData //Entity
              id = new JSONObject(entity).get("Id").toString();
          }
          

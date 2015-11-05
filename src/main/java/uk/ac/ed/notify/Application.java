@@ -49,7 +49,7 @@ import java.io.IOException;
  * Created by rgood on 18/09/2015.
  */
 @SpringBootApplication
-@EntityScan("uk.ac.ed.notify.entity")
+@EntityScan("uk.ac.ed.notify")
 @ComponentScan({"uk.ac.ed.notify"})
 @EnableOAuth2Resource
 public class Application extends SpringBootServletInitializer {
@@ -70,10 +70,12 @@ public class Application extends SpringBootServletInitializer {
                     .authenticationProvider(
                             preauthAuthProvider())
                     .csrf().disable()
-                    .authorizeRequests().anyRequest().authenticated()
+                    .authorizeRequests()
+                    .antMatchers("/office365NewEmailCallback/**").permitAll()
+                    .anyRequest().authenticated()
             .antMatchers("/").hasRole("EMERGENCY");
         }
-
+        
         @Autowired
         public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
             auth.authenticationProvider(preauthAuthProvider());

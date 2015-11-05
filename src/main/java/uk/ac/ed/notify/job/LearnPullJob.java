@@ -15,7 +15,7 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.ac.ed.notify.Office365CallbackController;
+import uk.ac.ed.notify.controller.Office365CallbackController;
 import uk.ac.ed.notify.entity.DatePartSerializer;
 import uk.ac.ed.notify.entity.Notification;
 import uk.ac.ed.notify.learn.entity.Announcements;
@@ -45,7 +45,7 @@ public class LearnPullJob implements Job {
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        //if(true) return;
+        if(true) return;
         logger.debug("LearnPullJob");        
         learnService.pullLearnNotifications();
     }
