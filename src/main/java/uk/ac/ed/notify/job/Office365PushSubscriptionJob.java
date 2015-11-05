@@ -28,7 +28,7 @@ public class Office365PushSubscriptionJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         //if(true) return;
-        logger.info("Office365PullJob started");
+        logger.info("Office365PushSubscriptionJob started");
                 
         String token = office365ApiService.acquireAccessToken();  
         logger.debug("token - " + token);        
@@ -46,7 +46,7 @@ public class Office365PushSubscriptionJob implements Job {
             
             logger.debug("create new subscription now");
             office365ApiService.subscribeToNotification(token);
-            logger.info("Office365PullJob finished successfully.");
+            logger.info("Office365PushSubscriptionJob finished successfully.");
             
             /* delete later, renew API is broken on office 365
             logger.debug("prevous subscription found, renew now");     
