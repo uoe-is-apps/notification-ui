@@ -146,7 +146,6 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 
           });
     $scope.route = $route;
-    //$rootScope.getUser();
 	$http.get('notification/publisher/notify-ui').success(function(data) {
 		$scope.notificationList = data;
 	});
@@ -253,7 +252,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
         //TODO add validation on variables being set
         $http.post("notification/",notification).then(function successCallback(response) {
                                                  message.setSuccessMessage("Notification Saved");
-                                                 console.log(message.successMessage());
+                                                 $location.path("/");
                                                }, function errorCallback(response) {
                                                  message.setErrorMessage("Error saving notification:"+response.status+response.statusText);
                                                });
@@ -264,7 +263,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
                 .then(function successCallback(response)
                 {
                     message.setSuccessMessage("Notification Saved");
-                    $location.path("/");
+                     $location.path("/");
                 },
                 function errorCallback(response)
                 {

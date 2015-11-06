@@ -72,7 +72,8 @@ public class NotificationController {
 
     @RequestMapping(value="/notification/", method=RequestMethod.POST)
     public @ResponseBody
-    JsonNotification setNotification(@RequestBody String notification) throws ServletException, JsonProcessingException {
+    JsonNotification setNotification(@RequestBody JsonNotification notification) throws ServletException, JsonProcessingException {
+        
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity request= new HttpEntity(notification, headers);
@@ -82,7 +83,7 @@ public class NotificationController {
     }
 
     @RequestMapping(value="/notification/{notification-id}",method=RequestMethod.PUT)
-    public void updateNotification(@PathVariable("notification-id") String notificationId, @RequestBody String notification) throws ServletException {
+    public void updateNotification(@PathVariable("notification-id") String notificationId, @RequestBody JsonNotification notification) throws ServletException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity request= new HttpEntity(notification, headers);

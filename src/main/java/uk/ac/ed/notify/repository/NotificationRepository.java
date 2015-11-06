@@ -1,6 +1,7 @@
 package uk.ac.ed.notify.repository;
 
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import uk.ac.ed.notify.entity.Notification;
 
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.List;
 /**
  * Created by rgood on 18/09/2015.
  */
+@RepositoryRestResource(exported = false)
 public interface NotificationRepository extends CrudRepository<Notification,String>{
 
     public List<Notification> findByPublisherIdAndPublisherNotificationId (String publisherId, String publisherNotificationId);
