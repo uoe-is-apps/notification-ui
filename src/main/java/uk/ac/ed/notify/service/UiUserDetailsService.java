@@ -33,20 +33,16 @@ public class UiUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         try {
-            System.out.println("trying to get user"+s);
-            if (uiUserRepository==null)
-            {
-                System.out.println("Repo is null");
-            }
+
 
             UiUser user = uiUserRepository.findOne(s);
-            System.out.println("Got user"+user.getUun());
+
             if (user == null) {
                 throw new UsernameNotFoundException(s + "was not found.");
             }
             Collection<GrantedAuthority> roles = new ArrayList<GrantedAuthority>();
             for (UiRole uiRole : user.getUiRoles()) {
-                System.out.println("found role:"+uiRole.getRoleDescription());
+
                 roles.add(new SimpleGrantedAuthority(uiRole.getRoleCode()));
             }
             return new User(user.getUun(), "", true, true, true, true, roles);

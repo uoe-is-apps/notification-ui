@@ -87,7 +87,7 @@ public class HttpOperationService {
             String output = "";
             String json = "";
             while ((output = br.readLine()) != null) {  
-                System.out.println("server output: " + output);
+                logger.debug("server output: " + output);
                 if(output.indexOf("json") != -1 || output.indexOf("odata") != -1){
                     json = output;
                 }

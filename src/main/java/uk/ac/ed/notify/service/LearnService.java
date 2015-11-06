@@ -338,7 +338,7 @@ public class LearnService {
                 
                 Notification notification = constructLearnNotification(publisherNotificationId, category, title, body, url, startDate, endDate, uun);
                 
-                System.out.println(i + " " + category + " - " + assessment.getCrsmainPk1() + " " + assessment.getTitle() + " " + assessment.getPk1() + " " + assessment.getPossible() + " " + grade);                 
+                logger.debug(i + " " + category + " - " + assessment.getCrsmainPk1() + " " + assessment.getTitle() + " " + assessment.getPk1() + " " + assessment.getPossible() + " " + grade);
 
                 if (ifInsertLearnNotification(publisherId, publisherNotificationId, uun, notification)) {                
                     logger.debug("insert");

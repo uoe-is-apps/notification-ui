@@ -32,7 +32,6 @@ public class NotificationController {
     private String notificationMsUrl;
 
     public NotificationController() {
-        System.out.println("init");
         restTemplate = new OAuth2RestTemplate(resource());
     }
 
@@ -43,7 +42,6 @@ public class NotificationController {
         resource.setAccessTokenUri("https://dev.oauth.ws-apps.is.ed.ac.uk:443/oauth/token");
         resource.setClientSecret("s1llycrash3s");
         resource.setClientId("notification-ui");
-        System.out.println("returning resource:" + resource.getClientId());
         return resource;
     }
 
@@ -57,7 +55,6 @@ public class NotificationController {
     public
     @ResponseBody
     JsonNotification getNotification(@PathVariable("notification-id") String notificationId) throws ServletException {
-        System.out.println(restTemplate.getResource().getClientSecret());
         ResponseEntity<JsonNotification> response = restTemplate.getForEntity(notificationMsUrl + "/" + notificationId, JsonNotification.class);
 
         return response.getBody();

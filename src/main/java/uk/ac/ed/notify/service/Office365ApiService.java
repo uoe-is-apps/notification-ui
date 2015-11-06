@@ -76,13 +76,13 @@ public class Office365ApiService {
             InputStream pkcs12Certificate=new FileInputStream(certfile);
 
             AsymmetricKeyCredential credential = AsymmetricKeyCredential.create(clientId, pkcs12Certificate, pfxPassword); 
-            System.out.println("certificate loaded successfully");
+            logger.debug("certificate loaded successfully");
 
             Future<AuthenticationResult> future=authenticationContext.acquireToken("https://outlook.office365.com", (AsymmetricKeyCredential)credential, null);
 
             token=future.get().getAccessToken();
 
-            System.out.println("token - " + token);
+            logger.debug("token - " + token);
             service.shutdown();
         }catch(Exception e){
 
@@ -99,7 +99,7 @@ public class Office365ApiService {
         while(iteration.iterator().hasNext()){
             Office365Subscription subscription = iteration.iterator().next();
             subscriptionId = subscription.getSubscriptionId();
-            System.out.println("readSubscriptionId - " + subscriptionId);
+            logger.debug("readSubscriptionId - " + subscriptionId);
             break;
         }
         
@@ -110,7 +110,7 @@ public class Office365ApiService {
     public void subscribeToNotification(String token){
         String url = "https://outlook.office.com/api/beta/users/" + account + "/subscriptions";
         
-        System.out.println("subscribeToNotification - " + url);            
+        logger.debug("subscribeToNotification - " + url);            
         
         /*
         String input = 
@@ -161,13 +161,13 @@ ChangeType	changeType                      ChangeType
         */
         
         try {
-            System.out.println("input - " + input);   
+            logger.debug("input - " + input);   
             
             logger.debug("url - " + url);       
             logger.debug("input - " + input);       
             
             String json = httpOperationService.post(token, url, input);
-            System.out.println("success " + json); 
+            logger.debug("success " + json); 
             logger.debug("success " + json);     
             
             
@@ -237,10 +237,10 @@ Final version
             //String subscriptionId = readSubscriptionId();
             String url = "https://outlook.office.com/api/beta/users/" + account + "/subscriptions/" + subscriptionId + "/renew";
             
-            System.out.println("renew url - " + url);
+            logger.debug("renew url - " + url);
                       
             //String json  = "  {  \"@odata.type\":\"#Microsoft.OutlookServices.PushSubscription\", \"subscriptionExpirationDateTime\": \"2015-11-04T20:00:00.0Z\"}  ";   
-            //System.out.println(json);
+            //logger.debug(json);
             
             
             //httpOperationService.post(token, url, json);
@@ -264,17 +264,17 @@ Final version
             String url = "https://outlook.office365.com/api/v1.0/users/" + account + "/folders/inbox/messages?$filter=IsRead%20eq%20false";
             String json = httpOperationService.get(token, url);
 
-            System.out.println("processUnreadEmail - " + json);
+            logger.debug("processUnreadEmail - " + json);
             
             Hashtable<String, Notification> table = office365JsonService.parseTableOfNotification(json);
-            System.out.println("fetchUnreadEmail - " + table.size());
+            logger.debug("fetchUnreadEmail - " + table.size());
             
             Iterator<String> iterator = table.keySet().iterator();
             while(iterator.hasNext()){
                 String id = iterator.next();
                 Notification notification = table.get(id);
                 
-                System.out.println("save notification..." + notification.getTitle());
+                logger.debug("save notification..." + notification.getTitle());
                 
                 notificationRepository.save(notification);
                 
@@ -338,7 +338,7 @@ Final version
             url = "https://outlook.office.com/api/beta/users/" + account + "/subscriptions/" + id + ""; //ODYzNUJEMjQtRDJFMi00RDA3LTlENUYtNjZBMzExMkYwN0VEXzQ1MTU4OEJFLTczQzQtNDBFOS1BN0E1LUYyOTdENkEzM0NBMQ=="
             
              
-            System.out.println(url);
+            logger.debug(url);
             httpOperationService.delete(token, url);
             
             office365Repository.delete(id);
