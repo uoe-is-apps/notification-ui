@@ -113,7 +113,7 @@ public class LearnService {
         return false;
     }
     
-    private boolean ifInsertLearnNotification(String publisherId, String publisherNotificationId, Notification notification) {
+    public boolean ifInsertLearnNotification(String publisherId, String publisherNotificationId, Notification notification) {
         List<Notification> existingNotifications = notificationRepository.findByPublisherIdAndPublisherNotificationId(publisherId, publisherNotificationId);
         if (existingNotifications.size() == 0) {
             return true;

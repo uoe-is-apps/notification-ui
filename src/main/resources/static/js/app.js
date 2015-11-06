@@ -264,6 +264,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
                 .then(function successCallback(response)
                 {
                     message.setSuccessMessage("Notification Saved");
+                    $location.path("/");
                 },
                 function errorCallback(response)
                 {
@@ -271,7 +272,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
                 });
      }
 
-     $location.path("/");
+
 
 
   }
@@ -356,13 +357,14 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
                        .then(function successCallback(response)
                        {
                            message.setSuccessMessage("User Saved");
+                           $location.path("/user-administration");
                        },
                        function errorCallback(response)
                        {
                            message.setErrorMessage("Error saving user:"+response.status+response.statusText);
                        });
 
-       $location.path("/user-administration");
+
 
     }
 
