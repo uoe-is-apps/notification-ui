@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.hibernate.annotations.GenericGenerator;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ed.notify.repository.UserNotificationAuditRepository;
 
@@ -24,9 +26,7 @@ import java.util.Objects;
 public class Notification {
 
 
-    @Autowired
-    @Transient
-    UserNotificationAuditRepository userNotificationAuditRepository;
+    private static final Logger logger = LoggerFactory.getLogger(Notification.class);
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -135,13 +135,7 @@ public class Notification {
 
         String cleaned = Jsoup.clean(topic, Whitelist.basic());
         if (!cleaned.equals(topic)) {
-            UserNotificationAudit userNotificationAudit = new UserNotificationAudit();
-            userNotificationAudit.setAction(AuditActions.CLEANED_HTML);
-            userNotificationAudit.setAuditDate(new Date());
-            userNotificationAudit.setPublisherId(this.getPublisherId());
-            userNotificationAudit.setUun(this.getUun());
-            userNotificationAudit.setAuditDescription("Was (" + topic.substring(1, 248) + ")");
-            userNotificationAuditRepository.save(userNotificationAudit);
+            logger.warn("notification topic for "+notificationId+"cleaned, was ("+topic);
         }
         this.topic = cleaned;
     }
@@ -153,13 +147,7 @@ public class Notification {
     public void setTitle(String title) {
         String cleaned = Jsoup.clean(title, Whitelist.basic());
         if (!cleaned.equals(title)) {
-            UserNotificationAudit userNotificationAudit = new UserNotificationAudit();
-            userNotificationAudit.setAction(AuditActions.CLEANED_HTML);
-            userNotificationAudit.setAuditDate(new Date());
-            userNotificationAudit.setPublisherId(this.getPublisherId());
-            userNotificationAudit.setUun(this.getUun());
-            userNotificationAudit.setAuditDescription("Was (" + title.substring(1, 248) + ")");
-            userNotificationAuditRepository.save(userNotificationAudit);
+            logger.warn("notification title for "+notificationId+"cleaned, was ("+title);
         }
         this.title = cleaned;
     }
@@ -171,13 +159,7 @@ public class Notification {
     public void setBody(String body) {
         String cleaned = Jsoup.clean(body, Whitelist.basic());
         if (!cleaned.equals(body)) {
-            UserNotificationAudit userNotificationAudit = new UserNotificationAudit();
-            userNotificationAudit.setAction(AuditActions.CLEANED_HTML);
-            userNotificationAudit.setAuditDate(new Date());
-            userNotificationAudit.setPublisherId(this.getPublisherId());
-            userNotificationAudit.setUun(this.getUun());
-            userNotificationAudit.setAuditDescription("Was (" + body.substring(1, 248) + ")");
-            userNotificationAuditRepository.save(userNotificationAudit);
+            logger.warn("notification body for "+notificationId+"cleaned, was ("+body);
         }
         this.body = cleaned;
     }
@@ -190,13 +172,7 @@ public class Notification {
 
         String cleaned = Jsoup.clean(url, Whitelist.basic());
         if (!cleaned.equals(url)) {
-            UserNotificationAudit userNotificationAudit = new UserNotificationAudit();
-            userNotificationAudit.setAction(AuditActions.CLEANED_HTML);
-            userNotificationAudit.setAuditDate(new Date());
-            userNotificationAudit.setPublisherId(this.getPublisherId());
-            userNotificationAudit.setUun(this.getUun());
-            userNotificationAudit.setAuditDescription("Was (" + url.substring(1, 248) + ")");
-            userNotificationAuditRepository.save(userNotificationAudit);
+            logger.warn("notification url for "+notificationId+"cleaned, was ("+url);
         }
         this.url = cleaned;
     }
