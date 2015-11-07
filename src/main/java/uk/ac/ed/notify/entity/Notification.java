@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.hibernate.annotations.GenericGenerator;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
+import org.springframework.beans.factory.annotation.Autowired;
+import uk.ac.ed.notify.repository.UserNotificationAuditRepository;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -13,169 +15,196 @@ import java.util.Objects;
  * Created by rgood on 18/09/2015.
  */
 @Entity
-@Table(name="NOTIFICATIONS")
+@Table(name = "NOTIFICATIONS")
 @NamedQueries({
-       @NamedQuery(name = "Notification.findByPublisherId", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1)"),
-       @NamedQuery(name = "Notification.findByPublisherIdAndPublisherNotificationId", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and a.publisherNotificationId  = (?2)"),
-        @NamedQuery(name = "Notification.findByPublisherIdAndPublisherNotificationIdAndUun", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and a.publisherNotificationId  = (?2) and a.uun = (?3)")       
+        @NamedQuery(name = "Notification.findByPublisherId", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1)"),
+        @NamedQuery(name = "Notification.findByPublisherIdAndPublisherNotificationId", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and a.publisherNotificationId  = (?2)"),
+        @NamedQuery(name = "Notification.findByPublisherIdAndPublisherNotificationIdAndUun", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and a.publisherNotificationId  = (?2) and a.uun = (?3)")
 })
 public class Notification {
 
-        @Id
-        @GeneratedValue(generator="system-uuid")
-        @GenericGenerator(name="system-uuid",
-                strategy = "uuid")
-        @Column(name="NOTIFICATION_ID")
-        private String notificationId;
 
-        @Column(name="PUBLISHER_ID")
-        private String publisherId;
+    @Autowired
+    @Transient
+    UserNotificationAuditRepository userNotificationAuditRepository;
 
-        @Column(name="PUBLISHER_NOTIFICATION_ID")
-        private String publisherNotificationId;
+    @Id
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid",
+            strategy = "uuid")
+    @Column(name = "NOTIFICATION_ID")
+    private String notificationId;
 
-        @Column(name="TOPIC")
-        private String category;
+    @Column(name = "PUBLISHER_ID")
+    private String publisherId;
 
-        @Column(name="TITLE")
-        private String title;
+    @Column(name = "PUBLISHER_NOTIFICATION_ID")
+    private String publisherNotificationId;
 
-        @Column(name="NOTIFICATION_BODY")
-        private String body;
+    @Column(name = "TOPIC")
+    private String topic;
 
-        @Column(name="NOTIFICATION_URL")
-        private String url;
+    @Column(name = "TITLE")
+    private String title;
 
-        @JsonSerialize(using=DatePartSerializer.class)
-        @Column(name="START_DATE")
-        @Temporal(TemporalType.TIMESTAMP)
-        private Date startDate;
+    @Column(name = "NOTIFICATION_BODY")
+    private String body;
 
-        @JsonSerialize(using=DatePartSerializer.class)
-        @Column(name="END_DATE")
-        @Temporal(TemporalType.TIMESTAMP)
-        private Date endDate;
+    @Column(name = "NOTIFICATION_URL")
+    private String url;
 
-        @Column(name="uun")
-        private String uun;
+    @JsonSerialize(using = DatePartSerializer.class)
+    @Column(name = "START_DATE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date startDate;
 
-        @JsonSerialize(using=DatePartSerializer.class)
-        @Column(name="LAST_UPDATED")
-        @Temporal(TemporalType.TIMESTAMP)
-        private Date lastUpdated;
+    @JsonSerialize(using = DatePartSerializer.class)
+    @Column(name = "END_DATE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date endDate;
 
-        public Date getLastUpdated() {
-            return lastUpdated;
+    @Column(name = "uun")
+    private String uun;
+
+    @JsonSerialize(using = DatePartSerializer.class)
+    @Column(name = "LAST_UPDATED")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastUpdated;
+
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public String getNotificationId() {
+        return notificationId;
+    }
+
+    public void setNotificationId(String notificationId) {
+        this.notificationId = notificationId;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getUun() {
+        return uun;
+    }
+
+    public void setUun(String uun) {
+        this.uun = uun;
+    }
+
+    public String getPublisherId() {
+        return publisherId;
+    }
+
+    public void setPublisherId(String publisherId) {
+        this.publisherId = publisherId;
+    }
+
+    public String getPublisherNotificationId() {
+        return publisherNotificationId;
+    }
+
+    public void setPublisherNotificationId(String publisherNotificationId) {
+        this.publisherNotificationId = publisherNotificationId;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+
+        String cleaned = Jsoup.clean(topic, Whitelist.basic());
+        if (!cleaned.equals(topic)) {
+            UserNotificationAudit userNotificationAudit = new UserNotificationAudit();
+            userNotificationAudit.setAction(AuditActions.CLEANED_HTML);
+            userNotificationAudit.setAuditDate(new Date());
+            userNotificationAudit.setPublisherId(this.getPublisherId());
+            userNotificationAudit.setUun(this.getUun());
+            userNotificationAudit.setAuditDescription("Was (" + topic.substring(1, 248) + ")");
+            userNotificationAuditRepository.save(userNotificationAudit);
         }
+        this.topic = cleaned;
+    }
 
-        public void setLastUpdated(Date lastUpdated) {
-            this.lastUpdated = lastUpdated;
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        String cleaned = Jsoup.clean(title, Whitelist.basic());
+        if (!cleaned.equals(title)) {
+            UserNotificationAudit userNotificationAudit = new UserNotificationAudit();
+            userNotificationAudit.setAction(AuditActions.CLEANED_HTML);
+            userNotificationAudit.setAuditDate(new Date());
+            userNotificationAudit.setPublisherId(this.getPublisherId());
+            userNotificationAudit.setUun(this.getUun());
+            userNotificationAudit.setAuditDescription("Was (" + title.substring(1, 248) + ")");
+            userNotificationAuditRepository.save(userNotificationAudit);
         }
+        this.title = cleaned;
+    }
 
-        public String getNotificationId() {
-                return notificationId;
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        String cleaned = Jsoup.clean(body, Whitelist.basic());
+        if (!cleaned.equals(body)) {
+            UserNotificationAudit userNotificationAudit = new UserNotificationAudit();
+            userNotificationAudit.setAction(AuditActions.CLEANED_HTML);
+            userNotificationAudit.setAuditDate(new Date());
+            userNotificationAudit.setPublisherId(this.getPublisherId());
+            userNotificationAudit.setUun(this.getUun());
+            userNotificationAudit.setAuditDescription("Was (" + body.substring(1, 248) + ")");
+            userNotificationAuditRepository.save(userNotificationAudit);
         }
+        this.body = cleaned;
+    }
 
-        public void setNotificationId(String notificationId) {
-                this.notificationId = notificationId;
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+
+        String cleaned = Jsoup.clean(url, Whitelist.basic());
+        if (!cleaned.equals(url)) {
+            UserNotificationAudit userNotificationAudit = new UserNotificationAudit();
+            userNotificationAudit.setAction(AuditActions.CLEANED_HTML);
+            userNotificationAudit.setAuditDate(new Date());
+            userNotificationAudit.setPublisherId(this.getPublisherId());
+            userNotificationAudit.setUun(this.getUun());
+            userNotificationAudit.setAuditDescription("Was (" + url.substring(1, 248) + ")");
+            userNotificationAuditRepository.save(userNotificationAudit);
         }
+        this.url = cleaned;
+    }
 
-        public String getPublisherId() {
-                return publisherId;
-        }
-
-        public void setPublisherId(String publisherId) {
-                this.publisherId = publisherId;
-        }
-
-        public String getPublisherNotificationId() {
-                return publisherNotificationId;
-        }
-
-        public void setPublisherNotificationId(String publisherNotificationId) {
-                this.publisherNotificationId = publisherNotificationId;
-        }
-
-        public String getCategory() {
-                return category;
-        }
-
-        public void setCategory(String category) {
-
-                String cleaned = Jsoup.clean(category,Whitelist.basic());
-                if (!cleaned.equals(category))
-                {
-                        //TODO Add audit
-                }
-                this.category = cleaned;
-        }
-
-        public String getTitle() {
-                return title;
-        }
-
-        public void setTitle(String title) {
-                String cleaned = Jsoup.clean(title,Whitelist.basic());
-                if (!cleaned.equals(title))
-                {
-                        //TODO Add audit
-                }
-                this.title = cleaned;
-        }
-
-        public String getBody() {
-                return body;
-        }
-
-        public void setBody(String body) {
-                String cleaned = Jsoup.clean(body, Whitelist.basic());
-                if (!cleaned.equals(body))
-                {
-                        //TODO Add audit
-                }
-                this.body = cleaned;
-        }
-
-        public String getUrl() { return url; }
-
-        public void setUrl(String url) {
-
-                String cleaned = Jsoup.clean(url,Whitelist.basic());
-                if (!cleaned.equals(url))
-                {
-                        //TODO Add audit
-                }
-                this.url = cleaned;
-        }
-
-        public Date getStartDate() {
-                return startDate;
-        }
-
-        public void setStartDate(Date startDate) {
-                this.startDate = startDate;
-        }
-
-        public Date getEndDate() {
-                return endDate;
-        }
-
-        public void setEndDate(Date endDate) {
-                this.endDate = endDate;
-        }
-
-        public String getUun() {
-                return uun;
-        }
-
-        public void setUun(String uun) {
-                this.uun = uun;
-        }
-
-        @Override
-        public String toString() {
-            return "Notification{" + "notificationId=" + notificationId + ", publisherId=" + publisherId + ", publisherNotificationId=" + publisherNotificationId + ", category=" + category + ", title=" + title + ", body=" + body + ", url=" + url + ", startDate=" + startDate + ", endDate=" + endDate + ", uun=" + uun + ", lastUpdated=" + lastUpdated + '}';
-        }
+    @Override
+    public String toString() {
+        return "Notification{" + "notificationId=" + notificationId + ", publisherId=" + publisherId + ", publisherNotificationId=" + publisherNotificationId + ", topic=" + topic + ", title=" + title + ", body=" + body + ", url=" + url + ", startDate=" + startDate + ", endDate=" + endDate + ", uun=" + uun + ", lastUpdated=" + lastUpdated + '}';
+    }
 
     @Override
     public int hashCode() {
@@ -183,7 +212,7 @@ public class Notification {
         return hash;
     }
 
-    
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -199,7 +228,7 @@ public class Notification {
         if (!Objects.equals(this.publisherNotificationId, other.publisherNotificationId)) {
             return false;
         }
-        if (!Objects.equals(this.category, other.category)) {
+        if (!Objects.equals(this.topic, other.topic)) {
             return false;
         }
         if (!Objects.equals(this.title, other.title)) {
@@ -207,7 +236,7 @@ public class Notification {
         }
         if (!Objects.equals(this.body, other.body)) {
             return false;
-        }        
+        }
         if (!Objects.equals(this.startDate, other.startDate)) {
             return false;
         }
@@ -216,8 +245,6 @@ public class Notification {
         }
         return true;
     }
-    
-        
-        
-        
+
+
 }

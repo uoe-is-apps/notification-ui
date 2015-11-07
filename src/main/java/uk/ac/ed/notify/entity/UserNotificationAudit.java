@@ -10,7 +10,7 @@ import java.util.Date;
  * Created by rgood on 20/10/2015.
  */
 @Entity
-@Table(name="USER_NOTIFICATION_AUDIT")
+@Table(name="USER_NOTIFICATION_AUDIT", schema="NOTIFY")
 public class UserNotificationAudit {
 
     @Id
@@ -19,6 +19,9 @@ public class UserNotificationAudit {
             strategy = "uuid")
     @Column(name="AUDIT_ID")
     private String auditId;
+
+    @Column(name="AUDIT_DESCRIPTION")
+    private String auditDescription;
 
     @Column(name="UUN")
     private String uun;
@@ -72,5 +75,13 @@ public class UserNotificationAudit {
 
     public void setAuditDate(Date auditDate) {
         this.auditDate = auditDate;
+    }
+
+    public String getAuditDescription() {
+        return auditDescription;
+    }
+
+    public void setAuditDescription(String auditDescription) {
+        this.auditDescription = auditDescription;
     }
 }

@@ -73,7 +73,7 @@ public class LearnService {
 
     private Notification constructLearnNotification(
             String publisherNotificationId,
-            String category,
+            String topic,
             String title,
             String body,
             String url,
@@ -87,7 +87,7 @@ public class LearnService {
             body = title;
         }
         notification.setBody(body);
-        notification.setCategory(category);
+        notification.setTopic(topic);
         notification.setPublisherId(publisherId);
         notification.setPublisherNotificationId(publisherNotificationId);
         notification.setStartDate(startDate);
