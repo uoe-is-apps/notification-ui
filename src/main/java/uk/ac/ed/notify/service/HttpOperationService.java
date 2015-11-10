@@ -5,17 +5,11 @@
 package uk.ac.ed.notify.service;
 
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
+//these are for http patch request, will reenable once renew subscription works, do not delete
 //import org.apache.http.HttpEntity;
 //import org.apache.http.HttpResponse;
 //import org.apache.http.NameValuePair;
@@ -87,7 +81,7 @@ public class HttpOperationService {
             String output = "";
             String json = "";
             while ((output = br.readLine()) != null) {  
-                System.out.println("server output: " + output);
+                logger.debug("server output: " + output);
                 if(output.indexOf("json") != -1 || output.indexOf("odata") != -1){
                     json = output;
                 }
@@ -158,7 +152,7 @@ success
                 InputStream is = entity.getContent();
                 StringBuilder sb = new StringBuilder();
                 try {
-                    System.out.println("ok");
+                    logger.debug("ok");
                     
                     BufferedReader br = null;
                     String line;
@@ -186,7 +180,7 @@ success
                     is.close();
                 }
                 
-                System.out.println(sb.toString());
+                logger.debug(sb.toString());
             }            
             
         } catch (Exception ex) {
