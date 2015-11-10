@@ -20,26 +20,13 @@ import static org.junit.Assert.assertEquals;
 import uk.ac.ed.notify.TestApplication;
 import uk.ac.ed.notify.entity.Office365Subscription;
 
-public class Office365RepositoryTest {}
 
-/*
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = TestApplication.class)
 public class Office365RepositoryTest {
 
     @Autowired
     Office365Repository office365Repository;
-
-    @Before
-    public void setup()
-    {
-
-    }
-
-    @After
-    public void cleanup() {
-
-    }
 
     @Test
     public void testSaveSubscription() throws ParseException {
@@ -50,8 +37,6 @@ public class Office365RepositoryTest {
         office365Repository.save(office365Subscription);
         
         assertEquals(1,office365Repository.count());
-        
-        
     }
 
     @Test
@@ -67,5 +52,6 @@ public class Office365RepositoryTest {
         assertEquals(office365SubscriptionInDB.getSubscriptionId(), "123");
     }
 
+    
+    
 }
-*/
