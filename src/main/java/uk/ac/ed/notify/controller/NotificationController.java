@@ -1,6 +1,7 @@
 package uk.ac.ed.notify.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
@@ -18,20 +19,20 @@ import java.security.Principal;
 @RestController
 public class NotificationController {
 
-
-    @Value("${spring.oauth2.client.clientSecret}")
-    private String clientSecret;
-
-    @Value("${spring.oauth2.client.accessTokenUri}")
-    private String tokenUrl;
-
-    @Value("${spring.oauth2.client.clientId}")
-    private String clientId;
-
     @Value("${zuul.routes.resource.url}")
     private String notificationMsUrl;
 
-    public NotificationController() {
+    private String clientSecret;
+    private String tokenUrl;
+    private String clientId;
+
+    @Autowired
+    public NotificationController( @Value("${spring.oauth2.client.clientSecret}") String clientSecret,
+                                   @Value("${spring.oauth2.client.accessTokenUri}") String tokenUrl,
+                                   @Value("${spring.oauth2.client.clientId}") String clientId) {
+        this.clientId=clientId;
+        this.clientSecret=clientSecret;
+        this.tokenUrl=tokenUrl;
         restTemplate = new OAuth2RestTemplate(resource());
     }
 
@@ -39,9 +40,9 @@ public class NotificationController {
 
     protected OAuth2ProtectedResourceDetails resource() {
         ClientCredentialsResourceDetails resource = new ClientCredentialsResourceDetails();
-        resource.setAccessTokenUri("https://dev.oauth.ws-apps.is.ed.ac.uk:443/oauth/token");
-        resource.setClientSecret("s1llycrash3s");
-        resource.setClientId("notification-ui");
+        resource.setAccessTokenUri(tokenUrl);
+        resource.setClientSecret(clientSecret);
+        resource.setClientId(clientId);
         return resource;
     }
 
