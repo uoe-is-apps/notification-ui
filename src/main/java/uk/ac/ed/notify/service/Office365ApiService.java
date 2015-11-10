@@ -66,6 +66,7 @@ public class Office365ApiService {
     private String clientState;
         
     public String acquireAccessToken(){
+        logger.info("acquireAccessToken");
         String token = "";
         String authority = "https://login.windows.net/" + tenantId + "/oauth2/authorize";
         ExecutorService service = null;
@@ -76,41 +77,38 @@ public class Office365ApiService {
             InputStream pkcs12Certificate=new FileInputStream(certfile);
 
             AsymmetricKeyCredential credential = AsymmetricKeyCredential.create(clientId, pkcs12Certificate, pfxPassword); 
-            System.out.println("certificate loaded successfully");
+            logger.info("certificate loaded successfully");
 
             Future<AuthenticationResult> future=authenticationContext.acquireToken("https://outlook.office365.com", (AsymmetricKeyCredential)credential, null);
 
             token=future.get().getAccessToken();
 
-            System.out.println("token - " + token);
+            logger.info("token - " + token);
             service.shutdown();
+            
+            logger.info("success");    
         }catch(Exception e){
-
+            logger.error("acquireAccessToken - " + e.toString());
         }
         
         return token;
     }
-     
 
-    private String readSubscriptionId(){
-        String subscriptionId = "";
-        
-        Iterable<Office365Subscription> iteration = office365Repository.findAll();
-        while(iteration.iterator().hasNext()){
-            Office365Subscription subscription = iteration.iterator().next();
-            subscriptionId = subscription.getSubscriptionId();
-            System.out.println("readSubscriptionId - " + subscriptionId);
-            break;
-        }
-        
-        return subscriptionId;
-    }
-    
-    
     public void subscribeToNotification(String token){
         String url = "https://outlook.office.com/api/beta/users/" + account + "/subscriptions";
         
-        System.out.println("subscribeToNotification - " + url);            
+        logger.info("subscribeToNotification - " + url);            
+        
+        /*do not delete
+            http://blogs.msdn.com/b/exchangedev/archive/2015/10/21/outlook-rest-api-changes-to-beta-endpoint-part-iii.aspx        
+            Current         Interim                         Final
+            ResourceURL	resource                        Resource
+            CallbackURL	notificationURL                 NotificationURL
+            ClientState	context                         ClientState
+            ExpirationTime	subscriptionExpirationDateTime	SubscriptionExpirationDateTime
+            ChangeType	changeType                      ChangeType
+        */
+                
         
         /*
         String input = 
@@ -122,11 +120,7 @@ public class Office365ApiService {
                     "  \"ClientState\": \"" + clientState + "\"                                                                         " +
                     "  }                                                                                                                ";                
         */
-        
-        //callbackUrl = "https://www-test.myed.ed.ac.uk/BlackboardVCPortlet/callback";
-        //callbackUrl = "https://dev.notifyadm.is.ed.ac.uk/office365NewEmailCallback/";
-        
-        
+
         /*
         String input = 
                     "  {                                                                                                                " +
@@ -150,76 +144,144 @@ public class Office365ApiService {
                     "  \"ClientState\": \"" + clientState + "\"                                                                             " +
                     "  }                                                                                                                ";    
         
-        /*
-        //http://blogs.msdn.com/b/exchangedev/archive/2015/10/21/outlook-rest-api-changes-to-beta-endpoint-part-iii.aspx        
-Current         Interim                         Final
-ResourceURL	resource                        Resource
-CallbackURL	notificationURL                 NotificationURL
-ClientState	context                         ClientState
-ExpirationTime	subscriptionExpirationDateTime	SubscriptionExpirationDateTime
-ChangeType	changeType                      ChangeType
-        */
-        
-        try {
-            System.out.println("input - " + input);   
+        try {   
+            logger.info("input - " + input);  
             
-            logger.debug("url - " + url);       
-            logger.debug("input - " + input);       
-            
-            String json = httpOperationService.post(token, url, input);
-            System.out.println("success " + json); 
-            logger.debug("success " + json);     
-            
-            
-            logger.debug("office365NewSubscriptionCallback - " + json);
+            String json = httpOperationService.post(token, url, input);            
+            logger.info("success " + json); 
 
-            //2015-11-04 14:14:54.711 DEBUG 17168 --- [ryBean_Worker-3] u.a.e.n.service.HttpOperationService     : post, server response code - 201
-            //server output: 
-            //{"@odata.context":"https://outlook.office.com/api/beta/$metadata#Users('scotapps%40scotapps.onmicrosoft.com')/Subscriptions/$entity",
-            //"@odata.type":"#Microsoft.OutlookServices.PushSubscription",
-            //"@odata.id":"https://outlook.office.com/api/beta/Users('scotapps@scotapps.onmicrosoft.com')/Subscriptions('QkRDMjgwQUEtQjExNi00NjA5LTkyMjAtMEJFOTVBQTNCQjU3XzQ1MTU4OEJFLTczQzQtNDBFOS1BN0E1LUYyOTdENkEzM0NBMQ==')",
-            //"Id":"QkRDMjgwQUEtQjExNi00NjA5LTkyMjAtMEJFOTVBQTNCQjU3XzQ1MTU4OEJFLTczQzQtNDBFOS1BN0E1LUYyOTdENkEzM0NBMQ==",
-            //"Resource":"https://outlook.office.com/api/beta/users/scotapps@scotapps.onmicrosoft.com/messages","ChangeType":"Created, Acknowledgment, Missed","ClientState":"c75831bd-fad3-4191-9a66-280a48528679","NotificationURL":"https://dev.notifyadm.is.ed.ac.uk/office365NewEmailCallback/",
-            //"SubscriptionExpirationDateTime":"2015-11-07T14:14:54.4142775Z"}
-            //success  
-            
-            
             Office365Subscription newSubscription = office365JsonService.parseOffice365NewSubscriptionCallbackSubscriptionId(json); 
-            logger.debug("newSubscription - " + newSubscription);
+            logger.info("newSubscription - " + newSubscription);
+            
             office365Repository.save(newSubscription);
-            logger.debug("subscription saved successfully");        
+            logger.info("subscription saved successfully");        
                     
         }catch(Exception e){
-            e.printStackTrace();
-            logger.error("e " + e.toString());       
+            logger.error("subscribeToNotification - " + e.toString());       
         }
 
     }
         
-    /*
-Interim version     
-{
-     @odata.type:"#Microsoft.OutlookServices.PushSubscription",
-     subscriptionExpirationDateTime: "2015-10-24T20:00:00.0Z"
- } 
-  
-{"@odata.type":"#Microsoft.OutlookServices.PushSubscription", "subscriptionExpirationDateTime": "2015-11-08T17:17:45.9028722Z"}       
-{"@odata.type":"#Microsoft.OutlookServices.PushSubscription", "subscriptionExpirationDateTime": "2015-11-08T20:00:00.0Z"}  
-{"@odata.type":"#Microsoft.OutlookServices.PushSubscription", "subscriptionExpirationDateTime": "2015-11-08T20:00:00.0Z"}  
-     
-Final version  
- {
-   @odata.type:"#Microsoft.OutlookServices.PushSubscription",
-   SubscriptionExpirationDateTime: "2015-10-24T20:00:00.0Z"
- } 
-     */
-    
-    public void renewSubscriptionToNotification(String token, String subscriptionId){
-        if(true){
-            deleteSubscriptionById(token, subscriptionId);
-            return;
+
+ 
+    public void processUnreadEmail(String token){
+        try {
+            String url = "https://outlook.office365.com/api/v1.0/users/" + account + "/folders/inbox/messages?$filter=IsRead%20eq%20false";
+            String json = httpOperationService.get(token, url);
+
+            logger.info("processUnreadEmail - " + json);
+            
+            Hashtable<String, Notification> table = office365JsonService.parseTableOfNotification(json);
+            logger.info("fetchUnreadEmail - found notifications, size - " + table.size());
+            
+            Iterator<String> iterator = table.keySet().iterator();
+            while(iterator.hasNext()){
+                String id = iterator.next();
+                Notification notification = table.get(id);
+                
+                logger.debug("save notification..." + notification.getTitle());
+                
+                if(notificationRepository.findByPublisherIdAndPublisherNotificationIdAndUun(notification.getPublisherId(), notification.getPublisherNotificationId(), notification.getUun()).size() == 0){
+                    logger.info("notification not exist in db, save");
+                    notificationRepository.save(notification);    
+                }else{
+                    logger.info("existing notification found, ignore");
+                }  
+                
+                deleteEmailById(token, id);
+            }
+            logger.info("success");    
+        }catch(Exception e){
+            logger.error(e.toString());
         }
+    }
+    
+    
+    public void processEmailById(String token, String id){
+        try {            
+            String url = "https://outlook.office365.com/api/v1.0/users/" + account + "/folders/inbox/messages/" + id;
+            
+            logger.info("processEmailById - " + id);
+            
+            String json = httpOperationService.get(token, url);            
+            Notification notification = office365JsonService.parseNotification(json);
+           
+            logger.info("construct notification from email - " + notification);
+            
+            String publisherId = notification.getPublisherId();
+            String publisherNotificationId = notification.getPublisherNotificationId();
+            String uun = notification.getUun();
+            if(notificationRepository.findByPublisherIdAndPublisherNotificationIdAndUun(publisherId, publisherNotificationId, uun).size() == 0){
+                logger.info("notification not exist in db, save");
+                notificationRepository.save(notification);    
+            }else{
+                logger.info("existing notification found, ignore");
+            }     
+            
+            logger.info("success");    
+        }catch(Exception e){
+            logger.error(e.toString());
+        }
+    }    
+    
+    
+    public void deleteEmailById(String token, String id){
+        try {
+            String url = "https://outlook.office365.com/api/v1.0/users/" + account + "/folders/inbox/messages/" + id;
+          
+            logger.info("deleteEmailById - " + url);
+            
+            httpOperationService.delete(token, url);   
+            
+            logger.info("success");
+        }catch(Exception e){
+            logger.error(e.toString());
+        }
+    }    
+    
+    
+    public void deleteSubscriptionById(String token, String id){
+        try {     
+            //v1
+            //String url = "https://outlook.office365.com/api/v1.0/users/" + account + "/subscriptions/" + id + ""; 
+            
+            String url = url = "https://outlook.office.com/api/beta/users/" + account + "/subscriptions/" + id + ""; 
+            
+            logger.info("deleteSubscriptionById - " + url);
+            
+            httpOperationService.delete(token, url);
+            
+            office365Repository.delete(id);
+            
+            logger.info("success");
+        }catch(Exception e){
+            logger.error(e.toString());
+        }
+    }    
+    
+
+
+    public void renewSubscriptionToNotification(String token, String subscriptionId){
+        //renew subscription does not work on office365 at the moment, this method is not used, do not delete, for future reference
         
+        /*
+        Interim version     
+        {
+             @odata.type:"#Microsoft.OutlookServices.PushSubscription",
+             subscriptionExpirationDateTime: "2015-10-24T20:00:00.0Z"
+         } 
+
+        {"@odata.type":"#Microsoft.OutlookServices.PushSubscription", "subscriptionExpirationDateTime": "2015-11-08T17:17:45.9028722Z"}       
+        {"@odata.type":"#Microsoft.OutlookServices.PushSubscription", "subscriptionExpirationDateTime": "2015-11-08T20:00:00.0Z"}  
+        {"@odata.type":"#Microsoft.OutlookServices.PushSubscription", "subscriptionExpirationDateTime": "2015-11-08T20:00:00.0Z"}  
+
+        Final version  
+         {
+           @odata.type:"#Microsoft.OutlookServices.PushSubscription",
+           SubscriptionExpirationDateTime: "2015-10-24T20:00:00.0Z"
+         } 
+        */
+            
         
         try {
             
@@ -237,10 +299,10 @@ Final version
             //String subscriptionId = readSubscriptionId();
             String url = "https://outlook.office.com/api/beta/users/" + account + "/subscriptions/" + subscriptionId + "/renew";
             
-            System.out.println("renew url - " + url);
+            logger.debug("renew url - " + url);
                       
             //String json  = "  {  \"@odata.type\":\"#Microsoft.OutlookServices.PushSubscription\", \"subscriptionExpirationDateTime\": \"2015-11-04T20:00:00.0Z\"}  ";   
-            //System.out.println(json);
+            //logger.debug(json);
             
             
             //httpOperationService.post(token, url, json);
@@ -253,106 +315,6 @@ Final version
             logger.error(e.toString());
         }         
     }    
-   
-    
-    public void processUnreadEmail(String token){
-        //fetchUnreadEmail - {"@odata.context":"https://outlook.office365.com/api/v1.0/$metadata#Users('hsun1%40uoeapps.onmicrosoft.com')/Folders('inbox')/Messages",
-        //"value":[{"@odata.id":"https://outlook.office365.com/api/v1.0/Users('hsun1@uoeapps.onmicrosoft.com')/Messages
-        //('AAMkADMzYmFjZmM5LWRjNzEtNDNiNS1iMDE4LWJjNGRlZDBlNDI5NwBGAAAAAADQ1fbd9u-oS6EUMm8vRMp5BwCfJe3G2ZDPT54eZMk1kgk2AAAAAAEMAACfJe3G2ZDPT54eZMk1kgk2AAAATKXbAAA=')","@odata.etag":"W/\"CQAAABYAAACfJe3G2ZDPT54eZMk1kgk2AAAATKgn\"","Id":"AAMkADMzYmFjZmM5LWRjNzEtNDNiNS1iMDE4LWJjNGRlZDBlNDI5NwBGAAAAAADQ1fbd9u-oS6EUMm8vRMp5BwCfJe3G2ZDPT54eZMk1kgk2AAAAAAEMAACfJe3G2ZDPT54eZMk1kgk2AAAATKXbAAA=","ChangeKey":"CQAAABYAAACfJe3G2ZDPT54eZMk1kgk2AAAATKgn","Categories":[],"DateTimeCreated":"2015-10-22T09:32:18Z","DateTimeLastModified":"2015-10-22T09:32:18Z","HasAttachments":false,"Subject":"notification create","Body":{"ContentType":"Text","Content":"<script type=\"application/ld+json\">\r\n{\r\n\"@type\": \"Notification\", \"publisherId\": \"12345\", \"publisherNotificationId\": \"12345\", \"publisherKey\": \"005AFE5E177048ABE05400144F00F4CC\", \"topic\": \"example category\", \"title\": \"example title\",\"body\": \"example body\", \"url\": \"http://www.ed.ac.uk\", \"uun\": \"rgood\", \"startDate\": \"2013-05-15T08:30\", \"endDate\": \"2013-05-20T08:30\", \"action\": \"insert\"\r\n}\r\n</script>\r\n\r\n-- \r\nThe University of Edinburgh is a charitable body, registered in\r\nScotland, with registration number SC005336.\r\n\r\n"},"BodyPreview":"<script type=\"application/ld+json\">\r\n{\r\n\"@type\": \"Notification\", \"publisherId\": \"12345\", \"publisherNotificationId\": \"12345\", \"publisherKey\": \"005AFE5E177048ABE05400144F00F4CC\", \"topic\": \"example category\", \"title\": \"example title\",\"body\": \"example body\", ","Importance":"Normal","ParentFolderId":"AQMkADMzAGJhY2ZjOS1kYzcxLTQzYjUtYjAxOC1iYzRkZWQwZTQyOTcALgAAA9DV9t327_hLoRQyby9EynkBAJ8l7cbZkM9Pnh5kyTWSCTYAAAIBDAAAAA==","Sender":{"EmailAddress":{"Address":"Hui.Sun@ed.ac.uk","Name":"SUN Michael"}},"From":{"EmailAddress":{"Address":"Hui.Sun@ed.ac.uk","Name":"SUN Michael"}},"ToRecipients":[{"EmailAddress":{"Address":"hsun1@uoeapps.onmicrosoft.com","Name":"Hui Sun"}}],"CcRecipients":[],"BccRecipients":[],"ReplyTo":[],"ConversationId":"AAQkADMzYmFjZmM5LWRjNzEtNDNiNS1iMDE4LWJjNGRlZDBlNDI5NwAQALmIdVeKe0ocnBuBKjRFxGo=","IsDeliveryReceiptRequested":null,"IsReadReceiptRequested":false,"IsRead":false,"IsDraft":false,"DateTimeReceived":"2015-10-22T09:32:18Z","DateTimeSent":"2015-10-22T09:31:37Z","WebLink":"https://outlook.office365.com/owa/?ItemID=AAMkADMzYmFjZmM5LWRjNzEtNDNiNS1iMDE4LWJjNGRlZDBlNDI5NwBGAAAAAADQ1fbd9u%2FoS6EUMm8vRMp5BwCfJe3G2ZDPT54eZMk1kgk2AAAAAAEMAACfJe3G2ZDPT54eZMk1kgk2AAAATKXbAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"}]}
-
-        try {
-            String url = "https://outlook.office365.com/api/v1.0/users/" + account + "/folders/inbox/messages?$filter=IsRead%20eq%20false";
-            String json = httpOperationService.get(token, url);
-
-            System.out.println("processUnreadEmail - " + json);
-            
-            Hashtable<String, Notification> table = office365JsonService.parseTableOfNotification(json);
-            System.out.println("fetchUnreadEmail - " + table.size());
-            
-            Iterator<String> iterator = table.keySet().iterator();
-            while(iterator.hasNext()){
-                String id = iterator.next();
-                Notification notification = table.get(id);
-                
-                System.out.println("save notification..." + notification.getTitle());
-                
-                notificationRepository.save(notification);
-                
-                deleteEmailById(token, id);
-            }
-                        
-        }catch(Exception e){
-            e.printStackTrace();
-            logger.error(e.toString());
-        }
-    }
-    
-    
-    public void processEmailById(String token, String id){
-        try {
-            
-            String url = "https://outlook.office365.com/api/v1.0/users/" + account + "/folders/inbox/messages/" + id;
-            
-            logger.debug("processEmailById - " + id);
-            
-            String json = httpOperationService.get(token, url);            
-            Notification notification = office365JsonService.parseNotification(json);
-           
-            logger.debug("notification from email - " + notification);
-            
-            String publisherId = notification.getPublisherId();
-            String publisherNotificationId = notification.getPublisherNotificationId();
-            String uun = notification.getUun();
-            if(notificationRepository.findByPublisherIdAndPublisherNotificationIdAndUun(publisherId, publisherNotificationId, uun).size() == 0){
-                logger.debug("notification not exist in db, save");
-                notificationRepository.save(notification);    
-            }else{
-                logger.debug("existing notification found, ignore");
-            }         
-        }catch(Exception e){
-            e.printStackTrace();
-            logger.error(e.toString());
-        }
-    }    
-    
-    
-    public void deleteEmailById(String token, String id){
-        if(true) return; //do not enable
-        try {
-            //String id = "AAMkADMzYmFjZmM5LWRjNzEtNDNiNS1iMDE4LWJjNGRlZDBlNDI5NwBGAAAAAADQ1fbd9u-oS6EUMm8vRMp5BwCfJe3G2ZDPT54eZMk1kgk2AAAAAAEMAACfJe3G2ZDPT54eZMk1kgk2AAAATKXcAAA=";
-            String url = "https://outlook.office365.com/api/v1.0/users/" + account + "/folders/inbox/messages/" + id;
-          
-            httpOperationService.delete(token, url);   
-        }catch(Exception e){
-            e.printStackTrace();
-            logger.error(e.toString());
-        }
-    }    
-    
-    
-    public void deleteSubscriptionById(String token, String id){
-        try {            
-            String url = "https://outlook.office365.com/api/v1.0/users/" + account + "/subscriptions/" + id + "";       
-            
-            //works in fiddler
-            url = "https://outlook.office.com/api/beta/users/" + account + "/subscriptions/" + id + ""; //ODYzNUJEMjQtRDJFMi00RDA3LTlENUYtNjZBMzExMkYwN0VEXzQ1MTU4OEJFLTczQzQtNDBFOS1BN0E1LUYyOTdENkEzM0NBMQ=="
-            
-             
-            System.out.println(url);
-            httpOperationService.delete(token, url);
-            
-            office365Repository.delete(id);
-            
-        }catch(Exception e){
-            e.printStackTrace();
-            logger.error(e.toString());
-        }
-    }    
-    
-//new subscription - {"value":[{"@odata.type":"#Microsoft.OutlookServices.Notification","Id":null,"subscriptionId":"OUJCOEMwQUYtMzk5OS00QUNBLUJBQzAtQzNFRTNDMzQzNDg3XzMzQkFDRkM5LURDNzEtNDNCNS1CMDE4LUJDNERFRDBFNDI5Nw==","subscriptionExpirationDateTime":"2015-10-30T17:52:32.1693974Z","sequenceNumber":0,"changeType":"Acknowledgment"}]}    
-//new email - {"value":[{"@odata.type":"#Microsoft.OutlookServices.Notification","Id":null,"subscriptionId":"RTEyRUVBOTUtMjI4NS00MEE0LUFGQ0UtOTgxNkNBRDAyQzkwXzQ1MTU4OEJFLTczQzQtNDBFOS1BN0E1LUYyOTdENkEzM0NBMQ==","subscriptionExpirationDateTime":"2015-10-30T17:32:37.4526939Z","sequenceNumber":1,"changeType":"Created","resource":"https://outlook.office.com/api/beta/Users('scotapps@scotapps.onmicrosoft.com')/Messages('AAMkADQ1MTU4OGJlLTczYzQtNDBlOS1hN2E1LWYyOTdkNmEzM2NhMQBGAAAAAAAQSU6klR_CS7f2u_Zotqz3BwCK45XT6t02QqdGHEQt1wAjAAAAAAEMAACK45XT6t02QqdGHEQt1wAjAAAAAAF6AAA=')","resourceData":{"@odata.type":"#Microsoft.OutlookServices.Message","@odata.id":"https://outlook.office.com/api/beta/Users('scotapps@scotapps.onmicrosoft.com')/Messages('AAMkADQ1MTU4OGJlLTczYzQtNDBlOS1hN2E1LWYyOTdkNmEzM2NhMQBGAAAAAAAQSU6klR_CS7f2u_Zotqz3BwCK45XT6t02QqdGHEQt1wAjAAAAAAEMAACK45XT6t02QqdGHEQt1wAjAAAAAAF6AAA=')","@odata.etag":"W/\"CQAAABYAAACK45XT6t02QqdGHEQt1wAjAAAAAAGj\"","Id":"AAMkADQ1MTU4OGJlLTczYzQtNDBlOS1hN2E1LWYyOTdkNmEzM2NhMQBGAAAAAAAQSU6klR_CS7f2u_Zotqz3BwCK45XT6t02QqdGHEQt1wAjAAAAAAEMAACK45XT6t02QqdGHEQt1wAjAAAAAAF6AAA="}}]}
-    
-    
-    
+       
     
 }

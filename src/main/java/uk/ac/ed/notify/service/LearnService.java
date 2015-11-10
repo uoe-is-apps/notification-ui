@@ -9,8 +9,6 @@ import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -338,7 +336,7 @@ public class LearnService {
                 
                 Notification notification = constructLearnNotification(publisherNotificationId, category, title, body, url, startDate, endDate, uun);
                 
-                System.out.println(i + " " + category + " - " + assessment.getCrsmainPk1() + " " + assessment.getTitle() + " " + assessment.getPk1() + " " + assessment.getPossible() + " " + grade);                 
+                logger.debug(i + " " + category + " - " + assessment.getCrsmainPk1() + " " + assessment.getTitle() + " " + assessment.getPk1() + " " + assessment.getPossible() + " " + grade);                 
 
                 if (ifInsertLearnNotification(publisherId, publisherNotificationId, uun, notification)) {                
                     logger.debug("insert");

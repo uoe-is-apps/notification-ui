@@ -11,13 +11,15 @@ import uk.ac.ed.notify.entity.JsonNotification;
 
 import javax.servlet.ServletException;
 import java.security.Principal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by rgood on 28/10/2015.
  */
 @RestController
 public class NotificationController {
-
+    private static final Logger logger = LoggerFactory.getLogger(NotificationController.class);
 
     @Value("${spring.oauth2.client.clientSecret}")
     private String clientSecret;
@@ -32,7 +34,7 @@ public class NotificationController {
     private String notificationMsUrl;
 
     public NotificationController() {
-        System.out.println("init");
+        logger.debug("init");
         restTemplate = new OAuth2RestTemplate(resource());
     }
 
@@ -43,7 +45,7 @@ public class NotificationController {
         resource.setAccessTokenUri("https://dev.oauth.ws-apps.is.ed.ac.uk:443/oauth/token");
         resource.setClientSecret("s1llycrash3s");
         resource.setClientId("notification-ui");
-        System.out.println("returning resource:" + resource.getClientId());
+        logger.debug("returning resource:" + resource.getClientId());
         return resource;
     }
 
@@ -57,7 +59,7 @@ public class NotificationController {
     public
     @ResponseBody
     JsonNotification getNotification(@PathVariable("notification-id") String notificationId) throws ServletException {
-        System.out.println(restTemplate.getResource().getClientSecret());
+        logger.debug(restTemplate.getResource().getClientSecret());
         ResponseEntity<JsonNotification> response = restTemplate.getForEntity(notificationMsUrl + "/" + notificationId, JsonNotification.class);
 
         return response.getBody();
