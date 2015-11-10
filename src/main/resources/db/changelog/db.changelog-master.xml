@@ -46,7 +46,7 @@
     </changeSet>
     <changeSet id="insert_myed_subscriber_oracle" dbms="oracle" author="rgood">
         <sqlFile encoding="utf8"
-                 path="db/changelog/sql/insert_myed_subscriber_oracle.sql.sql"
+                 path="db/changelog/sql/insert_myed_subscriber_oracle.sql"
                  splitStatements="true"
                  stripComments="true"/>
     </changeSet>
