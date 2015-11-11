@@ -9,8 +9,6 @@ import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +71,7 @@ public class LearnService {
 
     private Notification constructLearnNotification(
             String publisherNotificationId,
-            String topic,
+            String category,
             String title,
             String body,
             String url,
@@ -87,7 +85,7 @@ public class LearnService {
             body = title;
         }
         notification.setBody(body);
-        notification.setTopic(topic);
+        notification.setCategory(category);
         notification.setPublisherId(publisherId);
         notification.setPublisherNotificationId(publisherNotificationId);
         notification.setStartDate(startDate);
@@ -113,7 +111,7 @@ public class LearnService {
         return false;
     }
     
-    public boolean ifInsertLearnNotification(String publisherId, String publisherNotificationId, Notification notification) {
+    private boolean ifInsertLearnNotification(String publisherId, String publisherNotificationId, Notification notification) {
         List<Notification> existingNotifications = notificationRepository.findByPublisherIdAndPublisherNotificationId(publisherId, publisherNotificationId);
         if (existingNotifications.size() == 0) {
             return true;
@@ -338,7 +336,7 @@ public class LearnService {
                 
                 Notification notification = constructLearnNotification(publisherNotificationId, category, title, body, url, startDate, endDate, uun);
                 
-                logger.debug(i + " " + category + " - " + assessment.getCrsmainPk1() + " " + assessment.getTitle() + " " + assessment.getPk1() + " " + assessment.getPossible() + " " + grade);
+                logger.debug(i + " " + category + " - " + assessment.getCrsmainPk1() + " " + assessment.getTitle() + " " + assessment.getPk1() + " " + assessment.getPossible() + " " + grade);                 
 
                 if (ifInsertLearnNotification(publisherId, publisherNotificationId, uun, notification)) {                
                     logger.debug("insert");
