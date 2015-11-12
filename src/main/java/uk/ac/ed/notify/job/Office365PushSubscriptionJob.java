@@ -1,6 +1,5 @@
 package uk.ac.ed.notify.job;
 
-import java.util.List;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;

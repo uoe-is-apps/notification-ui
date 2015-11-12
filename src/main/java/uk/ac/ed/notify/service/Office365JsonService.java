@@ -24,7 +24,7 @@ public class Office365JsonService {
     private static final Logger logger = LoggerFactory.getLogger(Office365JsonService.class); 
     
     public Office365Subscription parseOffice365NewSubscriptionCallbackSubscriptionId(String json) {
-         /*
+         /* v1
          Office365Subscription office365Subscription = null;
          JSONObject jsonObj = new JSONObject(json);
          JSONArray array = jsonObj.getJSONArray("value");
@@ -58,7 +58,7 @@ public class Office365JsonService {
              office365Subscription.setSubscriptionExpiry((new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).parse(expiryDate)); //"2015-10-23T10:32:23.0363654Z"
              office365Subscription.setSubscriptionRenew(new Date());
          }catch(Exception e){
-             e.printStackTrace();
+             logger.error(e.toString());
          }
          
          return office365Subscription;        
@@ -113,8 +113,7 @@ public class Office365JsonService {
             notification.setUrl(jsonNotification.getString("url"));
             notification.setUun(jsonNotification.getString("uun"));
             notification.setLastUpdated(new Date());
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception e) {           
             logger.error(e.toString());
         }
 
