@@ -14,7 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.ac.ed.notify.entity.AuditActions;
 import uk.ac.ed.notify.entity.Notification;
+import uk.ac.ed.notify.entity.UserNotificationAudit;
 import uk.ac.ed.notify.learn.entity.Announcements;
 import uk.ac.ed.notify.learn.entity.CourseUsers;
 import uk.ac.ed.notify.learn.entity.GradebookGrade;
@@ -28,6 +30,7 @@ import uk.ac.ed.notify.learn.repository.LearnGradebookGradeRepository;
 import uk.ac.ed.notify.learn.repository.LearnTaskRepository;
 import uk.ac.ed.notify.learn.repository.LearnUserRepository;
 import uk.ac.ed.notify.repository.NotificationRepository;
+import uk.ac.ed.notify.repository.UserNotificationAuditRepository;
 
 /**
  *
@@ -58,14 +61,15 @@ public class LearnService {
     @Autowired
     LearnGradebookGradeRepository learnGradebookGradeRepository;
     
-    @Autowired
-    private MacService macService;
     private static final String announceForwardUrl = "/webapps/blackboard/execute/announcement?method=search&context=course&course_id=courseidtoreplace&handle=cp_announcements";
     private static final String taskForwardUrl = "/webapps/blackboard/execute/taskView?course_id=courseidtoreplace&task_id=taskidtoreplace";
     private static final String assignForwardUrl = "/webapps/assignment/uploadAssignment?content_id=contentidtoreplace&course_id=courseidtoreplace&assign_group_id=&mode=view";
     
     @Value("${learn.baseurl}")
     private String baseUrl; 
+    
+    @Value("${learn.notificationurl}")
+    private String notificationUrl; 
     
     private final String publisherId = "learn";
 
@@ -125,8 +129,14 @@ public class LearnService {
         return false;
     }
     
-
+    
+    private String getAnnouncementForwardUrl() {
+        return notificationUrl;
+    }
+    
     private String getAnnouncementForwardUrl(String uun, String courseId) {
+        System.out.println(notificationUrl);
+        /* WEB007-6, deep linking is not in use
         try {
             String forwardUrl = URLEncoder.encode(announceForwardUrl.replace("courseidtoreplace", courseId), "UTF-8");
             String timestamp = macService.getTimestamp();
@@ -150,9 +160,12 @@ public class LearnService {
         } catch (UnsupportedEncodingException e) {
             return "error_in_encoding_announcement_url";
         }
+        */
+        return notificationUrl;
     }
 
     private String getTaskForwardUrl(String uun, String courseId, String taskId) {
+        /* WEB007-6, deep linking is not in use
         try {
             String forwardUrl = URLEncoder.encode(taskForwardUrl.replace("courseidtoreplace", courseId).replace("taskidtoreplace", taskId), "UTF-8");
 
@@ -177,9 +190,13 @@ public class LearnService {
         } catch (UnsupportedEncodingException e) {
             return "error_in_encoding_task_url";
         }
+        */
+        
+        return notificationUrl;
     }
 
     private String getAssignForwardUrl(String uun, String contentId, String courseId) {
+        /* WEB007-6, deep linking is not in use
         try {
             String forwardUrl = URLEncoder.encode(assignForwardUrl.replace("courseidtoreplace", courseId).replace("contentidtoreplace", contentId), "UTF-8");
 
@@ -203,6 +220,9 @@ public class LearnService {
         } catch (UnsupportedEncodingException e) {
             return "error_in_assign_url_encoding";
         }
+        */
+        
+        return notificationUrl;
     }
 
     
@@ -240,7 +260,7 @@ public class LearnService {
             String category = "Learn System Announcement";
             String title = announcement.getSubject() + "";
             String body = announcement.getAnnouncement() + "";
-            String url = "";
+            String url = getAnnouncementForwardUrl();
             Date startDate = announcement.getStartDate();
             Date endDate = announcement.getEndDate();
             Notification notification = constructLearnNotification(publisherNotificationId, category, title, body, "ignore", startDate, endDate, "ignore");
@@ -343,9 +363,8 @@ public class LearnService {
                     notificationRepository.save(notification);
                 }
             }
-
-
         }
 
     }
+      
 }
