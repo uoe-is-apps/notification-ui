@@ -8,4 +8,3 @@ GRANT select,insert,update,delete on USER_NOTIFICATION_AUDIT TO notify_user;
 GRANT select,insert,update,delete on NOTIFICATION_UI_USERS TO notify_user;
 GRANT select,insert,update,delete on NOTIFICATION_UI_USER_ROLES TO notify_user;
 GRANT select,insert,update,delete on NOTIFICATION_UI_ROLES TO notify_user;
-GRANT select,insert,update,delete on OFFICE365_SUBSCRIPTION TO notify_user;

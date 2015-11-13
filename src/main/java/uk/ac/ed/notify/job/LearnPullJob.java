@@ -21,8 +21,9 @@ public class LearnPullJob implements Job {
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        //if(true) return;
         logger.info("LearnPullJob started");
         learnService.pullLearnNotifications();
-        logger.info ("LearnPullJob finished succesfully");
+        logger.info ("LearnPullJob finished successfully");
     }
 }

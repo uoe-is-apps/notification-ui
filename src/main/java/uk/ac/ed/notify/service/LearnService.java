@@ -407,7 +407,7 @@ public class LearnService {
                  if(action.equals(AuditActions.CREATE_NOTIFICATION) || action.equals(AuditActions.UPDATE_NOTIFICATION)){                      
                       notificationRepository.save(notification);
                  }else if(action.equals(AuditActions.DELETE_NOTIFICATION)){                      
-                      notificationRepository.delete(notification);
+                      notificationRepository.delete(notification.getNotificationId());
                  } 
                  logNotification(action, notification);
             }catch(Exception e){

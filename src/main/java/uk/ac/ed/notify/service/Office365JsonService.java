@@ -112,6 +112,8 @@ public class Office365JsonService {
             notification.setEndDate(dateFormat.parse(jsonNotification.getString("endDate")));
             notification.setUrl(jsonNotification.getString("url"));
             notification.setUun(jsonNotification.getString("uun"));
+            try{notification.setAction(jsonNotification.getString("action"));}catch(Exception e){};
+            try{notification.setPublisherKey(jsonNotification.getString("publisherKey"));}catch(Exception e){};
             notification.setLastUpdated(new Date());
         } catch (Exception e) {           
             logger.error(e.toString());

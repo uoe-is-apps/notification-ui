@@ -5,6 +5,18 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.7
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.7.xsd">
+    <changeSet id="office365_tables_oracle" author="hsun1" dbms="oracle" runOnChange="true">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/create_office365_table_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+        <rollback>
+            <sqlFile encoding="utf8"
+                     path="db/changelog/sql/office365_table_rollback_oracle.sql"
+                     splitStatements="true"
+                     stripComments="true"/>
+        </rollback>        
+    </changeSet>    
     <changeSet id="quartz_tables_oracle" author="rgood" dbms="oracle">
         <sqlFile encoding="utf8"
                  path="db/changelog/sql/quartz_tables_oracle.sql"

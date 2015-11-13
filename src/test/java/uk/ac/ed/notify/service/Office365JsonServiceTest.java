@@ -27,6 +27,19 @@ public class Office365JsonServiceTest {
     @Autowired 
     Office365JsonService office365JsonService;
 
+    
+    @Test
+    public void testParseSingleNotification() throws ParseException {
+        String unreadEmailJson = "{\"@odata.context\":\"https://outlook.office365.com/api/v1.0/$metadata#Users('scotapps%40scotapps.onmicrosoft.com')/Folders('inbox')/Messages\",\"value\":[{\"@odata.id\":\"https://outlook.office365.com/api/v1.0/Users('scotapps@scotapps.onmicrosoft.com')/Messages('AAMkADQ1MTU4OGJlLTczYzQtNDBlOS1hN2E1LWYyOTdkNmEzM2NhMQBGAAAAAAAQSU6klR_CS7f2u_Zotqz3BwCK45XT6t02QqdGHEQt1wAjAAAAAAEMAACK45XT6t02QqdGHEQt1wAjAAAItUOGAAA=')\",\"@odata.etag\":\"W/\\\"CQAAABYAAACK45XT6t02QqdGHEQt1wAjAAAItlsJ\\\"\",\"Id\":\"AAMkADQ1MTU4OGJlLTczYzQtNDBlOS1hN2E1LWYyOTdkNmEzM2NhMQBGAAAAAAAQSU6klR_CS7f2u_Zotqz3BwCK45XT6t02QqdGHEQt1wAjAAAAAAEMAACK45XT6t02QqdGHEQt1wAjAAAItUOGAAA=\",\"DateTimeCreated\":\"2015-11-13T17:23:41Z\",\"DateTimeLastModified\":\"2015-11-13T17:23:41Z\",\"ChangeKey\":\"CQAAABYAAACK45XT6t02QqdGHEQt1wAjAAAItlsJ\",\"Categories\":[],\"DateTimeReceived\":\"2015-11-13T17:23:41Z\",\"DateTimeSent\":\"2015-11-13T17:23:39Z\",\"HasAttachments\":false,\"Subject\":\"office 365 notify\",\"Body\":{\"ContentType\":\"HTML\",\"Content\":\"<html>\\r\\n<head>\\r\\n<meta http-equiv=\\\"Content-Type\\\" content=\\\"text/html; charset=utf-8\\\">\\r\\n<meta content=\\\"text/html; charset=iso-8859-1\\\">\\r\\n<style type=\\\"text/css\\\" style=\\\"display:none\\\">\\r\\n<!--\\r\\np\\r\\n\\t{margin-top:0;\\r\\n\\tmargin-bottom:0}\\r\\n-->\\r\\n</style>\\r\\n</head>\\r\\n<body dir=\\\"ltr\\\">\\r\\n<div id=\\\"divtagdefaultwrapper\\\" style=\\\"font-size:12pt; color:#000000; background-color:#FFFFFF; font-family:Calibri,Arial,Helvetica,sans-serif\\\">\\r\\n<p><span id=\\\"ms-rterangepaste-start\\\"></span>&lt;script type=&quot;application/ld&#43;json&quot;&gt;<br>\\r\\n{<br>\\r\\n&quot;@type&quot;: &quot;Notification&quot;, &quot;publisherId&quot;: &quot;learn&quot;, &quot;publisherNotificationId&quot;: &quot;112911&quot;, &quot;publisherKey&quot;: &quot;005AFE5E177048ABE05400144F00F4CC&quot;, &quot;topic&quot;: &quot;Learn Assessment&quot;, &quot;title&quot;: &quot;Richard Test&quot;,&quot;body&quot;: &quot;example body7&quot;, &quot;url&quot;: &quot;http://www.ed.ac.uk&quot;, &quot;uun&quot;: &quot;rgood&quot;,\\r\\n &quot;startDate&quot;: &quot;2013-05-15T08:30&quot;, &quot;endDate&quot;: &quot;2016-05-20T08:30&quot;, &quot;action&quot;: &quot;insert&quot;<br>\\r\\n}<br>\\r\\n&lt;/script&gt;<span id=\\\"ms-rterangepaste-end\\\"></span><br>\\r\\n</p>\\r\\n</div>\\r\\n</body>\\r\\n</html>\\r\\n\"},\"BodyPreview\":\"<script type=\\\"application/ld+json\\\">\\r\\n{\\r\\n\\\"@type\\\": \\\"Notification\\\", \\\"publisherId\\\": \\\"learn\\\", \\\"publisherNotificationId\\\": \\\"112911\\\", \\\"publisherKey\\\": \\\"005AFE5E177048ABE05400144F00F4CC\\\", \\\"topic\\\": \\\"Learn Assessment\\\", \\\"title\\\": \\\"Richard Test\\\",\\\"body\\\": \\\"example body7\\\",\",\"Importance\":\"Normal\",\"ParentFolderId\":\"AAMkADQ1MTU4OGJlLTczYzQtNDBlOS1hN2E1LWYyOTdkNmEzM2NhMQAuAAAAAAAQSU6klR_CS7f2u_Zotqz3AQCK45XT6t02QqdGHEQt1wAjAAAAAAEMAAA=\",\"Sender\":{\"EmailAddress\":{\"Name\":\"Jing Pang\",\"Address\":\"scotapps@scotapps.onmicrosoft.com\"}},\"From\":{\"EmailAddress\":{\"Name\":\"Jing Pang\",\"Address\":\"scotapps@scotapps.onmicrosoft.com\"}},\"ToRecipients\":[{\"EmailAddress\":{\"Name\":\"Jing Pang\",\"Address\":\"scotapps@scotapps.onmicrosoft.com\"}}],\"CcRecipients\":[],\"BccRecipients\":[],\"ReplyTo\":[],\"ConversationId\":\"AAQkADQ1MTU4OGJlLTczYzQtNDBlOS1hN2E1LWYyOTdkNmEzM2NhMQAQABNicJfVt1xDvvgl2r7msa8=\",\"IsDeliveryReceiptRequested\":false,\"IsReadReceiptRequested\":false,\"IsRead\":false,\"IsDraft\":false,\"WebLink\":\"https://outlook.office365.com/owa/?ItemID=AAMkADQ1MTU4OGJlLTczYzQtNDBlOS1hN2E1LWYyOTdkNmEzM2NhMQBGAAAAAAAQSU6klR%2BCS7f2u%2BZotqz3BwCK45XT6t02QqdGHEQt1wAjAAAAAAEMAACK45XT6t02QqdGHEQt1wAjAAAItUOGAAA%3D&exvsurl=1&viewmodel=ReadMessageItem\"}]}";
+
+        Hashtable<String, Notification> idAndNotificationPairTable = office365JsonService.parseTableOfNotification(unreadEmailJson);
+        
+        int expectedTotal = 1;
+        int actualTotal = idAndNotificationPairTable.size();
+        
+        assertEquals(expectedTotal,actualTotal); 
+    }
+    
 
     @Test
     public void testParseNotification() throws ParseException {
@@ -35,7 +48,7 @@ public class Office365JsonServiceTest {
         
         int expectedTotal = 4;
         int actualTotal = idAndNotificationPairTable.size();
-        
+
         assertEquals(expectedTotal,actualTotal); 
     }
 
@@ -60,5 +73,5 @@ public class Office365JsonServiceTest {
         
         assertEquals(expected,actual);
     }  
-   
+  
 }

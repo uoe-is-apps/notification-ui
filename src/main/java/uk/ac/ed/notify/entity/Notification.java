@@ -71,6 +71,28 @@ public class Notification {
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdated;
 
+    @Transient 
+    private String publisherKey;
+    
+    @Transient 
+    private String action;      
+
+    public String getPublisherKey() {
+        return publisherKey;
+    }
+
+    public void setPublisherKey(String publisherKey) {
+        this.publisherKey = publisherKey;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+        
     public Date getLastUpdated() {
         return lastUpdated;
     }
@@ -179,7 +201,7 @@ public class Notification {
 
     @Override
     public String toString() {
-        return "Notification{" + "notificationId=" + notificationId + ", publisherId=" + publisherId + ", publisherNotificationId=" + publisherNotificationId + ", topic=" + topic + ", title=" + title + ", body=" + body + ", url=" + url + ", startDate=" + startDate + ", endDate=" + endDate + ", uun=" + uun + ", lastUpdated=" + lastUpdated + '}';
+        return "Notification{" + "notificationId=" + notificationId + ", publisherId=" + publisherId + ", publisherNotificationId=" + publisherNotificationId + ", topic=" + topic + ", title=" + title + ", body=" + body + ", url=" + url + ", startDate=" + startDate + ", endDate=" + endDate + ", uun=" + uun + ", action=" + action + ", publisherKey=" + publisherKey + '}';
     }
 
     @Override
