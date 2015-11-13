@@ -51,7 +51,7 @@
                     <input name="url" type="url" ng-model="notification.url" placeholder="URL">
                 </div>
                 <p class="help-block" ng-show="editNotificationForm.url.$touched && editNotificationForm.url.$invalid">
-                    Please enter a URL in the format http(s)://<url, e.g. http://www.ed.ac.uk
+                    Please enter a URL in the format http(s)://(url), e.g. http://www.ed.ac.uk
                 </p>
             </div>
             <div class="form-group">
@@ -60,30 +60,30 @@
                     <input type="text" ng-model="notification.topic" required readonly>
                 </div>
             </div>
-            <div class="form-group" ng-class="{ 'has-error': editNotificationForm.startDate.$touched && editNotificationForm.startDate.$invalid }">
+            <div class="form-group" ng-class="{ 'has-error': editNotificationForm.startDate.$touched && (editNotificationForm.startDate.$invalid || badStartDate) }">
                 <label class="col-sm-2 control-label">Start Date:</label>
                 <div class="col-sm-10">
                     <p class="input-group">
-                        <input name="startDate" type="text" class="form-control" datepicker-popup="{{format}}" ng-model="notification.startDate" is-open="startDateStatus.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+                        <input name="startDate" type="text" class="form-control" datepicker-popup="{{format}}" ng-change="checkDates(notification)" ng-model="notification.startDate" is-open="startDateStatus.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
                 <span class="input-group-btn">
-                    <button type="button" class="btn btn-default" ng-click="openStartDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                    <button type="button" class="btn btn-default" ng-click="openStartDate($event)"  ><i class="glyphicon glyphicon-calendar"></i></button>
                 </span>
-                    <p class="help-block" ng-show="editNotificationForm.startDate.$touched && editNotificationForm.startDate.$invalid">
-                        Start Date is required.
+                    <p class="help-block" ng-show="editNotificationForm.startDate.$touched && (editNotificationForm.startDate.$invalid || badStartDate)">
+                        Date should be in the format DD-Month-YYYY, e.g. 29-November-20152., and should be from today onwards.
                     </p>
                     </p>
                 </div>
             </div>
-            <div class="form-group" ng-class="{ 'has-error': editNotificationForm.startDate.$touched && editNotificationForm.endDate.$invalid }">
+            <div class="form-group" ng-class="{ 'has-error': editNotificationForm.startDate.$touched && (editNotificationForm.endDate.$invalid || badEndDate) }">
                 <label class="col-sm-2 control-label">End Date:</label>
                 <div class="col-sm-10">
                     <p class="input-group">
-                        <input name="endDate" type="text" class="form-control" datepicker-popup="{{format}}" ng-model="notification.endDate" is-open="endDateStatus.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+                        <input name="endDate" type="text" class="form-control" datepicker-popup="{{format}}" ng-change="checkDates(notification)" ng-model="notification.endDate" is-open="endDateStatus.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
                 <span class="input-group-btn">
-                    <button type="button" class="btn btn-default" ng-click="openEndDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                    <button type="button" class="btn btn-default" ng-click="openEndDate($event)" ><i class="glyphicon glyphicon-calendar"></i></button>
                 </span>
-                    <p class="help-block" ng-show="editNotificationForm.endDate.$touched && editNotificationForm.endDate.$invalid">
-                        End Date is required.
+                    <p class="help-block" ng-show="editNotificationForm.endDate.$touched && (editNotificationForm.endDate.$invalid || badEndDate)">
+                        Date should be in the format DD-Month-YYYY, e.g. 29-November-20152. End Date should be after Start Date.
                     </p>
                     </p>
                 </div>
