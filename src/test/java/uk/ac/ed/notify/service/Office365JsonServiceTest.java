@@ -24,8 +24,8 @@ import uk.ac.ed.notify.entity.Notification;
 @SpringApplicationConfiguration(classes = TestApplication.class)
 public class Office365JsonServiceTest {
 
-    //@Autowired //gives autowire error
-    Office365JsonService office365JsonService = new Office365JsonService();
+    @Autowired 
+    Office365JsonService office365JsonService;
 
 
     @Test

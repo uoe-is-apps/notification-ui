@@ -204,6 +204,9 @@ public class Notification {
         if (!Objects.equals(this.publisherNotificationId, other.publisherNotificationId)) {
             return false;
         }
+        if (!Objects.equals(this.url, other.url)) {
+            return false;
+        }        
         if (!Objects.equals(this.topic, other.topic)) {
             return false;
         }

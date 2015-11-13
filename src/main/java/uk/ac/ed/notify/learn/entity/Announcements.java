@@ -39,7 +39,22 @@ import javax.persistence.Transient;
      "and v.crsmainPk1=m.pk1 " +     
      "and v.announcementType='C' " +   
      "order by m.dtcreated desc "
+     ),    
+    /*
+    @NamedQuery(name = "Announcements.findCourseAnnouncements", 
+     query = 
+     //"select u.pk1 as userId, u.userId as uun, m.courseName, m.pk1 as pk1,m.courseId as courseId, m.startDate as startDate, m.endDate as endDate " +     
+     //", s.startDate, s.endDate, s.subject, s.crsmainPk1 " +     
+     "SELECT v from Users u, CourseUsers cu, CourseMain m, " +     
+     "Announcements v " +     
+     "where " +     
+     "u.pk1 = cu.usersPk1 and m.pk1 = cu.crsmainPk1 and (m.startDate <= sysdate and sysdate <= m.endDate or m.endDate is null)  " +     
+     //"and u.userId='admin.hsun1' " +     
+     "and v.crsmainPk1=m.pk1 " +     
+     "and v.announcementType='C' " +   
+     "order by m.dtcreated desc "
      ),
+     */
     @NamedQuery(name = "Announcements.findSystemAnnouncements", 
      query = 
      "select v " +     
@@ -180,6 +195,11 @@ public class Announcements {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Announcements{" + "pk1=" + pk1 + ", crsmainPk1=" + crsmainPk1 + ", usersPk1=" + usersPk1 + ", subject=" + subject + ", announcement=" + announcement + ", announcementType=" + announcementType + ", startDate=" + startDate + ", endDate=" + endDate + '}';
     }
 
 

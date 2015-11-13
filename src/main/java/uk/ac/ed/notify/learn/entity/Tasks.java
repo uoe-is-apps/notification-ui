@@ -72,6 +72,10 @@ public class Tasks {
     private String subject;  
     
     @Basic(optional = false)
+    @Column(name = "description")
+    private String description;          
+    
+    @Basic(optional = false)
     @Column(name = "task_type")
     private String taskType;       
 
@@ -134,6 +138,16 @@ public class Tasks {
     public void setTaskType(String taskType) {
         this.taskType = taskType;
     }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+
     
     
     

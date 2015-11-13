@@ -45,6 +45,10 @@ public class GradebookGrade implements Serializable{
     private Integer pk1;
 
     @Basic(optional = false)
+    @Column(name = "course_users_pk1")
+    private Integer courseUsersPk1;    
+    
+    @Basic(optional = false)
     @Column(name = "gradebook_main_pk1")
     private Integer gradebookMainPk1;
 
@@ -111,6 +115,19 @@ public class GradebookGrade implements Serializable{
 
     public void setManualScore(Integer manualScore) {
         this.manualScore = manualScore;
+    }
+
+    public Integer getCourseUsersPk1() {
+        return courseUsersPk1;
+    }
+
+    public void setCourseUsersPk1(Integer courseUsersPk1) {
+        this.courseUsersPk1 = courseUsersPk1;
+    }
+
+    @Override
+    public String toString() {
+        return "GradebookGrade{" + "pk1=" + pk1 + ", courseUsersPk1=" + courseUsersPk1 + ", gradebookMainPk1=" + gradebookMainPk1 + ", lastOverrideDate=" + lastOverrideDate + ", manualGrade=" + manualGrade + ", averageScore=" + averageScore + ", manualScore=" + manualScore + '}';
     }
     
     

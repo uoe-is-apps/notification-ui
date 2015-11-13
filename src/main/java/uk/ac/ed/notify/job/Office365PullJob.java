@@ -20,6 +20,7 @@ public class Office365PullJob implements Job {
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        if(true) return;
         logger.info("Office365PullJob started");
         String token = office365Service.acquireAccessToken();
         office365Service.processUnreadEmail(token);
