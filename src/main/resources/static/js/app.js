@@ -242,7 +242,31 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
   $scope.reset = function() {
 
     $scope.notification = { publisherId: "notify-ui", topic: "Emergency", startDate: new Date(), lastUpdated: new Date()};
-  }
+  };
+
+  $scope.checkDates = function(notification){
+
+          var curDate = new Date();
+          curDate.setHours(0,0,0,0);
+
+          if(new Date(notification.startDate) > new Date(notification.endDate))
+          {
+            $scope.badEndDate = true;
+          }
+          else
+          {
+            $scope.badEndDate = null;
+          }
+          if(new Date(notification.startDate) < curDate)
+          {
+             $scope.badStartDate = true;
+          }
+          else
+          {
+            $scope.badStartDate = null;
+          }
+
+  };
 
   $scope.update = function(notification)
   {
@@ -274,7 +298,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 
 
 
-  }
+  };
 
 })
 .controller('listUiUsersController', function($rootScope,$scope, $http,$route,$location,message,user) {
