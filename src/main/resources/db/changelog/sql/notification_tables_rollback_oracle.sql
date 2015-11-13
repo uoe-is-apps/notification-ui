@@ -8,3 +8,4 @@ drop table notification_ui_roles;
 drop table notification_ui_user_roles;
 drop table notification_ui_users;
 drop table user_notification_audit;
+drop table office365_subscription;
