@@ -63,7 +63,7 @@ and att.gradebook_grade_pk1(+)=gg.pk1
 and u.user_id='"+uun+"' 
  */
 @Entity
-@Table(name = "gradebook_main")
+@Table(name = "gradebook_main", schema="BBLEARN")
 @NamedQueries({
  
 /*        

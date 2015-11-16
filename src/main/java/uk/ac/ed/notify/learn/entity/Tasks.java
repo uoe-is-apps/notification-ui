@@ -20,7 +20,7 @@ import javax.persistence.TemporalType;
  * @author hsun1
  */
 @Entity
-@Table(name = "tasks")
+@Table(name = "tasks", schema="Bblearn")
 @NamedQueries({
 
     @NamedQuery(name = "Tasks.findTasks", 

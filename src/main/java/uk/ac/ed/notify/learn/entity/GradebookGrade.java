@@ -21,7 +21,7 @@ import javax.persistence.TemporalType;
  * @author hsun1
  */
 @Entity
-@Table(name = "gradebook_grade")
+@Table(name = "gradebook_grade", schema="Bblearn")
 @NamedQueries({
 
 

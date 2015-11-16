@@ -23,7 +23,7 @@ public class Office365PullJob implements Job {
         //if(true) return;
         logger.info("Office365PullJob started");
         String token = office365Service.acquireAccessToken();
-        office365Service.processUnreadEmail(token);
+        if(token.length() > 0) office365Service.processUnreadEmail(token);
         logger.info("Office365PullJob finished successfully");
     }
 }

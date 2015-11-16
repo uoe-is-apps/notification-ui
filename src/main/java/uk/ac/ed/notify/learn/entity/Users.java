@@ -18,7 +18,7 @@ import javax.persistence.Table;
  */
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", schema="Bblearn")
 @NamedQueries({
     @NamedQuery(name = "Users.findAll", query = "SELECT v FROM Users v"),
     @NamedQuery(name = "Users.findByPk1", query = "SELECT v FROM Users v WHERE v.pk1 = (?1)")      

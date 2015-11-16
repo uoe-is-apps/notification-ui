@@ -25,7 +25,7 @@ import javax.persistence.Transient;
  * @author hsun1
  */
 @Entity
-@Table(name = "announcements")
+@Table(name = "announcements", schema="Bblearn")
 @NamedQueries({    
     @NamedQuery(name = "Announcements.findCourseAnnouncements", 
      query = 
