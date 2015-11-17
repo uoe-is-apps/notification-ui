@@ -1,5 +1,7 @@
 package uk.ac.ed.notify.entity;
 
+import org.springframework.data.rest.core.annotation.RestResource;
+
 import javax.persistence.*;
 import java.util.Collection;
 
@@ -14,9 +16,11 @@ public class UiUser {
     @Column(name = "UUN")
     private String uun;
 
+
     @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(name="NOTIFICATION_UI_USER_ROLES", joinColumns = {@JoinColumn (name="UUN")},
             inverseJoinColumns = {@JoinColumn(name="ROLE_CODE",nullable = false,updatable = false)})
+    @RestResource(exported = false)
     private Collection<UiRole> uiRoles;
 
     public String getUun() {
