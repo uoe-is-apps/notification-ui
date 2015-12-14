@@ -104,7 +104,7 @@ public class Office365JsonService {
             //notification.setNotificationId(jsonNotification.getString("")); //auto generate
             notification.setTitle(jsonNotification.getString("title"));
             notification.setBody(jsonNotification.getString("body"));
-            notification.setCategory(jsonNotification.getString("topic"));
+            notification.setTopic(jsonNotification.getString("topic"));
             notification.setPublisherId(jsonNotification.getString("publisherId"));
             notification.setPublisherNotificationId(jsonNotification.getString("publisherNotificationId"));
             SimpleDateFormat dateFormat = (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm"));
@@ -112,6 +112,8 @@ public class Office365JsonService {
             notification.setEndDate(dateFormat.parse(jsonNotification.getString("endDate")));
             notification.setUrl(jsonNotification.getString("url"));
             notification.setUun(jsonNotification.getString("uun"));
+            try{notification.setAction(jsonNotification.getString("action"));}catch(Exception e){};
+            try{notification.setPublisherKey(jsonNotification.getString("publisherKey"));}catch(Exception e){};
             notification.setLastUpdated(new Date());
         } catch (Exception e) {           
             logger.error(e.toString());

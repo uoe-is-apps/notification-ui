@@ -43,8 +43,7 @@ public class Application extends SpringBootServletInitializer {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http.addFilterBefore(remoteUserAuthenticationFilter(), RequestHeaderAuthenticationFilter.class)
-                    .authenticationProvider(
-                            preauthAuthProvider())
+                    .authenticationProvider(preauthAuthProvider())
                     .csrf().disable()
                     .authorizeRequests().anyRequest().authenticated()
                     .antMatchers("/office365NewEmailCallback/**").permitAll()

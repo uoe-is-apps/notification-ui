@@ -49,10 +49,10 @@ public class HttpOperationService {
             String json = "";
             String output = "";
             while ((output = br.readLine()) != null) { 
-                if(output.indexOf("json") != -1){
                     json = output;
-                }
             }
+            
+            logger.debug("http get output - [" + json + "]");
             con.disconnect();                
             return json;
     }

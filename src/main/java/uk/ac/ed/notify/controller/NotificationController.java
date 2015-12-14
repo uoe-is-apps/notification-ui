@@ -1,6 +1,7 @@
 package uk.ac.ed.notify.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
@@ -11,30 +12,27 @@ import uk.ac.ed.notify.entity.JsonNotification;
 
 import javax.servlet.ServletException;
 import java.security.Principal;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Created by rgood on 28/10/2015.
  */
 @RestController
 public class NotificationController {
-    private static final Logger logger = LoggerFactory.getLogger(NotificationController.class);
-
-    @Value("${spring.oauth2.client.clientSecret}")
-    private String clientSecret;
-
-    @Value("${spring.oauth2.client.accessTokenUri}")
-    private String tokenUrl;
-
-    @Value("${spring.oauth2.client.clientId}")
-    private String clientId;
 
     @Value("${zuul.routes.resource.url}")
     private String notificationMsUrl;
 
-    public NotificationController() {
-        logger.debug("init");
+    private String clientSecret;
+    private String tokenUrl;
+    private String clientId;
+
+    @Autowired
+    public NotificationController( @Value("${spring.oauth2.client.clientSecret}") String clientSecret,
+                                   @Value("${spring.oauth2.client.accessTokenUri}") String tokenUrl,
+                                   @Value("${spring.oauth2.client.clientId}") String clientId) {
+        this.clientId=clientId;
+        this.clientSecret=clientSecret;
+        this.tokenUrl=tokenUrl;
         restTemplate = new OAuth2RestTemplate(resource());
     }
 
@@ -42,10 +40,9 @@ public class NotificationController {
 
     protected OAuth2ProtectedResourceDetails resource() {
         ClientCredentialsResourceDetails resource = new ClientCredentialsResourceDetails();
-        resource.setAccessTokenUri("https://dev.oauth.ws-apps.is.ed.ac.uk:443/oauth/token");
-        resource.setClientSecret("s1llycrash3s");
-        resource.setClientId("notification-ui");
-        logger.debug("returning resource:" + resource.getClientId());
+        resource.setAccessTokenUri(tokenUrl);
+        resource.setClientSecret(clientSecret);
+        resource.setClientId(clientId);
         return resource;
     }
 
@@ -59,7 +56,6 @@ public class NotificationController {
     public
     @ResponseBody
     JsonNotification getNotification(@PathVariable("notification-id") String notificationId) throws ServletException {
-        logger.debug(restTemplate.getResource().getClientSecret());
         ResponseEntity<JsonNotification> response = restTemplate.getForEntity(notificationMsUrl + "/" + notificationId, JsonNotification.class);
 
         return response.getBody();
@@ -77,7 +73,8 @@ public class NotificationController {
 
     @RequestMapping(value="/notification/", method=RequestMethod.POST)
     public @ResponseBody
-    JsonNotification setNotification(@RequestBody String notification) throws ServletException, JsonProcessingException {
+    JsonNotification setNotification(@RequestBody JsonNotification notification) throws ServletException, JsonProcessingException {
+        
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity request= new HttpEntity(notification, headers);
@@ -87,7 +84,7 @@ public class NotificationController {
     }
 
     @RequestMapping(value="/notification/{notification-id}",method=RequestMethod.PUT)
-    public void updateNotification(@PathVariable("notification-id") String notificationId, @RequestBody String notification) throws ServletException {
+    public void updateNotification(@PathVariable("notification-id") String notificationId, @RequestBody JsonNotification notification) throws ServletException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity request= new HttpEntity(notification, headers);

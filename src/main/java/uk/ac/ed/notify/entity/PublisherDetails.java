@@ -9,7 +9,10 @@ import java.util.Date;
  * Created by rgood on 20/10/2015.
  */
 @Entity
-@Table(name="PUBLISHER_DETAILS")
+@Table(name = "PUBLISHER_DETAILS")
+@NamedQueries({
+        @NamedQuery(name = "PublisherDetails.findByPublisherId", query = "SELECT a FROM PublisherDetails a WHERE a.publisherId = (?1)")
+})
 public class PublisherDetails {
 
     @Id

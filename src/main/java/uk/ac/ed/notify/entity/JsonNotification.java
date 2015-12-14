@@ -1,5 +1,6 @@
 package uk.ac.ed.notify.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import java.util.Date;
 /**
  * Created by rgood on 18/09/2015.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class JsonNotification {
 
         private String notificationId;

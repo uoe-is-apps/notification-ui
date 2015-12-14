@@ -9,9 +9,18 @@ import java.security.NoSuchAlgorithmException;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+//Ref: https://www.jira.is.ed.ac.uk/browse/WEB007-6 
+public class MacService {}
+
 /**
  * Created by rgood on 24/07/2015.
  */
+/**
+ * Calculates a secure MAC (message authentication code) from an array of strings and shared secret.
+ param values – Parameters must first be sorted alphabetically by parameter name, then the values of these sorted parameters passed to calculateSecureMac
+ return The calculated MAC
+ */
+/*
 @Service
 public class MacService {
 
@@ -20,13 +29,7 @@ public class MacService {
 
     static Logger logger = Logger.getLogger(MacService.class);
 
-    /**
-     * Calculates a secure MAC (message authentication code) from an array of strings and
-     shared secret.
-     * @param values – Parameters must first be sorted alphabetically by parameter name, then
-    the values of these sorted parameters passed to calculateSecureMac
-     * @return The calculated MAC
-     */
+
     public String getSecureMAC (final String[] values) throws
             NoSuchAlgorithmException
     {
@@ -52,13 +55,11 @@ public class MacService {
         }
         return mac; }
 
-        /**
-         * Gets a timestamp as a string.
-         * @return String
-         */
+
         public String getTimestamp()
         {
             return Integer.toString((int)(System.currentTimeMillis() / 1000));
         }
 
 }
+*/

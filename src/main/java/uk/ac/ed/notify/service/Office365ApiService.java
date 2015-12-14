@@ -9,8 +9,10 @@ import com.microsoft.aad.adal4j.AuthenticationContext;
 import com.microsoft.aad.adal4j.AuthenticationResult;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -19,10 +21,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import uk.ac.ed.notify.entity.AuditActions;
+import uk.ac.ed.notify.entity.ErrorCodes;
 import uk.ac.ed.notify.entity.Notification;
+import uk.ac.ed.notify.entity.NotificationError;
 import uk.ac.ed.notify.repository.Office365Repository;
 import uk.ac.ed.notify.entity.Office365Subscription;
+import uk.ac.ed.notify.entity.PublisherDetails;
+import uk.ac.ed.notify.entity.UserNotificationAudit;
+import uk.ac.ed.notify.repository.NotificationErrorRepository;
 import uk.ac.ed.notify.repository.NotificationRepository;
+import uk.ac.ed.notify.repository.PublisherDetailsRepository;
+import uk.ac.ed.notify.repository.UserNotificationAuditRepository;
 
 /**
  *
@@ -31,6 +42,12 @@ import uk.ac.ed.notify.repository.NotificationRepository;
 @Service
 public class Office365ApiService {
     private static final Logger logger = LoggerFactory.getLogger(Office365ApiService.class);           
+    
+    @Autowired
+    NotificationErrorRepository notificationErrorRepository;    
+    
+    @Autowired
+    UserNotificationAuditRepository userNotificationAuditRepository;        
     
     @Autowired
     Office365Repository office365Repository;
@@ -43,6 +60,9 @@ public class Office365ApiService {
     
     @Autowired
     HttpOperationService httpOperationService;
+    
+    @Autowired
+    PublisherDetailsRepository publisherDetailsRepository;
     
     @Value("${office365.tenantId}")
     private String tenantId;
@@ -169,25 +189,16 @@ public class Office365ApiService {
             String url = "https://outlook.office365.com/api/v1.0/users/" + account + "/folders/inbox/messages?$filter=IsRead%20eq%20false";
             String json = httpOperationService.get(token, url);
 
-            logger.info("processUnreadEmail - " + json);
+            logger.info("construct all unread notifications from email - " + json);
             
             Hashtable<String, Notification> table = office365JsonService.parseTableOfNotification(json);
             logger.info("fetchUnreadEmail - found notifications, size - " + table.size());
-            
+            logger.info(table + "");
             Iterator<String> iterator = table.keySet().iterator();
             while(iterator.hasNext()){
                 String id = iterator.next();
                 Notification notification = table.get(id);
-                
-                logger.debug("save notification..." + notification.getTitle());
-                
-                if(notificationRepository.findByPublisherIdAndPublisherNotificationIdAndUun(notification.getPublisherId(), notification.getPublisherNotificationId(), notification.getUun()).size() == 0){
-                    logger.info("notification not exist in db, save");
-                    notificationRepository.save(notification);    
-                }else{
-                    logger.info("existing notification found, ignore");
-                }  
-                
+                processSingleNotification(notification);
                 deleteEmailById(token, id);
             }
             logger.info("success");    
@@ -207,16 +218,10 @@ public class Office365ApiService {
             Notification notification = office365JsonService.parseNotification(json);
            
             logger.info("construct notification from email - " + notification);
+                      
+            processSingleNotification(notification);    
             
-            String publisherId = notification.getPublisherId();
-            String publisherNotificationId = notification.getPublisherNotificationId();
-            String uun = notification.getUun();
-            if(notificationRepository.findByPublisherIdAndPublisherNotificationIdAndUun(publisherId, publisherNotificationId, uun).size() == 0){
-                logger.info("notification not exist in db, save");
-                notificationRepository.save(notification);    
-            }else{
-                logger.info("existing notification found, ignore");
-            }     
+            deleteEmailById(token, id);
             
             logger.info("success");    
         }catch(Exception e){
@@ -226,6 +231,7 @@ public class Office365ApiService {
     
     
     public void deleteEmailById(String token, String id){
+        if(true) return;
         try {
             String url = "https://outlook.office365.com/api/v1.0/users/" + account + "/folders/inbox/messages/" + id;
           
@@ -260,6 +266,95 @@ public class Office365ApiService {
     }    
     
 
+    public void processSingleNotification(Notification notification){
+        logger.debug("handle notification..." + notification);
+                
+        String action = notification.getAction();
+        PublisherDetails publisher = publisherDetailsRepository.findOne(notification.getPublisherId());
+        if (publisher != null 
+                && publisher.getKey() != null && notification.getPublisherKey() != null && publisher.getKey().equals(notification.getPublisherKey())
+                && action != null && (action.equalsIgnoreCase("insert") || action.equalsIgnoreCase("update") || action.equalsIgnoreCase("delete"))
+                ) {
+            logger.info("publisher key verified");
+
+            
+            if (action.equalsIgnoreCase("insert")) {
+                logger.info("action: insert");
+                notification.setNotificationId(null);
+                handleNotification(AuditActions.CREATE_NOTIFICATION, notification);
+            } else if (action.equalsIgnoreCase("update")) {
+                logger.info("action: update");
+                List<Notification> existingNotifications = notificationRepository.findByPublisherIdAndPublisherNotificationIdAndUun(notification.getPublisherId(), notification.getPublisherNotificationId(), notification.getUun());
+                if (existingNotifications.size() == 0) {
+                    logger.info("notification not exist in db, insert instead");
+                    notification.setNotificationId(null);
+                    handleNotification(AuditActions.CREATE_NOTIFICATION, notification);
+                } else {         
+                    for(int i = 0; i < existingNotifications.size(); i++){
+                        notification.setNotificationId(existingNotifications.get(i).getNotificationId());
+                        logger.info("index - " + i + " - existing notification found, update");
+                        handleNotification(AuditActions.UPDATE_NOTIFICATION, notification);
+                    }                                        
+                }
+            } else if (action.equalsIgnoreCase("delete")) {
+                logger.info("action: delete");
+                List<Notification> existingNotifications = notificationRepository.findByPublisherIdAndPublisherNotificationIdAndUun(notification.getPublisherId(), notification.getPublisherNotificationId(), notification.getUun());
+                if (existingNotifications.size() == 0) {
+                    logger.info("notification not exist in db, ignore");
+                    notification.setNotificationId(null);
+                    handleNotification(AuditActions.CREATE_NOTIFICATION, notification);
+                } else {
+                    for(int i = 0; i < existingNotifications.size(); i++){
+                        notification.setNotificationId(existingNotifications.get(i).getNotificationId());
+                        logger.info("index - " + i + " - existing notification found, delete");
+                        handleNotification(AuditActions.DELETE_NOTIFICATION, notification);
+                    }
+                }
+            }
+        } else {
+            logger.info("notification failed to be processed due to failure in processing json packet or invalid publisher key");
+        }      
+    }
+
+    @Transactional 
+    public void handleNotification(String action, Notification notification){
+            try{
+                 if(action.equals(AuditActions.CREATE_NOTIFICATION) || action.equals(AuditActions.UPDATE_NOTIFICATION)){                      
+                      notificationRepository.save(notification);
+                 }else if(action.equals(AuditActions.DELETE_NOTIFICATION)){                      
+                      notificationRepository.delete(notification.getNotificationId());
+                 } 
+                 logNotification(action, notification);
+            }catch(Exception e){
+                 if(action.equals(AuditActions.CREATE_NOTIFICATION)){
+                     logErrorNotification(ErrorCodes.SAVE_ERROR ,e); 
+                 }else if(action.equals(AuditActions.UPDATE_NOTIFICATION)){
+                     logErrorNotification(ErrorCodes.SAVE_ERROR ,e); 
+                 }else if(action.equals(AuditActions.DELETE_NOTIFICATION)){
+                     logErrorNotification(ErrorCodes.DELETE_ERROR ,e); 
+                 }
+            }        
+    }
+    
+    private void logNotification(String action, Notification notification) {
+            //AuditActions.CREATE_NOTIFICATION AuditActions.UPDATE_NOTIFICATION  AuditActions.DELETE_NOTIFICATION
+            UserNotificationAudit userNotificationAudit = new UserNotificationAudit();
+            userNotificationAudit.setAction(action);
+            userNotificationAudit.setAuditDate(new Date());
+            userNotificationAudit.setPublisherId(notification.getPublisherId());
+            userNotificationAudit.setUun(notification.getUun());
+            userNotificationAuditRepository.save(userNotificationAudit);                 
+    }  
+    
+    private void logErrorNotification(String errorCode, Exception e){
+            //ErrorCodes.SAVE_ERROR ErrorCodes.DELETE_ERROR
+            NotificationError notificationError = new NotificationError();
+            notificationError.setErrorCode(errorCode);
+            notificationError.setErrorDescription(e.getMessage());
+            notificationError.setErrorDate(new Date());
+            notificationErrorRepository.save(notificationError);        
+    }    
+    
 
     public void renewSubscriptionToNotification(String token, String subscriptionId){
         //renew subscription does not work on office365 at the moment, this method is not used, do not delete, for future reference

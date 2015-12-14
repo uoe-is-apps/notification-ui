@@ -63,7 +63,7 @@ and att.gradebook_grade_pk1(+)=gg.pk1
 and u.user_id='"+uun+"' 
  */
 @Entity
-@Table(name = "gradebook_main")
+@Table(name = "gradebook_main", schema="BBLEARN")
 @NamedQueries({
  
 /*        
@@ -116,11 +116,11 @@ and u.user_id='"+uun+"'
 " and cu.rowStatus=0 "
 ////// + " and gg.gradebookMainPk1=gm.pk1 "
 //" and att.gradebookGradePk1=gg.pk1 " +      
-+ " and u.userId='admin.hsun1' "
+//+ " and u.userId='admin.hsun1' "
 /*
-" and gg.gradebookMainPk1(+)=gm.pk1 " +
-" and att.gradebookGradePk1(+)=gg.pk1 " +      
-" and u.userId='admin.hsun1' " 
+//" and gg.gradebookMainPk1(+)=gm.pk1 " +
+//" and att.gradebookGradePk1(+)=gg.pk1 " +      
+"// and u.userId='admin.hsun1' " 
  */                
   ),
     @NamedQuery(name = "GradebookMain.findAll", query = "SELECT gm FROM GradebookMain gm"),
@@ -226,6 +226,11 @@ public class GradebookMain implements Serializable{
 
     public void setPossible(Float possible) {
         this.possible = possible;
+    }
+
+    @Override
+    public String toString() {
+        return "GradebookMain{" + "crsmainPk1=" + crsmainPk1 + ", pk1=" + pk1 + ", courseContentsPk1=" + courseContentsPk1 + ", title=" + title + ", dueDate=" + dueDate + ", possible=" + possible + ", visibleInd=" + visibleInd + '}';
     }
     
     

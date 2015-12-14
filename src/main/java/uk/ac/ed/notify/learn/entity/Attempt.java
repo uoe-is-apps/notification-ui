@@ -20,7 +20,7 @@ import javax.persistence.TemporalType;
  * @author hsun1
  */
 @Entity
-@Table(name = "attempt")
+@Table(name = "attempt", schema="Bblearn")
 @NamedQueries({
     @NamedQuery(name = "Attempt.findAll", query = "SELECT v FROM Attempt v"),
     @NamedQuery(name = "Attempt.findByGradebookGradePk1", query = "SELECT v FROM Attempt v WHERE v.gradebookGradePk1 = (?1)")

@@ -20,7 +20,7 @@ import javax.persistence.TemporalType;
  * @author hsun1
  */
 @Entity
-@Table(name = "tasks")
+@Table(name = "tasks", schema="Bblearn")
 @NamedQueries({
 
     @NamedQuery(name = "Tasks.findTasks", 
@@ -70,6 +70,10 @@ public class Tasks {
     @Basic(optional = false)
     @Column(name = "subject")
     private String subject;  
+    
+    @Basic(optional = false)
+    @Column(name = "description")
+    private String description;          
     
     @Basic(optional = false)
     @Column(name = "task_type")
@@ -134,6 +138,16 @@ public class Tasks {
     public void setTaskType(String taskType) {
         this.taskType = taskType;
     }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+
     
     
     
