@@ -93,8 +93,17 @@ public class Office365JsonService {
         
         Notification notification = new Notification();
 
-        JSONObject jsonObj = new JSONObject(json);
-        String content = jsonObj.getJSONObject("Body").get("Content").toString();
+        String content = json;        
+        //if this json is fetched by Office365 api, extract the content from json, if below is giving error
+        //this means the json is from ewsservice, so it is a string, no need to parse from json
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            content = jsonObj.getJSONObject("Body").get("Content").toString();
+         } catch (Exception e) {           
+            logger.error(e.toString());
+        }
+        
+        
         try {
             content = content.replaceAll("<script type=\"application\\/ld\\+json\">", "");
             content = content.replaceAll("</script>", "");

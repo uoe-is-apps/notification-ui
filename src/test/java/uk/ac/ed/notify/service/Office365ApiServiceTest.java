@@ -29,6 +29,9 @@ import uk.ac.ed.notify.repository.PublisherDetailsRepository;
 @SpringApplicationConfiguration(classes = TestApplication.class)
 public class Office365ApiServiceTest {
 
+    @Autowired
+    EmailNotificationHandlingService emailNotificationHandlingService;    
+    
     @Autowired 
     Office365JsonService office365JsonService;
     
@@ -77,7 +80,7 @@ public class Office365ApiServiceTest {
         notification.setUun("existing");
         notification.setPublisherKey("valid");
         notification.setAction("insert");
-        office365ApiService.processSingleNotification(notification);
+        emailNotificationHandlingService.processSingleNotification(notification);
                 
         assertEquals(2,notificationRepository.count()); 
     }    
@@ -93,7 +96,7 @@ public class Office365ApiServiceTest {
         notification.setUun("existing");
         notification.setPublisherKey("valid");
         notification.setAction("update");
-        office365ApiService.processSingleNotification(notification);
+        emailNotificationHandlingService.processSingleNotification(notification);
                 
         assertEquals(2,notificationRepository.count()); 
     }       
@@ -110,7 +113,7 @@ public class Office365ApiServiceTest {
         notification.setUun("existing");
         notification.setPublisherKey("valid");
         notification.setAction("update");
-        office365ApiService.processSingleNotification(notification);
+        emailNotificationHandlingService.processSingleNotification(notification);
                 
         assertEquals(1,notificationRepository.count()); 
     }      
@@ -126,7 +129,7 @@ public class Office365ApiServiceTest {
         notification.setBody("body");                
         notification.setUun("existing");
         notification.setPublisherKey("invalid");
-        office365ApiService.processSingleNotification(notification);
+        emailNotificationHandlingService.processSingleNotification(notification);
                 
         assertEquals(1,notificationRepository.count()); 
     }    
@@ -143,7 +146,7 @@ public class Office365ApiServiceTest {
         notification.setUun("existing");
         notification.setPublisherKey("valid");
         notification.setAction("delete");
-        office365ApiService.processSingleNotification(notification);
+        emailNotificationHandlingService.processSingleNotification(notification);
                 
         assertEquals(0,notificationRepository.count()); 
     }        

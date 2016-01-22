@@ -6,6 +6,8 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import uk.ac.ed.notify.service.EWSService;
 import uk.ac.ed.notify.service.Office365ApiService;
 
 /**
@@ -17,13 +19,25 @@ public class Office365PullJob implements Job {
     
     @Autowired
     Office365ApiService office365Service;
-
+    
+    @Autowired
+    EWSService ewsService;    
+    
+    @Value("${office365PullJob.source}")
+    private String source;        
+    
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         //if(true) return;
         logger.info("Office365PullJob started");
-        String token = office365Service.acquireAccessToken();
-        if(token.length() > 0) office365Service.processUnreadEmail(token);
+        
+        if(source.equals("office365")){
+            String token = office365Service.acquireAccessToken();                
+            if(token.length() > 0) office365Service.processUnreadEmail(token);
+        }else if(source.equals("exchange")){
+            ewsService.processUnreadEmail();
+        }
+        
         logger.info("Office365PullJob finished successfully");
     }
 }
