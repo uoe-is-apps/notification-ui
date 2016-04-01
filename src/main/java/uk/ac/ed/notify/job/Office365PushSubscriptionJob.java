@@ -1,5 +1,6 @@
 package uk.ac.ed.notify.job;
 
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -14,6 +15,7 @@ import uk.ac.ed.notify.service.Office365ApiService;
  * Job to handle the Office 365 Push Subscription refresh
  * Created by rgood on 05/10/15.
  */
+@DisallowConcurrentExecution
 public class Office365PushSubscriptionJob implements Job {
     private static final Logger logger = LoggerFactory.getLogger(Office365PushSubscriptionJob.class);   
     
