@@ -1,5 +1,6 @@
 package uk.ac.ed.notify.job;
 
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -13,6 +14,7 @@ import uk.ac.ed.notify.service.LearnService;
  * Job to implement the Learn pull
  * Created by rgood on 05/10/15.
  */
+@DisallowConcurrentExecution
 public class LearnPullJob implements Job {
     private static final Logger logger = LoggerFactory.getLogger(LearnPullJob.class);
      
