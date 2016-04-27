@@ -162,7 +162,7 @@ public class LearnService {
     
 
     public void pullLearnNotifications() {
-        logger.info("pullLearnNotifications started" + new Date());
+        logger.info("pullLearnNotifications started - " + new Date());
        
         ArrayList<Users> allUsers = (ArrayList)learnUserRepository.findAll();
         Hashtable<String, String> userIdNamePair = new Hashtable<String, String>();
@@ -176,6 +176,7 @@ public class LearnService {
         
         logger.info("1.----------task----------");
         List<Tasks> listOfTasks = learnTaskRepository.findTasks();
+        logger.info("total number of tasks - " + listOfTasks.size());
         ArrayList<Integer> listOfTaskPks = new ArrayList<Integer>(); 
         for (int i = 0; i < listOfTasks.size(); i++) {
             Tasks task = listOfTasks.get(i);          
@@ -193,7 +194,7 @@ public class LearnService {
             Date endDate = task.getDueDate();
             
             List<CourseUsers> courseUsers = learnCourseUserRepository.findByCrsmainPk1(task.getCrsmainPk1());
-            logger.info("check insert/update for all these users ------------------ course id - " + task.getCrsmainPk1() + " number of users - " + courseUsers.size());
+            logger.info("task index [" + i + "] check insert/update for all these users ------------------ course id - " + task.getCrsmainPk1() + " number of users - " + courseUsers.size());
             for(int r = 0; r < courseUsers.size(); r++){
                 String uun = userIdNamePair.get(courseUsers.get(r).getUsersPk1() + ""); //learnUserRepository.findByPk1(courseUsers.get(r).getUsersPk1()).get(0).getUserId();
   
@@ -207,7 +208,8 @@ public class LearnService {
                     handleNotification(AuditActions.UPDATE_NOTIFICATION, notification);
                 } 
                 allCurrentPublisherNotificationIdInLearn.add(publisherNotificationId);
-            }            
+            }   
+            logger.info("task index [" + i + "], complete for " + courseUsers.size() + " users");
         }
        
 
@@ -229,9 +231,9 @@ public class LearnService {
             Notification notification = constructLearnNotification(null, publisherNotificationId, category, title, body, notificationUrl, startDate, endDate, "ignore");
 
             logger.info(category + " - " + i + " " +  announcement.getSubject());
-
+ 
             String mode = ifSaveLearnNotification(publisherId, publisherNotificationId, notification);
-            logger.info("check insert/update for all users ------------------ need [" + mode + "]");
+            logger.info("system announcements index [" + i + "] check insert/update for all users ------------------ need [" + mode + "]");
             if (mode.equals("insert")) {                
                 for (int r = 0; r < allUsers.size(); r++) {                    
                     notification.setNotificationId(null);
@@ -254,6 +256,9 @@ public class LearnService {
                     
                 }
             }
+            
+            logger.info("system announcements index [" + i + "], complete for all users [" + allUsers.size() + "] users");
+            
             allCurrentPublisherNotificationIdInLearn.add(publisherNotificationId);
         }
         
@@ -263,6 +268,8 @@ public class LearnService {
         logger.info("3.----------course announcements----------");
         List<Announcements> listOfCourseAnnouncements = learnAnnouncementRepository.findCourseAnnouncements();
 
+        logger.info("total number of listOfCourseAnnouncements - " + listOfCourseAnnouncements.size());
+        
         ArrayList<Integer> listOfCourseAnnouncementPks = new ArrayList<Integer>(); 
         for (int i = 0; i < listOfCourseAnnouncements.size(); i++) {
             Announcements announcement = (Announcements) listOfCourseAnnouncements.get(i);
@@ -283,7 +290,7 @@ public class LearnService {
             Notification notification = constructLearnNotification(null, publisherNotificationId, category, title, body, notificationUrl, startDate, endDate, "ignore");                
             
             List<CourseUsers> courseUsers = learnCourseUserRepository.findByCrsmainPk1(announcement.getCrsmainPk1());
-            logger.info("check insert/update for all these users ------------------ course id - " + announcement.getCrsmainPk1() + " number of users - " + courseUsers.size());
+            logger.info("course announcements index [" + i + "] check insert/update for all these users ------------------ course id - " + announcement.getCrsmainPk1() + " number of users - " + courseUsers.size());
             for (int r = 0; r < courseUsers.size(); r++) {                                                   
                 String uun = userIdNamePair.get(courseUsers.get(r).getUsersPk1() + "");//learnUserRepository.findByPk1(courseUsers.get(r).getUsersPk1()).get(0).getUserId();
                 notification.setUun(uun);
@@ -297,7 +304,9 @@ public class LearnService {
                     handleNotification(AuditActions.UPDATE_NOTIFICATION, notification);
                 }  
                 allCurrentPublisherNotificationIdInLearn.add(publisherNotificationId);
-            }            
+            }      
+            
+            logger.info("course announcements index [" + i + "], complete for course users [" + courseUsers.size() + "] users");
         }
         
         
@@ -311,6 +320,8 @@ public class LearnService {
         logger.info("4.----------assessment----------");
         List<GradebookMain> listOfAssessment = learnAssessmentRepository.findGradebookMain();
 
+        logger.info("total number of listOfAssessment - " + listOfAssessment.size());
+        
         for (int i = 0; i < listOfAssessment.size(); i++) {
             GradebookMain assessment = listOfAssessment.get(i);
             
@@ -319,7 +330,7 @@ public class LearnService {
             //}
             
             List<CourseUsers> courseUsers = learnCourseUserRepository.findByCrsmainPk1(assessment.getCrsmainPk1());
-            logger.info("check insert/update for all these users ------------------ course id - " + assessment.getCrsmainPk1() + " number of users - " + courseUsers.size());
+            logger.info("assessment index [" + i + "] check insert/update for all these users ------------------ course id - " + assessment.getCrsmainPk1() + " number of users - " + courseUsers.size());
     
             List<GradebookGrade> grades = learnGradebookGradeRepository.findByGradebookMainPk1(assessment.getPk1());
             
@@ -374,6 +385,7 @@ public class LearnService {
                 }
                 allCurrentPublisherNotificationIdInLearn.add(publisherNotificationId);
             }
+            logger.info("assessment index [" + i + "], complete for assessment users");
         }        
         
         
