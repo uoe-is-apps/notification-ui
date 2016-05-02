@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ed.notify.entity.AuditActions;
@@ -103,11 +104,11 @@ public class LearnService {
             notification.setNotificationId(notificationId);
         }
         
-        notification.setTitle(title);
+        notification.setTitle(title + "");
         if (body == null || body.equals("")) {
-            body = title;
+            body = title + "";
         }
-        notification.setBody(body);
+        notification.setBody(body + "");
         notification.setTopic(category);
         notification.setPublisherId(publisherId);
         notification.setPublisherNotificationId(publisherNotificationId);
@@ -120,14 +121,33 @@ public class LearnService {
         return notification;
     }
 
-    public String ifSaveLearnNotification(String publisherId, String publisherNotificationId, String uun, Notification notification) {
-        List<Notification> existingNotifications = notificationRepository.findByPublisherIdAndPublisherNotificationIdAndUun(publisherId, publisherNotificationId, uun);
-        if (existingNotifications.size() == 0) {
+    public String ifSaveLearnNotification(List<Notification> existingNotificationInNB, String publisherId, String publisherNotificationId, String uun, Notification notification) {
+        //List<Notification> existingNotifications = notificationRepository.findByPublisherIdAndPublisherNotificationIdAndUun(publisherId, publisherNotificationId, uun);
+        
+        Notification existingNotification = null;
+        for(int i = 0; i < existingNotificationInNB.size(); i++){
+            Notification noti = existingNotificationInNB.get(i);
+            
+//            logger.info("[[[[[[");
+//            logger.info(noti.getPublisherId());
+//            logger.info(publisherId);
+//            logger.info(noti.getPublisherNotificationId());
+//            logger.info(publisherNotificationId); 
+//            logger.info(noti.getUun());
+//            logger.info(uun);
+//            logger.info("]]]]]]");
+            
+            if(noti.getPublisherId().equals(publisherId) && noti.getPublisherNotificationId().equals(publisherNotificationId) && noti.getUun().equals(uun)){
+                existingNotification = noti;
+                break;
+            }            
+        }
+        
+        if (existingNotification == null) {
             notification.setNotificationId(null);
             logger.debug(notification.getTitle() + " insert");
             return "insert";
         } else {
-            Notification existingNotification = existingNotifications.get(0);
             if (!notification.equals(existingNotification)) {
                 notification.setNotificationId(existingNotification.getNotificationId());
                         
@@ -140,14 +160,26 @@ public class LearnService {
         return "ignore";
     }
     
-    public String ifSaveLearnNotification(String publisherId, String publisherNotificationId, Notification notification) {
-        List<Notification> existingNotifications = notificationRepository.findByPublisherIdAndPublisherNotificationId(publisherId, publisherNotificationId);
-        if (existingNotifications.size() == 0) {
+    
+    
+    public String ifSaveLearnNotification(List<Notification> existingNotificationInNB, String publisherId, String publisherNotificationId, Notification notification) {
+        //List<Notification> existingNotifications = notificationRepository.findByPublisherIdAndPublisherNotificationId(publisherId, publisherNotificationId);
+        
+        Notification existingNotification = null;
+        for(int i = 0; i < existingNotificationInNB.size(); i++){
+            Notification noti = existingNotificationInNB.get(i);
+            
+            if(noti.getPublisherId().equals(publisherId) && noti.getPublisherNotificationId().equals(publisherNotificationId)){
+                existingNotification = noti;
+                break;
+            }            
+        }
+        
+        if (existingNotification == null) {
             notification.setNotificationId(null);
             logger.debug(notification.getTitle() + " insert");
             return "insert";
-        } else {
-            Notification existingNotification = existingNotifications.get(0);
+        } else {            
             if (!notification.equals(existingNotification)) {
                 notification.setNotificationId(existingNotification.getNotificationId());
                 
@@ -161,10 +193,34 @@ public class LearnService {
     }
     
 
+    private List<Notification> getListOfNotificationInNBByPublisherIdAndPublisherNotificationId(List<Notification> listOfLearnNotificationsInNB, String publisherId, String publisherNotificationId){
+        List<Notification> listOfLearnSysAnnouncementInNB = new ArrayList<>();
+            for(int m = 0; m < listOfLearnNotificationsInNB.size(); m++){
+                Notification n = listOfLearnNotificationsInNB.get(m);
+                if(n.getPublisherId().equals(publisherId) && n.getPublisherNotificationId().equals(publisherNotificationId)){
+                    listOfLearnSysAnnouncementInNB.add(n);
+                }
+            }
+            return listOfLearnSysAnnouncementInNB;
+    }
+    
+    
+    private List<Notification> getListOfNotificationInNBByPublisherIdAndTopic(List<Notification> listOfLearnNotificationsInNB, String publisherId, String topic){
+        List<Notification> listOfLearnSysAnnouncementInNB = new ArrayList<>();
+            for(int m = 0; m < listOfLearnNotificationsInNB.size(); m++){
+                Notification n = listOfLearnNotificationsInNB.get(m);
+                if(n.getPublisherId().equals(publisherId) && n.getTopic().equals(topic)){
+                    listOfLearnSysAnnouncementInNB.add(n);
+                }
+            }
+            return listOfLearnSysAnnouncementInNB;
+    }    
+    
     public void pullLearnNotifications() {
         logger.info("pullLearnNotifications started - " + new Date());
        
-        ArrayList<Users> allUsers = (ArrayList)learnUserRepository.findAll();
+        
+        ArrayList<Users> allUsers = (ArrayList)learnUserRepository.findAllActiveUsers();
         Hashtable<String, String> userIdNamePair = new Hashtable<String, String>();
         for(int i = 0; i < allUsers.size(); i++){
             Users user = allUsers.get(i);
@@ -172,11 +228,24 @@ public class LearnService {
         }
         logger.info("total number of users in learn - " + allUsers.size());
         
+        List<Notification> listOfLearnNotificationsInNB = notificationRepository.findByPublisherId(publisherId);
+        logger.info("total number of Learn notifications in Notification Backbone - " + listOfLearnNotificationsInNB.size());
+               
+         
         ArrayList<String> allCurrentPublisherNotificationIdInLearn = new ArrayList<String>();
         
+               
+   
+
+        
+
         logger.info("1.----------task----------");
         List<Tasks> listOfTasks = learnTaskRepository.findTasks();
-        logger.info("total number of tasks - " + listOfTasks.size());
+        logger.info("total number of tasks in Learn - " + listOfTasks.size());
+
+        List<Notification> listOfLearnTaskInNB = getListOfNotificationInNBByPublisherIdAndTopic(listOfLearnNotificationsInNB, publisherId, taskCategory);
+        logger.info("total number of tasks in Notification Backbone - " + listOfLearnTaskInNB.size());
+
         ArrayList<Integer> listOfTaskPks = new ArrayList<Integer>(); 
         for (int i = 0; i < listOfTasks.size(); i++) {
             Tasks task = listOfTasks.get(i);          
@@ -198,8 +267,13 @@ public class LearnService {
             for(int r = 0; r < courseUsers.size(); r++){
                 String uun = userIdNamePair.get(courseUsers.get(r).getUsersPk1() + ""); //learnUserRepository.findByPk1(courseUsers.get(r).getUsersPk1()).get(0).getUserId();
   
+                if(uun == null) continue;
+                
                 Notification notification = constructLearnNotification(null, publisherNotificationId, category, title, body, notificationUrl, startDate, endDate, uun);
-                String mode = ifSaveLearnNotification(publisherId, publisherNotificationId, uun, notification);
+                String mode = ifSaveLearnNotification(listOfLearnTaskInNB, publisherId, publisherNotificationId, uun, notification);
+//String mode = "ignore";
+                
+                logger.info("need [" + mode + "]");
                 if(mode.equals("insert")) {    
                     logger.debug(r + "----------insert task----------" + uun + " " + notification);
                     handleNotification(AuditActions.CREATE_NOTIFICATION, notification);           
@@ -211,13 +285,24 @@ public class LearnService {
             }   
             logger.info("task index [" + i + "], complete for " + courseUsers.size() + " users");
         }
-       
 
+        
+        
+        
+        
 
-       
+        
+        
+        
+        
+        
+        
+        
+        
+
         logger.info("2.----------system announcements----------");
         List<Announcements> listOfSystemAnnouncements = learnAnnouncementRepository.findSystemAnnouncements();        
-        logger.info("total number of listOfSystemAnnouncements - " + listOfSystemAnnouncements.size());
+        logger.info("total number of system announcements in Learn - " + listOfSystemAnnouncements.size());
         
         for (int i = 0; i < listOfSystemAnnouncements.size(); i++) {
             Announcements announcement = (Announcements) listOfSystemAnnouncements.get(i);  
@@ -228,47 +313,79 @@ public class LearnService {
             String body = announcement.getAnnouncement() + "";
             Date startDate = announcement.getStartDate();
             Date endDate = announcement.getEndDate();
-            Notification notification = constructLearnNotification(null, publisherNotificationId, category, title, body, notificationUrl, startDate, endDate, "ignore");
+            Notification notificationCompare = constructLearnNotification(null, publisherNotificationId, category, title, body, notificationUrl, startDate, endDate, "ignore");
 
             logger.info(category + " - " + i + " " +  announcement.getSubject());
  
-            String mode = ifSaveLearnNotification(publisherId, publisherNotificationId, notification);
-            logger.info("system announcements index [" + i + "] check insert/update for all users ------------------ need [" + mode + "]");
-            if (mode.equals("insert")) {                
-                for (int r = 0; r < allUsers.size(); r++) {                    
-                    notification.setNotificationId(null);
-                    String uun = allUsers.get(r).getUserId();
-                    notification.setUun(uun);
-                    handleNotification(AuditActions.CREATE_NOTIFICATION, notification);
-                    logger.debug(r + "----------insert sys announce----------" + uun + " " + notification);
+            
+            List<Notification> listOfLearnSysAnnouncementInNB = getListOfNotificationInNBByPublisherIdAndPublisherNotificationId(listOfLearnNotificationsInNB, publisherId, publisherNotificationId);
+        
+            String mode = ifSaveLearnNotification(listOfLearnSysAnnouncementInNB, publisherId, publisherNotificationId, notificationCompare);
+//String mode = "ignore";            
+            logger.info("system announcements index [" + i + "] check insert/update for all users in learn ------------------ need [" + mode + "]");
+            
+            if (mode.equals("insert")) {  
+
+                List<Notification> notificationsToBeInserted = new ArrayList<Notification>();
+                for (int r = 0; r < allUsers.size(); r++) {    
+                   Notification notificationInsert = constructLearnNotification(null, publisherNotificationId, category, title, body, notificationUrl, startDate, endDate, "ignore");
+                   String uun = allUsers.get(r).getUserId();
+                   notificationInsert.setUun(uun);
+                   notificationsToBeInserted.add(notificationInsert);
+                   //logger.debug(r + "----------insert sys announce----------" + uun + " " + notificationInsert);
                 }
-            }else if (mode.equals("update")) {                
-                for (int r = 0; r < allUsers.size(); r++) {
-                    String uun = allUsers.get(r).getUserId();
-                    
-                    List<Notification> existingNotifications = notificationRepository.findByPublisherIdAndPublisherNotificationIdAndUun(publisherId, publisherNotificationId, uun);
-                    if(existingNotifications.size() > 0){
-                        Notification existingNotification = existingNotifications.get(0);                        
-                        notification.setNotificationId(existingNotification.getNotificationId());
-                        handleNotification(AuditActions.UPDATE_NOTIFICATION, notification);
-                        logger.debug(r + "----------update sys announce----------" + uun + " " + notification);
-                    }
-                    
+
+                logger.info("start inserting notifications in database - " + new Date() + " [" + listOfLearnSysAnnouncementInNB.size() + "] user size - " + allUsers.size());
+                handleNotificationByBatch(AuditActions.CREATE_NOTIFICATION, notificationsToBeInserted);
+                logger.info("complete - " + new Date());
+                
+            }else if (mode.equals("update")) {  
+
+                /*method 1. batch update is still slow...
+                logger.info("1. start updating notifications in for loop - " + new Date() + " [" + listOfLearnSysAnnouncementInNB.size() + "] user size - " + allUsers.size());            
+                for(int r = 0; r < listOfLearnSysAnnouncementInNB.size(); r++){
+                    Notification notificationUpdate = listOfLearnSysAnnouncementInNB.get(r);
+                    notificationUpdate.setTitle(title);
+                    notificationUpdate.setBody(body);
+                    notificationUpdate.setStartDate(startDate);
+                    notificationUpdate.setEndDate(endDate);
                 }
+                logger.info("1. complete - " + new Date());
+                logger.info("2. start updating notifications in database - " + new Date());
+                handleNotificationByBatch(AuditActions.UPDATE_NOTIFICATION, listOfLearnSysAnnouncementInNB);
+                logger.info("2. complete - " + new Date());
+                */
+                
+                logger.info("start updating notifications in database - " + new Date());
+                notificationRepository.updateByPublisherIdAndPublisherNotificationId(title, body, startDate, endDate, publisherId, publisherNotificationId);
+                logger.info("complete - " + new Date());
             }
             
             logger.info("system announcements index [" + i + "], complete for all users [" + allUsers.size() + "] users");
             
             allCurrentPublisherNotificationIdInLearn.add(publisherNotificationId);
+            
         }
+   
+
+
+        
+        
+        
+        
+        
+        
+        
         
 
-
-       
-        logger.info("3.----------course announcements----------");
+        
+      
+        logger.info("3.----------course announcements----------"); 
         List<Announcements> listOfCourseAnnouncements = learnAnnouncementRepository.findCourseAnnouncements();
+        logger.info("total number of course announcements in Learn - " + listOfCourseAnnouncements.size());
+               
 
-        logger.info("total number of listOfCourseAnnouncements - " + listOfCourseAnnouncements.size());
+        List<Notification> notificationsToBeInserted = new ArrayList<Notification>();
         
         ArrayList<Integer> listOfCourseAnnouncementPks = new ArrayList<Integer>(); 
         for (int i = 0; i < listOfCourseAnnouncements.size(); i++) {
@@ -287,40 +404,101 @@ public class LearnService {
             Date startDate = announcement.getStartDate();
             Date endDate = announcement.getEndDate();
 
-            Notification notification = constructLearnNotification(null, publisherNotificationId, category, title, body, notificationUrl, startDate, endDate, "ignore");                
+            Notification notificationCompare = constructLearnNotification(null, publisherNotificationId, category, title, body, notificationUrl, startDate, endDate, "ignore");                
             
-            List<CourseUsers> courseUsers = learnCourseUserRepository.findByCrsmainPk1(announcement.getCrsmainPk1());
-            logger.info("course announcements index [" + i + "] check insert/update for all these users ------------------ course id - " + announcement.getCrsmainPk1() + " number of users - " + courseUsers.size());
-            for (int r = 0; r < courseUsers.size(); r++) {                                                   
-                String uun = userIdNamePair.get(courseUsers.get(r).getUsersPk1() + "");//learnUserRepository.findByPk1(courseUsers.get(r).getUsersPk1()).get(0).getUserId();
-                notification.setUun(uun);
-                                       
-                String mode = ifSaveLearnNotification(publisherId, publisherNotificationId, uun, notification);
-                if(mode.equals("insert")) {    
-                    logger.debug(r + "----------insert course announ ----------" + uun + " " + notification);
-                    handleNotification(AuditActions.CREATE_NOTIFICATION, notification);           
-                }else if (mode.equals("update")) {                
-                    logger.debug(r + "----------update course announ ----------" + uun + " " + notification);
-                    handleNotification(AuditActions.UPDATE_NOTIFICATION, notification);
-                }  
-                allCurrentPublisherNotificationIdInLearn.add(publisherNotificationId);
-            }      
             
-            logger.info("course announcements index [" + i + "], complete for course users [" + courseUsers.size() + "] users");
+            List<Notification> listOfLearnCourseAnnouncementInNB = getListOfNotificationInNBByPublisherIdAndPublisherNotificationId(listOfLearnNotificationsInNB, publisherId, publisherNotificationId);
+        
+            String mode = ifSaveLearnNotification(listOfLearnCourseAnnouncementInNB, publisherId, publisherNotificationId, notificationCompare);
+            
+            logger.info("couse announcements index [" + i + "] check insert/update for course users in learn ------------------ need [" + mode + "]");
+            if (mode.equals("insert")) {  
+                List<CourseUsers> courseUsers = learnCourseUserRepository.findByCrsmainPk1(announcement.getCrsmainPk1());
+
+                logger.info("1. start inserting notifications in for loop - " + new Date() + " [" + listOfLearnCourseAnnouncementInNB.size() + "] user size - " + courseUsers.size()); 
+                for (int r = 0; r < courseUsers.size(); r++) {     
+                   Notification notificationInsert = constructLearnNotification(null, publisherNotificationId, category, title, body, notificationUrl, startDate, endDate, "ignore");
+                   String uun = userIdNamePair.get(courseUsers.get(r).getUsersPk1() + "");
+                   notificationInsert.setUun(uun);
+                   
+                   if(notificationInsert.getTitle() != null && notificationInsert.getBody() != null && uun != null){
+                        notificationsToBeInserted.add(notificationInsert); 
+                   }
+                   
+                }
+                logger.info("1. complete - " + new Date());
+
+            }else if (mode.equals("update")) {  
+                
+                /*method 1. still slow...
+                logger.info("1. start updating notifications in for loop - " + new Date() + " [" + listOfLearnCourseAnnouncementInNB.size() + "] ");            
+                for(int r = 0; r < listOfLearnCourseAnnouncementInNB.size(); r++){
+                    Notification notificationUpdate = listOfLearnCourseAnnouncementInNB.get(r);
+                    notificationUpdate.setTitle(title);
+                    notificationUpdate.setBody(body);
+                    notificationUpdate.setStartDate(startDate);
+                    notificationUpdate.setEndDate(endDate);
+                    
+                }
+                logger.info("1. complete - " + new Date());
+                logger.info("2. start updating notifications in database - " + new Date());
+                handleNotificationByBatch(AuditActions.UPDATE_NOTIFICATION, listOfLearnCourseAnnouncementInNB);
+                logger.info("2. complete - " + new Date());
+                */
+                
+                logger.info("start updating course annoucement notifications in database - " + new Date());
+                notificationRepository.updateByPublisherIdAndPublisherNotificationId(title, body, startDate, endDate, publisherId, publisherNotificationId);
+                logger.info("complete - " + new Date());
+            }
+            
+            allCurrentPublisherNotificationIdInLearn.add(publisherNotificationId);            
         }
+
+        
+        logger.info("2. start inserting course annoucement notifications in database - size [" + notificationsToBeInserted.size() + "] " + new Date());
         
         
+        int total = notificationsToBeInserted.size();
+        int noOfBatch = 10;
+        int batchSize = total / 10;
         
-                           
+        for(int m = 0; m < noOfBatch; m++){
+            List<Notification> notificationsToBeInsertedSmallBatch = new ArrayList<>();
+            
+            int offset = batchSize * m;
+            logger.info(m + " from - [" + offset + "] to - [" + (batchSize + offset - 1) + "]" ); 
+            for(int i = 0 + offset; i < batchSize + offset; i++){
+                Notification n = notificationsToBeInserted.get(i);
+
+                notificationsToBeInsertedSmallBatch.add(n);
+            } 
+            handleNotificationByBatch(AuditActions.CREATE_NOTIFICATION, notificationsToBeInsertedSmallBatch);
+            logger.info(m + " complete - " + new Date());        
+        }               
         
+        logger.info("2. complete - " + new Date());        
 
 
 
         
+        
+        
+        
+        
+        
+        
+        
+        
+
+        
+/*        
         logger.info("4.----------assessment----------");
         List<GradebookMain> listOfAssessment = learnAssessmentRepository.findGradebookMain();
-
-        logger.info("total number of listOfAssessment - " + listOfAssessment.size());
+        logger.info("total number of assessment in Learn - " + listOfAssessment.size());
+        
+        List<Notification> listOfLearnAssessmentInNB = getListOfNotificationInNBByPublisherIdAndTopic(listOfLearnNotificationsInNB, publisherId, assessmentCategory);
+        logger.info("total number of assessment in Notification Backbone - " + listOfLearnAssessmentInNB.size());                
+        
         
         for (int i = 0; i < listOfAssessment.size(); i++) {
             GradebookMain assessment = listOfAssessment.get(i);
@@ -375,7 +553,8 @@ public class LearnService {
                 Notification notification = constructLearnNotification(null, publisherNotificationId, category, title, body, notificationUrl, startDate, endDate, uun);
                 
                
-                String mode = ifSaveLearnNotification(publisherId, publisherNotificationId, uun, notification);
+                //String mode = ifSaveLearnNotification(listOfLearnAssessmentInNB, publisherId, publisherNotificationId, uun, notification);
+String mode = "ignore";                 
                 if(mode.equals("insert")) {                
                     handleNotification(AuditActions.CREATE_NOTIFICATION, notification);  
                     logger.debug(r + "----------insert assessment ----------" + uun + " " + notification);
@@ -387,31 +566,66 @@ public class LearnService {
             }
             logger.info("assessment index [" + i + "], complete for assessment users");
         }        
+*/
         
         
-        logger.info("5.----------delete notification----------");              
-        ArrayList<Notification> allCurrentNotifications = (ArrayList<Notification>)notificationRepository.findByPublisherId(publisherId);        
-        logger.info("before delete, total number of current notifications in NB - " + allCurrentNotifications.size());
+        
+        
+        
+        
+        
+        
+       
+        logger.info("5.----------delete notification----------");                 
+        logger.info("before delete, total number of current notifications in NB - " + listOfLearnNotificationsInNB.size());
         logger.info("before delete, total number of source items(sys, course announce, task, assessment) in Learn - " + allCurrentPublisherNotificationIdInLearn.size());
         
         ArrayList<Notification> allCurrentNotificationsToBeDeleted = new ArrayList<Notification>();
-        for(int i = 0; i < allCurrentNotifications.size(); i++){            
-            Notification existingNotification = allCurrentNotifications.get(i);
+        for(int i = 0; i < listOfLearnNotificationsInNB.size(); i++){            
+            Notification existingNotification = listOfLearnNotificationsInNB.get(i);
             if(!allCurrentPublisherNotificationIdInLearn.contains(existingNotification.getPublisherNotificationId())){
-                logger.debug("in nb but not in learn, queue for deletion - " + existingNotification);
+                //logger.info("in nb but not in learn, queue for deletion - " + existingNotification);
                 allCurrentNotificationsToBeDeleted.add(existingNotification);
             }
         }
-        
-         logger.info("allCurrentNotificationsToBeDeleted - " + allCurrentNotificationsToBeDeleted.size());        
-        for(int i = 0; i < allCurrentNotificationsToBeDeleted.size(); i++){
-            Notification existingNotification = allCurrentNotificationsToBeDeleted.get(i);
-            logger.debug("delete " + i + " " + existingNotification);         
-            handleNotification(AuditActions.DELETE_NOTIFICATION, existingNotification); 
-        }
-        
-        logger.debug("pullLearnNotifications completed ... " + new Date());
+         
+        logger.info("allCurrentNotificationsToBeDeleted - " + allCurrentNotificationsToBeDeleted.size());        
+//        for(int i = 0; i < allCurrentNotificationsToBeDeleted.size(); i++){
+//            Notification existingNotification = allCurrentNotificationsToBeDeleted.get(i);
+//            logger.info("delete " + i + " " + existingNotification);         
+//            handleNotification(AuditActions.DELETE_NOTIFICATION, existingNotification); 
+//        }
+         handleNotificationByBatch(AuditActions.DELETE_NOTIFICATION, allCurrentNotificationsToBeDeleted);
+
+        logger.info("pullLearnNotifications completed ... " + new Date());
     }
+    
+    
+    
+    
+    
+    @Transactional 
+    public void handleNotificationByBatch(String action, List<Notification> notifications){
+            try{
+                 if(action.equals(AuditActions.CREATE_NOTIFICATION) || action.equals(AuditActions.UPDATE_NOTIFICATION)){                      
+                     notificationRepository.save(notifications);
+                 }else if(action.equals(AuditActions.DELETE_NOTIFICATION)){                      
+                     notificationRepository.delete(notifications);
+                 } 
+                 //to speed up, disable this logNotification function
+                 //logNotification(action, notification);
+            }catch(Exception e){
+                 if(action.equals(AuditActions.CREATE_NOTIFICATION)){
+                     logErrorNotification(ErrorCodes.SAVE_ERROR ,e); 
+                 }else if(action.equals(AuditActions.UPDATE_NOTIFICATION)){
+                     logErrorNotification(ErrorCodes.SAVE_ERROR ,e); 
+                 }else if(action.equals(AuditActions.DELETE_NOTIFICATION)){
+                     logErrorNotification(ErrorCodes.DELETE_ERROR ,e); 
+                 }
+            }        
+    }    
+    
+    
     
     @Transactional 
     public void handleNotification(String action, Notification notification){

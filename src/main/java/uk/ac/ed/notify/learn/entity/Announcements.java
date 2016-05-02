@@ -34,11 +34,21 @@ import javax.persistence.Transient;
      "SELECT v from Users u, CourseUsers cu, CourseMain m, " +     
      "Announcements v " +     
      "where " +     
-     "u.pk1 = cu.usersPk1 and m.pk1 = cu.crsmainPk1 and (m.startDate <= sysdate and sysdate <= m.endDate or m.endDate is null)  " +     
+     "u.pk1 = cu.usersPk1 and m.pk1 = cu.crsmainPk1 and (m.availableInd = 'Y' and m.startDate <= sysdate and sysdate <= m.endDate or m.endDate is null)  " +     
      //"and u.userId='admin.hsun1' " +     
      "and v.crsmainPk1=m.pk1 " +     
      "and v.announcementType='C' " +   
-     "order by m.dtcreated desc "
+        
+     //apply active filter   
+     "AND u.availableInd = 'Y' AND u.rowStatus = '0' " + //users
+     "AND cu.rowStatus = '0' " +  //CourseUsers        
+     //"AND ((m.availableInd = 'Y' and m.endDate is null) or (m.availableInd = 'Y' and sysdate <= m.endDate))  " +  //CourseMain 
+        
+        
+     "AND (v.endDate is null or (v.endDate is not null and v.endDate >= sysdate)) " +
+     "AND (v.startDate is null or (v.startDate is not null and v.startDate <= sysdate)) "   
+        
+     //"order by m.dtcreated desc "
      ),    
     /*
     @NamedQuery(name = "Announcements.findCourseAnnouncements", 
@@ -62,7 +72,13 @@ import javax.persistence.Transient;
      "Announcements v " +     
      "where " +     
      "v.announcementType='S' " +     
-     "order by v.startDate desc "
+        
+  
+     "AND (v.endDate is null or (v.endDate is not null and v.endDate >= sysdate)) " +
+     "AND (v.startDate is null or (v.startDate is not null and v.startDate <= sysdate)) "   
+                
+        
+     //"order by v.startDate desc "
      ),
     @NamedQuery(name = "Announcements.findAll", query = "SELECT v FROM Announcements v"),
     @NamedQuery(name = "Announcements.findByPk1", query = "SELECT v FROM Announcements v WHERE v.pk1 = (?1)")     

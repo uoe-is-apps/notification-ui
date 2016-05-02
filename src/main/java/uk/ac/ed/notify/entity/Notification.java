@@ -19,6 +19,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "NOTIFICATIONS")
 @NamedQueries({
+        @NamedQuery(name = "Notification.findByPublisherIdAndTopic", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and a.topic = (?2)"),
         @NamedQuery(name = "Notification.findByPublisherId", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1)"),
         @NamedQuery(name = "Notification.findByPublisherIdAndPublisherNotificationId", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and a.publisherNotificationId  = (?2)"),
         @NamedQuery(name = "Notification.findByPublisherIdAndPublisherNotificationIdAndUun", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and a.publisherNotificationId  = (?2) and a.uun = (?3)")
@@ -157,31 +158,37 @@ public class Notification {
 
         String cleaned = Jsoup.clean(topic, Whitelist.basic());
         if (!cleaned.equals(topic)) {
-            logger.warn("notification topic for "+notificationId+"cleaned, was ("+topic);
+            logger.debug("notification topic for "+notificationId+"cleaned, was ("+topic);
         }
         this.topic = cleaned;
     }
 
     public String getTitle() {
+        if(title == null){
+            return "";
+        }
         return title;
     }
 
     public void setTitle(String title) {
         String cleaned = Jsoup.clean(title, Whitelist.basic());
         if (!cleaned.equals(title)) {
-            logger.warn("notification title for "+notificationId+"cleaned, was ("+title);
+            logger.debug("notification title for "+notificationId+"cleaned, was ("+title);
         }
         this.title = cleaned;
     }
 
     public String getBody() {
+        if(body == null){
+            return "";
+        }
         return body;
     }
 
     public void setBody(String body) {
         String cleaned = Jsoup.clean(body, Whitelist.basic());
         if (!cleaned.equals(body)) {
-            logger.warn("notification body for "+notificationId+"cleaned, was ("+body);
+            logger.debug("notification body for "+notificationId+"cleaned, was ("+body);
         }
         this.body = cleaned;
     }
@@ -194,7 +201,7 @@ public class Notification {
 
         String cleaned = Jsoup.clean(url, Whitelist.basic());
         if (!cleaned.equals(url)) {
-            logger.warn("notification url for "+notificationId+"cleaned, was ("+url);
+            logger.debug("notification url for "+notificationId+"cleaned, was ("+url);
         }
         this.url = cleaned;
     }
