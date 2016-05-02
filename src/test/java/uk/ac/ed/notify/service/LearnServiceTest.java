@@ -1,5 +1,6 @@
 package uk.ac.ed.notify.service;
 
+import java.util.ArrayList;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import uk.ac.ed.notify.entity.Notification;
 import uk.ac.ed.notify.repository.NotificationRepository;
 
 import java.util.Date;
+import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 import static org.junit.Assert.assertFalse;
@@ -31,6 +33,8 @@ public class LearnServiceTest {
     @Autowired
     LearnService learnService;
 
+    List<Notification> existingNotificationInNB = null;
+    
     @Before
     public void setup()
     {
@@ -41,7 +45,10 @@ public class LearnServiceTest {
         notification.setBody("body");                
         notification.setUun("existing");
         notificationRepository.save(notification);
-
+        
+        existingNotificationInNB = new ArrayList<>();
+        existingNotificationInNB.add(notification);
+        
     }
 
     @After
@@ -59,7 +66,9 @@ public class LearnServiceTest {
         notification.setPublisherNotificationId("2");
         notification.setTitle("title");
         notification.setBody("body"); 
-        assertEquals("insert", learnService.ifSaveLearnNotification("learn","2",notification)); 
+        
+                
+        assertEquals("insert", learnService.ifSaveLearnNotification(existingNotificationInNB, "learn","2",notification)); 
     }    
     
     @Test
@@ -70,7 +79,7 @@ public class LearnServiceTest {
         notification.setPublisherNotificationId("1");
         notification.setTitle("title updated");
         notification.setBody("body"); 
-        assertEquals("update", learnService.ifSaveLearnNotification("learn","1",notification)); 
+        assertEquals("update", learnService.ifSaveLearnNotification(existingNotificationInNB, "learn","1",notification)); 
     }      
     
     @Test
@@ -81,7 +90,7 @@ public class LearnServiceTest {
         notification.setPublisherNotificationId("1");
         notification.setTitle("title");
         notification.setBody("body"); 
-        assertEquals("ignore", learnService.ifSaveLearnNotification("learn","1",notification));
+        assertEquals("ignore", learnService.ifSaveLearnNotification(existingNotificationInNB, "learn","1",notification));
     }
 
     @Test
@@ -93,7 +102,7 @@ public class LearnServiceTest {
         notification.setTitle("title");
         notification.setBody("body"); 
         notification.setUun("existing");
-        assertEquals("insert", learnService.ifSaveLearnNotification("learn","2", "existing", notification)); 
+        assertEquals("insert", learnService.ifSaveLearnNotification(existingNotificationInNB, "learn","2", "existing", notification)); 
     }    
     
     @Test
@@ -105,7 +114,7 @@ public class LearnServiceTest {
         notification.setTitle("title updated");
         notification.setBody("body"); 
         notification.setUun("existing");
-        assertEquals("update", learnService.ifSaveLearnNotification("learn","1","existing", notification)); 
+        assertEquals("update", learnService.ifSaveLearnNotification(existingNotificationInNB, "learn","1","existing", notification)); 
     }      
     
     @Test
@@ -117,7 +126,7 @@ public class LearnServiceTest {
         notification.setTitle("title updated");
         notification.setBody("body updated"); 
         notification.setUun("existing");
-        learnService.ifSaveLearnNotification("learn","1","existing", notification); 
+        learnService.ifSaveLearnNotification(existingNotificationInNB, "learn","1","existing", notification); 
         
         notificationRepository.save(notification);
         Notification existingNotification = notificationRepository.findOne(notification.getNotificationId());
@@ -135,7 +144,7 @@ public class LearnServiceTest {
         notification.setTitle("title");
         notification.setBody("body"); 
         notification.setUun("existing");
-        assertEquals("ignore", learnService.ifSaveLearnNotification("learn","1","existing",notification));
+        assertEquals("ignore", learnService.ifSaveLearnNotification(existingNotificationInNB, "learn","1","existing",notification));
     }    
     
     @Test    
