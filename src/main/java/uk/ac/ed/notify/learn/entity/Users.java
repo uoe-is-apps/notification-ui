@@ -20,7 +20,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "users", schema="Bblearn")
 @NamedQueries({
-    @NamedQuery(name = "Users.findAll", query = "SELECT v FROM Users v"),
+    @NamedQuery(name = "Users.findAllActiveUsers", query = "SELECT v FROM Users v "
+        + " WHERE v.availableInd = 'Y' AND v.rowStatus = '0' "), //apply active filter   
     @NamedQuery(name = "Users.findByPk1", query = "SELECT v FROM Users v WHERE v.pk1 = (?1)")      
 })
 public class Users {
@@ -42,6 +43,12 @@ public class Users {
     @Column(name = "row_status")
     private Integer rowStatus;      
 
+    @Basic(optional = false)
+    @Column(name = "available_ind")
+    private String availableInd;  
+    
+    
+    
     public Integer getRowStatus() {
         return rowStatus;
     }
@@ -65,4 +72,13 @@ public class Users {
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
+    public String getAvailableInd() {
+        return availableInd;
+    }
+
+    public void setAvailableInd(String availableInd) {
+        this.availableInd = availableInd;
+    }
+
 }

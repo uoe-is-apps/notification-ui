@@ -32,6 +32,13 @@ import javax.persistence.TemporalType;
      "u.pk1 = cu.usersPk1 and m.pk1 = cu.crsmainPk1 and (m.startDate <= sysdate and sysdate <= m.endDate or m.endDate is null) " +     
      //"and u.userId='admin.hsun1' " +     
      "and v.crsmainPk1=m.pk1 " +     
+       
+     //apply active filter   
+     "AND u.availableInd = 'Y' AND u.rowStatus = '0' " + //users
+     "AND cu.rowStatus = '0' " +  //CourseUsers        
+     "AND ((m.availableInd = 'Y' and m.endDate is null) or (m.availableInd = 'Y' and sysdate <= m.endDate))  " +  //CourseMain 
+
+        
      "order by m.dtcreated desc "
      ),    
 

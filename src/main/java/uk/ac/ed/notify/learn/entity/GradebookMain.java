@@ -108,6 +108,16 @@ and u.user_id='"+uun+"'
 //" GradebookGrade gg on gg.gradebookMainPk1 =gm.pk1  " +
     
 " where gm.courseContentsPk1 = cc.pk1  " +
+        
+        
+ 
+     //apply active filter   
+     "AND u.availableInd = 'Y' AND u.rowStatus = '0' " + //users
+     "AND cu.rowStatus = '0' " +  //CourseUsers        
+     "AND ((cm.availableInd = 'Y' and cm.endDate is null) or (cm.availableInd = 'Y' and sysdate <= cm.endDate))  " +  //CourseMain 
+                   
+        
+        
 " and cu.usersPk1 = u.pk1  " +
 " and cu.crsmainPk1=cm.pk1  " +
 " and gm.crsmainPk1=cm.pk1 " +   

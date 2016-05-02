@@ -16,4 +16,7 @@ public interface LearnUserRepository extends JpaRepository<Users, Long>{
     
     List<Users> findByPk1(Integer uun);
     
+    List<Users> findAllActiveUsers();
+    
+    
 }

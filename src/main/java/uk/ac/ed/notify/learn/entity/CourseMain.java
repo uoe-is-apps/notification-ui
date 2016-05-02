@@ -67,6 +67,19 @@ public class CourseMain {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dtcreated; 
 
+    @Basic(optional = false)
+    @Column(name = "available_ind")
+    private String availableInd;  
+    
+
+    public String getAvailableInd() {
+        return availableInd;
+    }
+
+    public void setAvailableInd(String availableInd) {
+        this.availableInd = availableInd;
+    }
+
     public Date getDtcreated() {
         return dtcreated;
     }
