@@ -188,7 +188,7 @@ public class Notification {
     public void setBody(String body) {
         String cleaned = Jsoup.clean(body, Whitelist.basic());
         if (!cleaned.equals(body)) {
-            logger.debug("notification body for "+notificationId+"cleaned, was ("+body);
+            logger.info("notification body for "+notificationId+"cleaned, was ("+body + ") after clean - " + cleaned);
         }
         this.body = cleaned;
     }
