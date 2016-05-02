@@ -167,6 +167,13 @@ public class Notification {
         if(title == null){
             return "";
         }
+        
+        String cleaned = Jsoup.clean(title, Whitelist.basic());
+        if (!cleaned.equals(title)) {
+            logger.debug("notification title for "+notificationId+"cleaned, was ("+title);
+        }
+        this.title = cleaned;        
+        
         return title;
     }
 
@@ -182,13 +189,20 @@ public class Notification {
         if(body == null){
             return "";
         }
+        
+        String cleaned = Jsoup.clean(body, Whitelist.basic());
+        if (!cleaned.equals(body)) {
+            logger.debug("notification body for "+notificationId+"cleaned, was ("+body + ") after clean - " + cleaned);
+        }
+        body = cleaned;        
+        
         return body;
     }
 
     public void setBody(String body) {
         String cleaned = Jsoup.clean(body, Whitelist.basic());
         if (!cleaned.equals(body)) {
-            logger.info("notification body for "+notificationId+"cleaned, was ("+body + ") after clean - " + cleaned);
+            logger.debug("notification body for "+notificationId+"cleaned, was ("+body + ") after clean - " + cleaned);
         }
         this.body = cleaned;
     }
