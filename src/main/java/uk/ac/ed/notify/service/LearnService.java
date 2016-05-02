@@ -223,8 +223,7 @@ public class LearnService {
         ArrayList<Users> allUsers = (ArrayList)learnUserRepository.findAllActiveUsers();
         Hashtable<String, String> userIdNamePair = new Hashtable<String, String>();
         for(int i = 0; i < allUsers.size(); i++){
-            Users user = allUsers.get(i);
-            userIdNamePair.put(user.getPk1() + "", user.getUserId());
+            userIdNamePair.put(allUsers.get(i).getPk1() + "", allUsers.get(i).getUserId());
         }
         logger.info("total number of users in learn - " + allUsers.size());
         
@@ -314,7 +313,7 @@ public class LearnService {
             Date startDate = announcement.getStartDate();
             Date endDate = announcement.getEndDate();
             Notification notificationCompare = constructLearnNotification(null, publisherNotificationId, category, title, body, notificationUrl, startDate, endDate, "ignore");
-
+ 
             logger.info(category + " - " + i + " " +  announcement.getSubject());
  
             
@@ -357,7 +356,7 @@ public class LearnService {
                 */
                 
                 logger.info("start updating notifications in database - " + new Date());
-                notificationRepository.updateByPublisherIdAndPublisherNotificationId(title, body, startDate, endDate, publisherId, publisherNotificationId);
+                notificationRepository.updateByPublisherIdAndPublisherNotificationId(notificationCompare.getTitle(), notificationCompare.getBody(), notificationCompare.getStartDate(), notificationCompare.getEndDate(), publisherId, publisherNotificationId);
                 logger.info("complete - " + new Date());
             }
             
@@ -447,7 +446,7 @@ public class LearnService {
                 */
                 
                 logger.info("start updating course annoucement notifications in database - " + new Date());
-                notificationRepository.updateByPublisherIdAndPublisherNotificationId(title, body, startDate, endDate, publisherId, publisherNotificationId);
+                notificationRepository.updateByPublisherIdAndPublisherNotificationId(notificationCompare.getTitle(), notificationCompare.getBody(), notificationCompare.getStartDate(), notificationCompare.getEndDate(), publisherId, publisherNotificationId);
                 logger.info("complete - " + new Date());
             }
             
