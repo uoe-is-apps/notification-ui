@@ -20,6 +20,11 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
         		controller : 'editUiUsersController',
         		activetab : 'user-administration'
     }).
+    when('/scheduled-tasks',{
+		templateUrl : 'listScheduledTasks.html',
+		controller : 'listScheduledTasksController',
+		activetab : 'scheduled-tasks'
+    }).
 	otherwise('/');
 
 	$httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -398,4 +403,14 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
         $scope.user.uiRoles = [];
       };
 
+})
+.controller('listScheduledTasksController', function($rootScope, $scope, $http, $route, $location, message) {
+	
+	 $http.get('/scheduled-tasks')
+	    .success(function(data) {
+ 		   $scope.triggerList = data;
+ 	    }).
+ 	    error(function(data) {
+ 	    	$scope.errorMessage = data;
+ 	    });
 });
