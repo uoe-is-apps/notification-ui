@@ -1,0 +1,2 @@
+insert into notification_ui_roles (role_code, role_description) values ('USRSUPPORT','Allows user support actions in the notification UI');
+insert into notification_ui_roles (role_code, role_description) values ('SYSSUPPORT','Allows system level support actions in the notification UI');

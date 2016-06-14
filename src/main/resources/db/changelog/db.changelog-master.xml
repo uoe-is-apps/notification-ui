@@ -62,4 +62,17 @@
                  splitStatements="true"
                  stripComments="true"/>
     </changeSet>
+    
+    <changeSet id="ui_roles_insert_oracle" author="agajda" dbms="oracle">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/insert_notification_ui_roles.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+        <rollback>
+            <sqlFile encoding="utf8"
+                     path="db/changelog/sql/insert_notification_ui_roles_rollback.sql"
+                     splitStatements="true"
+                     stripComments="true"/>
+        </rollback>        
+    </changeSet>   
 </databaseChangeLog>

@@ -1,0 +1,1 @@
+delete from notification_ui_roles where role_code in ('USRSUPPORT','SYSSUPPORT');
