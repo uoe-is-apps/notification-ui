@@ -3,6 +3,9 @@ package uk.ac.ed.notify.entity;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import javax.persistence.*;
+
+import org.hibernate.annotations.GenericGenerator;
+
 import java.util.Date;
 
 /**
@@ -14,6 +17,8 @@ public class TopicSubscription {
 
     @Id
     @Column(name="SUBSCRIPTION_ID")
+    @GeneratedValue(generator = "sysguid")
+    @GenericGenerator(name = "sysguid", strategy = "guid")
     private String subscriptionId;
 
     @Column(name="SUBSCRIBER_ID")

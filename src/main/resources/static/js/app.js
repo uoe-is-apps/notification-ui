@@ -25,6 +25,16 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 		controller : 'listScheduledTasksController',
 		activetab : 'scheduled-tasks'
     }).
+    when('/publisher-subscriber',{
+		templateUrl : 'listPublisherSubscriberDetails.html',
+		controller : 'listPublisherSubscriberDetailsController',
+		activetab : 'publisher-subscriber'
+    }).
+    when('/edit-topic-subscription',{
+		templateUrl : 'editTopicSubscription.html',
+		controller : 'editTopicSubscriptionController',
+		activetab : 'publisher-subscriber'
+    }).
 	otherwise('/');
 
 	$httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -92,6 +102,17 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
      return this.userData;
   }
 
+})
+.service("topicSubscription", function TopicSubscription(){
+	this.topicSubscriptionData = {subscriberId: "", topic: "", status: "A", lastUpdated: new Date()};
+	
+	this.setTopicSubscription = function(topicSubscription) {
+		this.topicSubscriptionData = topicSubscription;
+	}
+	
+	this.getTopicSubscription = function() {
+		return this.topicSubscriptionData;
+	}
 })
 .controller('navigation',function($rootScope, $scope, $http, $location, $route) {
 
@@ -389,7 +410,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
                        },
                        function errorCallback(response)
                        {
-                           message.setErrorMessage("Error saving user:"+response.status+response.statusText);
+                           message.setErrorMessage("Error saving user: "+response.status+response.statusText);
                        });
 
 
@@ -411,6 +432,59 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
  		   $scope.triggerList = data;
  	    }).
  	    error(function(data) {
- 	    	$scope.errorMessage = data;
+ 	    	$scope.errorMessage = data; //must handle error better
  	    });
+})
+.controller('listPublisherSubscriberDetailsController', function($rootScope, $scope, $http, $route, $location, message, topicSubscription) {
+	
+	 $http.get('/publishers')
+	    .success(function(data) {
+ 		   $scope.publisherList = data;
+ 	    }).
+ 	    error(function(data) {
+ 	    	$scope.errorMessage = data; //must handle error better
+ 	    });
+	 
+	 $http.get('/subscribers')
+	    .success(function(data) {
+		   $scope.subscriberList = data;
+	    }).
+	    error(function(data) {
+	    	$scope.errorMessage = data; //must handle error better
+	    });
+	 
+	 $http.get('/topic-subscriptions')
+	    .success(function(data) {
+		   $scope.topicSubscriptionList = data;
+	    }).
+	    error(function(data) {
+	    	$scope.errorMessage = data; //must handle error better
+	    });
+	    
+	 $scope.createTopicSubscription = function() {
+		 
+		 message.setSuccessMessage("");
+         message.setErrorMessage("");
+         
+         $location.path("/edit-topic-subscription");
+	 }
+	 
+	 $scope.deleteTopicSubscription = function(topicSubscription) {
+		 
+		 $http.delete("topic-subscriptions/" + topicSubscription.subscriptionId)
+		      .then(function successCallback(response){
+		    	  
+		    	  message.setSuccessMessage("Topic subscription deleted.");
+		    	  
+		          $http.get('/topic-subscriptions').success(function(data) {
+		  		       $scope.topicSubscriptionList = data;
+		  	      });  
+		    	  
+		      }, function errorCallback(response) {
+		    	  message.setErrorMessage("Error deleting topic subscription: " +response.status+response.statusText);
+		      }); 		
+	 }
+})
+.controller('editTopicSubscriptionController', function($rootScope, $scope, $http, $route, $location, message, topicSubscription) {
+	
 });

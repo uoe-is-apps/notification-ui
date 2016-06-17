@@ -20,26 +20,36 @@
 
 <br/>
 
-<div >
-  <table ng-if="triggerList" class="table table-striped table-bordered" cellspacing="0" width="100%"> 
-     <thead>
-     <tr>
-       <th>Job Name</th>
-       <th>Last Run</th>
-       <th>Next Run</th>
-       <th>State</th>
-       <th>Times Executed</th>
-     </tr>
-     </thead>
-     <tbody>
-      <tr ng-repeat="trigger in triggerList">
-         <td>{{trigger.jobName}}</td>
-         <td>{{trigger.prevRun}}</td>
-         <td>{{trigger.nextRun}}</td>
-         <td>{{trigger.triggerState}}</td>
-         <td>{{trigger.timesExecuted}}</td>
-      </tr>
-     </tbody>
-  
-  </table>
+<div class="panel panel-default uoe-overview-high">
+	<div class="panel-heading"><h3>Scheduled Tasks</h3></div>
+    	<div class="panel-body">
+    	   <div ng-if="!triggerList" class="progress">
+                <div class="progress-bar progress-bar-striped active" role="progressbar"
+                     aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                    Loading
+                </div>
+            </div>
+    	    <div class="table-responsive" ng-if="triggerList">
+			  <table class="table table-striped table-bordered" cellspacing="0" width="100%"> 
+			     <thead>
+			     <tr>
+			       <th>Job Name</th>
+			       <th>Last Run</th>
+			       <th>Next Run</th>
+			       <th>State</th>
+			       <th>Times Executed</th>
+			     </tr>
+			     </thead>
+			     <tbody>
+			      <tr ng-repeat="trigger in triggerList">
+			         <td>{{trigger.jobName}}</td>
+			         <td>{{trigger.prevRun}}</td>
+			         <td>{{trigger.nextRun}}</td>
+			         <td>{{trigger.triggerState}}</td>
+			         <td>{{trigger.timesExecuted}}</td>
+			      </tr>
+			     </tbody>
+			  </table>
+			</div>
+	    </div>
 </div>
