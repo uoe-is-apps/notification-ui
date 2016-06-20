@@ -1,3 +1,42 @@
-<div>
-You are in edit screen
+<div class="panel panel-default uoe-overview-high">
+    <div class="panel-heading"><h3>Create Topic Subscription</h3></div>
+    <div class="panel-body">
+    
+		<form name="editTopicSubscriptionForm" novalidate class="form-horizontal" ng-if="subscriberList.length > 0"> 
+		
+			<div class="form-group" ng-class="{'has-error' : (editTopicSubscriptionForm.$submitted || editTopicSubscriptionForm.subscriberSelect.$touched) && editTopicSubscriptionForm.subscriberSelect.$error.required}">
+			
+                <label for="subscriberSelect" class="col-sm-2 control-label">Subscriber</label>
+
+                <div  class="col-sm-10">
+                    <select name="subscriberSelect" id="subscriberSelect" ng-model="newTopicSubscription.subscriberId" required>
+				    	<option ng-repeat="subscriber in subscriberList" value="{{subscriber.subscriberId}}">{{subscriber.description}}</option>
+				    </select>
+				    
+				    <div ng-show="editTopicSubscriptionForm.$submitted || editTopicSubscriptionForm.subscriberSelect.$touched">
+				      <p class="alert-danger" ng-show="editTopicSubscriptionForm.subscriberSelect.$error.required">Subscriber is required.</p> 
+				    </div>
+                </div>
+            </div>
+			
+		     <div class="form-group" ng-class="{ 'has-error': (editTopicSubscriptionForm.$submitted || editTopicSubscriptionForm.topic.$touched) && (editTopicSubscriptionForm.topic.$error.required || editTopicSubscriptionForm.topic.$invalid) }" >
+                <label for="topic" class="col-sm-2 control-label">Topic</label>
+                
+                <div class="col-sm-10">
+                    <input type="text" name="topic" ng-model="newTopicSubscription.topic" placeholder="A new topic" required ng-maxlength="topicMaxLength"/>
+                    
+                    <div ng-show="editTopicSubscriptionForm.$submitted || editTopicSubscriptionForm.topic.$touched">
+				      <p class="alert-danger" ng-show="editTopicSubscriptionForm.topic.$error.required">Topic is required.</p>
+				      <p class="alert-danger" ng-show="editTopicSubscriptionForm.topic.$invalid">Topic must be up to {{topicMaxLength}} characters in length.</p>
+				    </div>
+                </div>
+            </div>
+            
+            <input type="button" ng-click="reset()" value="Reset" class="btn btn-warning"/>
+            <input type="submit" ng-disabled="editTopicSubscriptionForm.$invalid" ng-click="create(newTopicSubscription)" class="btn btn-primary" value="Save" />
+		       
+		</form>
+		
+		<div ng-if="!subscriberList.length">Unable to create a topic. There are no subscribers.</div>
+    </div>
 </div>

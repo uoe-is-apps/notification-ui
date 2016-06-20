@@ -113,6 +113,10 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 	this.getTopicSubscription = function() {
 		return this.topicSubscriptionData;
 	}
+	
+	this.createNewTopicSubscription = function() {
+		return {subscriberId: "", topic: "", status: "A", lastUpdated: new Date()};
+	}
 })
 .controller('navigation',function($rootScope, $scope, $http, $location, $route) {
 
@@ -161,7 +165,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 
 .controller('listEmergencyNotificationController', function($rootScope,$scope, $http,$route,notification,message,$location) {
 
-    $scope.successMessage =
+    $scope.successMessage = message.successMessage();
     $scope.errorMessage = message.errorMessage();
     $scope.$on('successMessageUpdated', function() {
         $scope.successMessage = message.successMessage();
@@ -437,6 +441,18 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 })
 .controller('listPublisherSubscriberDetailsController', function($rootScope, $scope, $http, $route, $location, message, topicSubscription) {
 	
+	$scope.successMessage = message.successMessage();
+    $scope.errorMessage = message.errorMessage();
+    $scope.$on('successMessageUpdated', function() {
+        $scope.successMessage = message.successMessage();
+
+      });
+    $scope.$on('errorMessageUpdated', function() {
+            $scope.errorMessage = message.errorMessage();
+
+          });
+    $scope.route = $route;
+	
 	 $http.get('/publishers')
 	    .success(function(data) {
  		   $scope.publisherList = data;
@@ -474,7 +490,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 		 $http.delete("topic-subscriptions/" + topicSubscription.subscriptionId)
 		      .then(function successCallback(response){
 		    	  
-		    	  message.setSuccessMessage("Topic subscription deleted.");
+		    	  message.setSuccessMessage("Topic subscription deleted.");//not showing why???
 		    	  
 		          $http.get('/topic-subscriptions').success(function(data) {
 		  		       $scope.topicSubscriptionList = data;
@@ -486,5 +502,43 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 	 }
 })
 .controller('editTopicSubscriptionController', function($rootScope, $scope, $http, $route, $location, message, topicSubscription) {
+	
+	$scope.successMessage = message.successMessage();
+    $scope.errorMessage = message.errorMessage();
+    $scope.$on('successMessageUpdated', function() {
+        $scope.successMessage = message.successMessage();
+
+      });
+    $scope.$on('errorMessageUpdated', function() {
+            $scope.errorMessage = message.errorMessage();
+
+          });
+    $scope.route = $route;
+	
+	$scope.newTopicSubscription = topicSubscription.createNewTopicSubscription();
+	$scope.topicMaxLength = 32;
+	
+	$scope.reset = function() {
+		$scope.newTopicSubscription = topicSubscription.createNewTopicSubscription();
+	}
+	
+	$http.get('/subscribers')
+       .success(function(data) {
+	      $scope.subscriberList = data;
+    });
+	
+	$scope.create = function(topicSubscription) {
+		
+		$http.post("/topic-subscriptions", topicSubscription)
+			.then(function successCallback(response)
+	        {
+	            message.setSuccessMessage("Topic subscription saved");
+	            $location.path("/publisher-subscriber");
+	        },
+	        function errorCallback(response)
+	        {
+	            message.setErrorMessage("Error saving topic subscription: "+response.status+response.statusText);
+	        });
+	}
 	
 });
