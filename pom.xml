@@ -144,6 +144,38 @@
             <artifactId>webservices</artifactId>
             <version>1.2</version>
         </dependency>  
+        
+        <!--  jasmine tests  -->
+        <dependency>
+	        <groupId>org.webjars</groupId>
+	        <artifactId>jquery</artifactId>
+	        <version>2.1.1</version>
+	        <scope>test</scope>
+        </dependency>
+        <dependency>
+	        <groupId>org.webjars</groupId>
+	        <artifactId>angularjs</artifactId>
+	        <version>1.3.8</version>
+	        <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>ng-ckeditor</artifactId>
+            <version>0.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>angular-ui-bootstrap</artifactId>
+            <version>0.13.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>ckeditor</artifactId>
+            <version>4.5.3</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -221,6 +253,39 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+		       <groupId>com.github.searls</groupId>
+		       <artifactId>jasmine-maven-plugin</artifactId>
+		       <version>2.0</version>
+		       <executions>
+		          <execution>
+		             <goals>
+		               <goal>test</goal>
+		             </goals>
+		          </execution>
+		       </executions>
+		 <!-- keep the configuration out of the execution so that the bdd goal has access to it -->
+		       <configuration>
+		           <jsSrcDir>src/main/resources/static/js</jsSrcDir>
+		           <sourceIncludes>
+		               <include>app.js</include>
+		           </sourceIncludes>
+		           <jsTestSrcDir>src/test/resources/static/js</jsTestSrcDir>
+		           <specIncludes>
+		               <include>*.spec.js</include>
+		           </specIncludes>
+		           <preloadSources>
+		               <source>webjars/angular.js</source>
+		               <source>webjars/jquery.js</source>
+		               <source>webjars/angular-route.js</source>
+		               <source>webjars/ng-ckeditor/0.2/ng-ckeditor.js</source>
+		               <source>webjars/ckeditor/4.5.3/basic/ckeditor.js</source>
+		               <source>src/main/resources/static/js/checklist-model.js</source>
+		               <source>webjars/angular-ui-bootstrap/0.13.3/ui-bootstrap.min.js</source>
+		               <source>webjars/angular-mocks.js</source>
+		           </preloadSources>
+		       </configuration>
+		 </plugin>
         </plugins>
     </build>
 

@@ -518,10 +518,6 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 	$scope.newTopicSubscription = topicSubscription.createNewTopicSubscription();
 	$scope.topicMaxLength = 32;
 	
-	$scope.reset = function() {
-		$scope.newTopicSubscription = topicSubscription.createNewTopicSubscription();
-	}
-	
 	$http.get('/subscribers')
        .success(function(data) {
 	      $scope.subscriberList = data;
@@ -539,6 +535,10 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 	        {
 	            message.setErrorMessage("Error saving topic subscription: "+response.status+response.statusText);
 	        });
+	}
+	
+	$scope.reset = function() {
+		$scope.newTopicSubscription = topicSubscription.createNewTopicSubscription();
 	}
 	
 });
