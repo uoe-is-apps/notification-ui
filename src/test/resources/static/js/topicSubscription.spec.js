@@ -1,25 +1,53 @@
-describe("Edit topic subscription test suite", function() {
+describe("Edit topic subscription controller test suite", function() {
+	
+	var $httpBackend, $rootScope, createController, lastUpdated, $scope;
 	
 	beforeEach(module('notify-ui-app'));
-	var $controller, $rootScope;
 	
-	beforeEach(inject(function(_$controller_, _$rootScope_){
-        $controller = _$controller_;
-        $rootScope = _$rootScope_;
+	beforeEach(inject(function($injector){
+		
+		$httpBackend = $injector.get('$httpBackend');
+		$rootScope = $injector.get('$rootScope');
+		var $controller = $injector.get('$controller');
+        $scope = $rootScope.$new();
+        
+        createController = function(name) {
+        	return $controller(name, {'$scope' : $scope}); 
+        };
+        
+        lastUpdated = new Date();
+ 
+        $httpBackend.expectGET('listEmergencyNotification.html').respond({});
     }));
 	
-	it("url to edit topic subscription should be [/edit-topic-subscription]", inject(function(_$httpBackend_, $route, $location, message, topicSubscription) {
+	afterEach(function() {
+        $httpBackend.verifyNoOutstandingExpectation();
+        $httpBackend.verifyNoOutstandingRequest();
+    });
+	
+	it("should get data from backend", inject(function($route, $location, message, topicSubscription) {
 		
-		var scope = $rootScope.$new();
-		var $httpBackend = _$httpBackend_;
+		var subscriberObject = [{"subscriberId":"myed","description":"MyEd Notification Subscriber","type":"Pull","status":"A","lastUpdated":"2015-11-10T11:18:04+0000"}];
 		
+		$httpBackend.when('GET','/subscribers')
+		.respond(200, subscriberObject);
+			
+		$httpBackend.when('POST', '/topic-subscriptions')
+		 .respond(200, true);
 		
-		$httpBackend.expectGET('/subscribers').respond(200, {});
-		$httpBackend.flush();
-		
-		var controller = $controller('editTopicSubscriptionController', {$scope: scope});
+		var controller = createController('editTopicSubscriptionController');
 		spyOn($rootScope, '$broadcast').and.callThrough();
 
-		expect(scope.subscriberList).toBe({});
+		$scope.create({});
+		
+		$httpBackend.expectGET('listPublisherSubscriberDetails.html').respond({});
+		
+		$httpBackend.flush();
+
+		expect($scope.subscriberList.length).toBe(1);
+		expect($scope.subscriberList).toEqual(subscriberObject);
+		
+		expect($scope.successMessage).toBe("Topic subscription saved");
+		
 	}));
 });

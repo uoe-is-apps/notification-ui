@@ -160,20 +160,8 @@
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
-            <artifactId>ng-ckeditor</artifactId>
-            <version>0.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
             <artifactId>angular-ui-bootstrap</artifactId>
             <version>0.13.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>ckeditor</artifactId>
-            <version>4.5.3</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
