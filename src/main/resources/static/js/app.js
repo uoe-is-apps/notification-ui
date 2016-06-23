@@ -456,25 +456,16 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 	 $http.get('/publishers')
 	    .success(function(data) {
  		   $scope.publisherList = data;
- 	    }).
- 	    error(function(data) {
- 	    	$scope.errorMessage = data; //must handle error better
  	    });
 	 
 	 $http.get('/subscribers')
 	    .success(function(data) {
 		   $scope.subscriberList = data;
-	    }).
-	    error(function(data) {
-	    	$scope.errorMessage = data; //must handle error better
 	    });
 	 
 	 $http.get('/topic-subscriptions')
 	    .success(function(data) {
 		   $scope.topicSubscriptionList = data;
-	    }).
-	    error(function(data) {
-	    	$scope.errorMessage = data; //must handle error better
 	    });
 	    
 	 $scope.createTopicSubscription = function() {
@@ -490,7 +481,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 		 $http.delete("topic-subscriptions/" + topicSubscription.subscriptionId)
 		      .then(function successCallback(response){
 		    	  
-		    	  message.setSuccessMessage("Topic subscription deleted.");//not showing why???
+		    	  message.setSuccessMessage("Topic subscription deleted.");
 		    	  
 		          $http.get('/topic-subscriptions').success(function(data) {
 		  		       $scope.topicSubscriptionList = data;
