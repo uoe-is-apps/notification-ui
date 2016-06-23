@@ -21,8 +21,14 @@ describe("publisher subscriber controller test suite", function() {
 			});
 		};
 		
-		$httpBackend.expectGET('listEmergencyNotification.html').respond(200);
+		$httpBackend.whenGET('listEmergencyNotification.html').respond(200);
 	}));
+	
+	afterEach(function() {
+        $httpBackend.verifyNoOutstandingExpectation();
+        $httpBackend.verifyNoOutstandingRequest();
+        $httpBackend.resetExpectations();
+    });
 	
 	it("should exist", function() {
 		
@@ -64,17 +70,19 @@ describe("publisher subscriber controller test suite", function() {
 	});
 	
 	it("should redirect to edit topic subscription view", function() {
-		
+	
 		$httpBackend.when('GET','/publishers').respond(200, {});
 		$httpBackend.when('GET','/subscribers').respond(200, {});
 		$httpBackend.when('GET','/topic-subscriptions').respond(200, {});
+		$httpBackend.whenGET('editTopicSubscription.html').respond(200, {});
 		
 		var controller = createController();
-		$httpBackend.flush();
 		
 		$scope.successMessage = "Test initialised";
 		$scope.createTopicSubscription();
-		
+
+		$httpBackend.flush();
+
 		expect($scope.successMessage).toEqual("");
 		expect($location.path()).toEqual("/edit-topic-subscription");
 	});
@@ -84,21 +92,25 @@ describe("publisher subscriber controller test suite", function() {
 		var topicSubscriptionList = [{"subscriptionId":"242EDD10F808F6FBE053071DA8C05A7F","subscriberId":"myed","topic":"Learn Task","status":"A","lastUpdated":"2015-11-10T11:18:04+0000"},
 		                             {"subscriptionId":"35B7356A67024A8DE053071DA8C0D11C","subscriberId":"myed","topic":"New subscription instruction","status":"A","lastUpdated":"2016-06-20T15:04:41+0100"}];
 		
+		var topicSubscriptionToDelete = topicSubscriptionList[0];
+		
 		$httpBackend.when('GET','/publishers').respond(200, {});
 		$httpBackend.when('GET','/subscribers').respond(200, {});
-		
 		$httpBackend.when('GET','/topic-subscriptions').respond(200, topicSubscriptionList);
-
 		$httpBackend.when('DELETE', /^topic-subscriptions\/?.*/).respond(200);
 
 		var controller = createController();
-
-		$scope.deleteTopicSubscription(topicSubscriptionList[0]);
+		$httpBackend.flush();
+		
+		topicSubscriptionList.shift();
+		$httpBackend.when('GET','/topic-subscriptions').respond(200, topicSubscriptionList);
+		
+		$scope.deleteTopicSubscription(topicSubscriptionToDelete);
 		
 		$httpBackend.flush();
 		
-		//expect($scope.topicSubscriptionList.length).toBe(1);
-		//expect($scope.topicSubscriptionList[0].subscriptionId).toEqual("35B7356A67024A8DE053071DA8C0D11C");
+		expect($scope.topicSubscriptionList.length).toBe(1);
+		expect($scope.topicSubscriptionList[0].subscriptionId).toEqual("35B7356A67024A8DE053071DA8C0D11C");
 		
 		expect($scope.successMessage).toEqual("Topic subscription deleted.")
 

@@ -1,4 +1,4 @@
-describe("Edit topic subscription controller test suite", function() {
+describe("edit topic subscription controller test suite", function() {
 	
 	var $httpBackend, $rootScope, createController, lastUpdated, $scope, $location;
 	
