@@ -35,6 +35,11 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 		controller : 'editTopicSubscriptionController',
 		activetab : 'publisher-subscriber'
     }).
+    when('/user-notifications',{
+		templateUrl : 'listUserNotifications.html',
+		controller : 'listUserNotificationsController',
+		activetab : 'user-notifications'
+    }).
 	otherwise('/');
 
 	$httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -532,4 +537,45 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 		$scope.newTopicSubscription = topicSubscription.createNewTopicSubscription();
 	}
 	
-});
+})
+.factory('notificationService', ['$http', function($http) {
+	var userNotificationList = [];
+	
+	var getUserNotifications = function(uun) {
+
+		$http.get('/notification/user/' + uun)
+		     .success(function(data) {
+		    	 userNotificationList = data;
+		    	 angular.forEach(userNotificationList, function(notification) {
+		    		 
+		    		 $http.get("/topic/" + notification.topic)
+					 .success(function(data) {
+					    	
+					    var topicSubscriberList = data; 
+					    
+					    var subscribers = [];
+						angular.forEach(topicSubscriberList, function(subscriber) {
+							
+							this.push(subscriber.subscriberId);
+						}, subscribers);
+						
+						notification.subscriberList = subscribers.toString();    
+		    	 });
+		     }); 
+	});
+		
+	return userNotificationList;
+	}
+	
+	return {
+		getUserNotifications : getUserNotifications
+	};
+}])
+.controller('listUserNotificationsController', ['$scope', '$http', 'notificationService', 'user', function($scope, $http, notificationService, user) {
+	
+	$scope.notificationUser = user.user();
+
+	$scope.getUserNotifications = function(uun) {
+		$scope.userNotificationList = notificationService.getUserNotifications(uun);
+	}		
+}]);
