@@ -48,6 +48,7 @@ public class Application extends SpringBootServletInitializer {
                     .authorizeRequests().anyRequest().authenticated()
                     .antMatchers("/office365NewEmailCallback/**").permitAll()
                     .antMatchers("/scheduled-tasks", "/publishers", "/subscribers", "/topic-subscriptions/**").hasRole("SYSSUPPORT")
+                    .antMatchers("/topic/**").hasRole("USRSUPPORT")
                     .antMatchers("/").hasRole("EMERGENCY");        
         }
 
