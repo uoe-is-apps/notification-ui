@@ -560,9 +560,9 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 						}, subscribers);
 						
 						notification.subscriberList = subscribers.toString();    
-		    	 });
-		     }); 
-	});
+		    	     });
+		         }); 
+	    });
 		
 	return userNotificationList;
 	}
