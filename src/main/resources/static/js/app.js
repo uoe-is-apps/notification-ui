@@ -538,10 +538,13 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 	}
 	
 })
-.factory('notificationService', ['$http', function($http) {
+.controller('listUserNotificationsController', ['$scope', '$http','user', function($scope, $http, user) {
+	
+	$scope.notificationUser = user.user();
+	
 	var userNotificationList = [];
 	
-	var getUserNotifications = function(uun) {
+	$scope.getUserNotifications = function(uun) {
 
 		$http.get('/notification/user/' + uun)
 		     .success(function(data) {
@@ -564,18 +567,6 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 		         }); 
 	    });
 		
-	return userNotificationList;
-	}
-	
-	return {
-		getUserNotifications : getUserNotifications
-	};
-}])
-.controller('listUserNotificationsController', ['$scope', '$http', 'notificationService', 'user', function($scope, $http, notificationService, user) {
-	
-	$scope.notificationUser = user.user();
-
-	$scope.getUserNotifications = function(uun) {
-		$scope.userNotificationList = notificationService.getUserNotifications(uun);
+		$scope.userNotificationList = userNotificationList;
 	}		
 }]);
