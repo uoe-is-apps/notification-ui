@@ -1,0 +1,2 @@
+ALTER TABLE NOTIFICATION_UI_USERS ADD ORG_GROUP_DN VARCHAR2(255);
+COMMENT ON COLUMN NOTIFICATION_UI_USERS.ORG_GROUP_DN IS 'Holds the org unit to which the user has permissions to create group notifications on or under';

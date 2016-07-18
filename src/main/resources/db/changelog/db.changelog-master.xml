@@ -74,5 +74,27 @@
                      splitStatements="true"
                      stripComments="true"/>
         </rollback>        
-    </changeSet>   
+    </changeSet> 
+      
+    <changeSet id="create_notification_users_table_oracle" dbms="oracle" author="agajda">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/create_notification_users_table_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+    
+    <changeSet id="alter_notifications_table_oracle" dbms="oracle" author="agajda">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/alter_notifications_table_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+    
+    <changeSet id="alter_notifications_ui_users_table_oracle" dbms="oracle" author="agajda">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/alter_notifications_ui_users_table_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+    
 </databaseChangeLog>
