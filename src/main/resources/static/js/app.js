@@ -181,7 +181,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 
           });
     $scope.route = $route;
-	$http.get('notification/publisher/notify-ui').success(function(data) {
+	$http.get('notifications/publisher/notify-ui').success(function(data) {
 		$scope.notificationList = data;
 	});
 
@@ -546,7 +546,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 	
 	$scope.getUserNotifications = function(uun) {
 
-		$http.get('/notification/user/' + uun)
+		$http.get('/notifications/user/' + uun)
 		     .success(function(data) {
 		    	 userNotificationList = data;
 		    	 angular.forEach(userNotificationList, function(notification) {

@@ -2,11 +2,9 @@ package uk.ac.ed.notify.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.hibernate.annotations.GenericGenerator;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by rgood on 18/09/2015.
@@ -29,7 +27,6 @@ public class JsonNotification {
         private String title;
 
 
-
         private String body;
 
 
@@ -41,11 +38,12 @@ public class JsonNotification {
         @JsonSerialize(using=DatePartSerializer.class)
         private Date endDate;
 
-
-        private String uun;
-
         @JsonSerialize(using=DatePartSerializer.class)
         private Date lastUpdated;
+        
+        
+        private List<NotificationUser> notificationUsers; 
+        
 
         public String getNotificationId() {
                 return notificationId;
@@ -121,14 +119,6 @@ public class JsonNotification {
                 this.endDate = endDate;
         }
 
-        public String getUun() {
-                return uun;
-        }
-
-        public void setUun(String uun) {
-                this.uun = uun;
-        }
-
         public Date getLastUpdated() {
                 return lastUpdated;
         }
@@ -136,4 +126,12 @@ public class JsonNotification {
         public void setLastUpdated(Date lastUpdated) {
                 this.lastUpdated = lastUpdated;
         }
+
+		public List<NotificationUser> getNotificationUsers() {
+			return notificationUsers;
+		}
+
+		public void setNotificationUsers(List<NotificationUser> notificationUsers) {
+			this.notificationUsers = notificationUsers;
+		}
 }

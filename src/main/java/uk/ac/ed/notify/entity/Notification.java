@@ -1,16 +1,18 @@
 package uk.ac.ed.notify.entity;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import org.hibernate.annotations.GenericGenerator;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import uk.ac.ed.notify.repository.UserNotificationAuditRepository;
 
 import javax.persistence.*;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -22,7 +24,7 @@ import java.util.Objects;
         @NamedQuery(name = "Notification.findByPublisherIdAndTopic", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and a.topic = (?2)"),
         @NamedQuery(name = "Notification.findByPublisherId", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1)"),
         @NamedQuery(name = "Notification.findByPublisherIdAndPublisherNotificationId", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and a.publisherNotificationId  = (?2)"),
-        @NamedQuery(name = "Notification.findByPublisherIdAndPublisherNotificationIdAndUun", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and a.publisherNotificationId  = (?2) and a.uun = (?3)")
+        @NamedQuery(name = "Notification.findByPublisherIdAndPublisherNotificationIdAndUun", query = "SELECT a FROM Notification a JOIN FETCH a.notificationUsers b WHERE a.publisherId = (?1) and a.publisherNotificationId  = (?2) and b.id.uun = (?3)")
 })
 public class Notification {
 
@@ -78,6 +80,9 @@ public class Notification {
     @Transient 
     private String action;      
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "notification", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NotificationUser> notificationUsers = new ArrayList<NotificationUser>();
+    
     public String getPublisherKey() {
         return publisherKey;
     }
@@ -219,8 +224,16 @@ public class Notification {
         }
         this.url = cleaned;
     }
+    
+    public List<NotificationUser> getNotificationUsers() {
+		return notificationUsers;
+	}
 
-    @Override
+	public void setNotificationUsers(List<NotificationUser> notificationUsers) {
+		this.notificationUsers = notificationUsers;
+	}
+
+	@Override
     public String toString() {
         return "Notification{" + "notificationId=" + notificationId + ", publisherId=" + publisherId + ", publisherNotificationId=" + publisherNotificationId + ", topic=" + topic + ", title=" + title + ", body=" + body + ", url=" + url + ", startDate=" + startDate + ", endDate=" + endDate + ", uun=" + uun + ", action=" + action + ", publisherKey=" + publisherKey + '}';
     }

@@ -11,12 +11,10 @@ import org.springframework.security.oauth2.client.token.grant.client.ClientCrede
 import org.springframework.web.bind.annotation.*;
 
 import uk.ac.ed.notify.entity.JsonNotification;
-import uk.ac.ed.notify.entity.Notification;
 
 import javax.servlet.ServletException;
 
 import java.security.Principal;
-import java.util.List;
 
 /**
  * Created by rgood on 28/10/2015.
@@ -58,32 +56,27 @@ public class NotificationController {
     }
 
     @RequestMapping(value = "/notification/{notification-id}", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    JsonNotification getNotification(@PathVariable("notification-id") String notificationId) throws ServletException {
-        ResponseEntity<JsonNotification> response = restTemplate.getForEntity(notificationMsUrl + "/" + notificationId, JsonNotification.class);
+    public JsonNotification getNotification(@PathVariable("notification-id") String notificationId) throws ServletException {
+        ResponseEntity<JsonNotification> response = restTemplate.getForEntity(notificationMsUrl + "/notification/" + notificationId, JsonNotification.class);
 
         return response.getBody();
     }
 
-    @RequestMapping(value = "/notification/publisher/{publisher-id}", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    JsonNotification[] getPublisherNotifications(@PathVariable("publisher-id") String publisherId) throws ServletException {
+    @RequestMapping(value = "/notifications/publisher/{publisher-id}", method = RequestMethod.GET)
+    public JsonNotification[] getPublisherNotifications(@PathVariable("publisher-id") String publisherId) throws ServletException {
 
-        ResponseEntity<JsonNotification[]> response = restTemplate.getForEntity(notificationMsUrl + "/publisher/" + publisherId, JsonNotification[].class);
+        ResponseEntity<JsonNotification[]> response = restTemplate.getForEntity(notificationMsUrl + "/notifications/publisher/" + publisherId, JsonNotification[].class);
         return response.getBody();
     }
 
 
     @RequestMapping(value="/notification/", method=RequestMethod.POST)
-    public @ResponseBody
-    JsonNotification setNotification(@RequestBody JsonNotification notification) throws ServletException, JsonProcessingException {
+    public JsonNotification setNotification(@RequestBody JsonNotification notification) throws ServletException, JsonProcessingException {
         
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity request= new HttpEntity(notification, headers);
-        ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/", HttpMethod.POST, request, JsonNotification.class);
+        ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/", HttpMethod.POST, request, JsonNotification.class);
         return response.getBody();
 
     }
@@ -93,7 +86,7 @@ public class NotificationController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity request= new HttpEntity(notification, headers);
-        ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/"+notificationId, HttpMethod.PUT, request, JsonNotification.class);
+        ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/"+notificationId, HttpMethod.PUT, request, JsonNotification.class);
     }
 
     @RequestMapping(value="/notification/{notification-id}",method=RequestMethod.DELETE)
@@ -102,13 +95,13 @@ public class NotificationController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity request= new HttpEntity("", headers);
-        ResponseEntity<String> response = restTemplate.exchange(notificationMsUrl + "/"+notificationId, HttpMethod.DELETE, request, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(notificationMsUrl + "/notification/"+notificationId, HttpMethod.DELETE, request, String.class);
     }
     
-    @RequestMapping(value="/notification/user/{uun}", method= RequestMethod.GET)
+    @RequestMapping(value="/notifications/user/{uun}", method= RequestMethod.GET)
     public JsonNotification[] getUserNotifications(@PathVariable("uun") String uun) {
     	
-    	ResponseEntity<JsonNotification[]> response = restTemplate.getForEntity(notificationMsUrl + "/user/" + uun, JsonNotification[].class);
+    	ResponseEntity<JsonNotification[]> response = restTemplate.getForEntity(notificationMsUrl + "/notifications/user/" + uun, JsonNotification[].class);
         return response.getBody();
     }
 

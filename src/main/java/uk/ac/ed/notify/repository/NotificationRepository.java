@@ -2,11 +2,9 @@ package uk.ac.ed.notify.repository;
 
 import java.util.Date;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import uk.ac.ed.notify.entity.Notification;
 
 import java.util.List;
-import javax.persistence.NamedQuery;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Created by rgood on 18/09/2015.
  */
-@RepositoryRestResource(exported = false)
+
 public interface NotificationRepository extends CrudRepository<Notification,String>{
 
     public List<Notification> findByPublisherIdAndPublisherNotificationId (String publisherId, String publisherNotificationId);
