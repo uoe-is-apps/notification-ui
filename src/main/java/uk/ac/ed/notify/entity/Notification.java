@@ -66,9 +66,6 @@ public class Notification {
     @Temporal(TemporalType.TIMESTAMP)
     private Date endDate;
 
-    @Column(name = "uun")
-    private String uun;
-
     @JsonSerialize(using = DatePartSerializer.class)
     @Column(name = "LAST_UPDATED")
     @Temporal(TemporalType.TIMESTAMP)
@@ -129,14 +126,6 @@ public class Notification {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
-    }
-
-    public String getUun() {
-        return uun;
-    }
-
-    public void setUun(String uun) {
-        this.uun = uun;
     }
 
     public String getPublisherId() {
@@ -235,7 +224,7 @@ public class Notification {
 
 	@Override
     public String toString() {
-        return "Notification{" + "notificationId=" + notificationId + ", publisherId=" + publisherId + ", publisherNotificationId=" + publisherNotificationId + ", topic=" + topic + ", title=" + title + ", body=" + body + ", url=" + url + ", startDate=" + startDate + ", endDate=" + endDate + ", uun=" + uun + ", action=" + action + ", publisherKey=" + publisherKey + '}';
+        return "Notification{" + "notificationId=" + notificationId + ", publisherId=" + publisherId + ", publisherNotificationId=" + publisherNotificationId + ", topic=" + topic + ", title=" + title + ", body=" + body + ", url=" + url + ", startDate=" + startDate + ", endDate=" + endDate + ", action=" + action + ", publisherKey=" + publisherKey + '}';
     }
 
     @Override
