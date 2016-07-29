@@ -152,7 +152,7 @@ public class EWSService   implements IAutodiscoverRedirectionUrl { //extends Ema
             PropertySet propSet = new PropertySet(BasePropertySet.IdOnly, ItemSchema.Body);   
             
             Iterator<Item> iterator = findResults.iterator();
-            int index = 0;
+            
             while(iterator.hasNext()){
                 ItemId itemId = iterator.next().getId();
                 EmailMessage email = EmailMessage.bind(service, itemId, propSet);
@@ -166,8 +166,6 @@ public class EWSService   implements IAutodiscoverRedirectionUrl { //extends Ema
                 }else if(ewsDeleteMode.equals("none")){
                     //do nothing, no delete, leave this option for testing, otherwise we need to make an email notification everytime this runs.
                 }
-               
-                index++;
             }
             logger.info("processUnreadEmail completed... ");
         }catch(Exception e){
@@ -176,23 +174,19 @@ public class EWSService   implements IAutodiscoverRedirectionUrl { //extends Ema
     }    
     
     
-    public String processEmailByBody(String id, String body){
+    public void processEmailByBody(String id, String body){
         try {                
             logger.debug("processEmailByBody - " + id + " - " + body);
-            Notification notification = office365JsonService.parseNotification(body);           
+            Notification notification = office365JsonService.parseNotification(body);   
+            
             logger.debug("construct notification from email - " + notification);                      
             emailNotificationHandlingService.processSingleNotification(notification);    
              
             logger.debug("success");  
 
-            return notification.getUun();
         }catch(Exception e){
             logger.error("processEmailByBody errored... " + id + " " + body + " " + e.toString());
-          
-            return "";
+
         }
     }       
-    
-
-
 }

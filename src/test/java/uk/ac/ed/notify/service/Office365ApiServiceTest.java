@@ -5,18 +5,27 @@
 package uk.ac.ed.notify.service;
 
 import java.text.ParseException;
-import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
 import org.junit.After;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import uk.ac.ed.notify.TestApplication;
 import uk.ac.ed.notify.entity.Notification;
+import uk.ac.ed.notify.entity.NotificationUser;
+import uk.ac.ed.notify.entity.NotificationUserPK;
 import uk.ac.ed.notify.entity.PublisherDetails;
 import uk.ac.ed.notify.repository.NotificationRepository;
 import uk.ac.ed.notify.repository.PublisherDetailsRepository;
@@ -44,15 +53,45 @@ public class Office365ApiServiceTest {
     @Autowired
     PublisherDetailsRepository publisherDetailsRepository;        
     
+    private Date date;
+    private Date dateFuture;
+    
     @Before
     public void setup()
     {
+    	date = new Date();
+        date.setTime(date.getTime()-10000);
+
+        dateFuture = new Date();
+        dateFuture.setTime(dateFuture.getTime()+100000);
+        
         Notification notification = new Notification();
         notification.setPublisherId("learn");
-        notification.setPublisherNotificationId("1");
+        notification.setPublisherNotificationId("3");
         notification.setTitle("title");
-        notification.setBody("body");                
-        notification.setUun("existing");
+        notification.setBody("body");
+        
+        notification.setUrl("http://www.google.co.uk");
+        notification.setStartDate(date);
+        notification.setEndDate(dateFuture);
+        notification.setTopic("Notification");
+        
+        List<NotificationUser> users = new ArrayList<NotificationUser>();
+        NotificationUser user = new NotificationUser();
+        /* when saving a notification with users
+         * you must assign notification reference to user 
+         * to fulfill @OneToMany relation between Notification and NotificationUser
+         */
+        user.setNotification(notification);
+        /*
+         * when a new notification is created its ID is generated automatically
+         * leave user's id.notificationId null
+         * @MapsId will populate it when notification has been inserted
+         */
+        user.setId(new NotificationUserPK(null,"user"));
+        users.add(user);
+        
+        notification.setNotificationUsers(users);
         notificationRepository.save(notification);
 
         PublisherDetails publisher = new PublisherDetails();
@@ -74,10 +113,17 @@ public class Office365ApiServiceTest {
         
         Notification notification = new Notification();
         notification.setPublisherId("learn");
-        notification.setPublisherNotificationId("3");
+        notification.setPublisherNotificationId("7");
         notification.setTitle("title");
         notification.setBody("body");                
-        notification.setUun("existing");
+        
+        List<NotificationUser> users = new ArrayList<NotificationUser>();
+        NotificationUser user = new NotificationUser();
+        user.setNotification(notification);
+        user.setId(new NotificationUserPK(null,"user"));
+        users.add(user);
+        notification.setNotificationUsers(users);
+        
         notification.setPublisherKey("valid");
         notification.setAction("insert");
         emailNotificationHandlingService.processSingleNotification(notification);
@@ -88,12 +134,19 @@ public class Office365ApiServiceTest {
     @Test
     public void testProcessSingleNotificationValidKeyUpdateAsInsertDueToNoExistingNotificationFound() throws ParseException {
         
-        Notification notification = new Notification();
+    	Notification notification = new Notification();
         notification.setPublisherId("learn");
-        notification.setPublisherNotificationId("3");
+        notification.setPublisherNotificationId("4");
         notification.setTitle("title");
         notification.setBody("body");                
-        notification.setUun("existing");
+        
+        List<NotificationUser> users = new ArrayList<NotificationUser>();
+        NotificationUser user = new NotificationUser();
+        user.setNotification(notification);
+        user.setId(new NotificationUserPK(null,"user"));
+        users.add(user);
+        notification.setNotificationUsers(users);
+        
         notification.setPublisherKey("valid");
         notification.setAction("update");
         emailNotificationHandlingService.processSingleNotification(notification);
@@ -105,12 +158,24 @@ public class Office365ApiServiceTest {
     @Test
     public void testProcessSingleNotificationValidKeyUpdate() throws ParseException {
         
-        Notification notification = new Notification();
+    	Notification notification = new Notification();
         notification.setPublisherId("learn");
-        notification.setPublisherNotificationId("1");
+        notification.setPublisherNotificationId("3");
         notification.setTitle("title");
-        notification.setBody("body");                
-        notification.setUun("existing");
+        notification.setBody("body");
+        
+        notification.setUrl("http://www.google.co.uk");
+        notification.setStartDate(date);
+        notification.setEndDate(dateFuture);
+        notification.setTopic("Notification Updated");
+        
+        List<NotificationUser> users = new ArrayList<NotificationUser>();
+        NotificationUser user = new NotificationUser();
+        user.setNotification(notification);
+        user.setId(new NotificationUserPK(null,"user"));
+        users.add(user);
+        notification.setNotificationUsers(users);
+        
         notification.setPublisherKey("valid");
         notification.setAction("update");
         emailNotificationHandlingService.processSingleNotification(notification);
@@ -122,13 +187,21 @@ public class Office365ApiServiceTest {
     @Test
     public void testProcessSingleNotificationInvalidKeyNoInsert() throws ParseException {
         
-        Notification notification = new Notification();
+    	Notification notification = new Notification();
         notification.setPublisherId("learn");
         notification.setPublisherNotificationId("3");
         notification.setTitle("title");
         notification.setBody("body");                
-        notification.setUun("existing");
+        
+        List<NotificationUser> users = new ArrayList<NotificationUser>();
+        NotificationUser user = new NotificationUser();
+        user.setNotification(notification);
+        user.setId(new NotificationUserPK(null,"user"));
+        users.add(user);
+        notification.setNotificationUsers(users);
+        
         notification.setPublisherKey("invalid");
+        notification.setAction("insert");
         emailNotificationHandlingService.processSingleNotification(notification);
                 
         assertEquals(1,notificationRepository.count()); 
@@ -140,10 +213,11 @@ public class Office365ApiServiceTest {
         
         Notification notification = new Notification();
         notification.setPublisherId("learn");
-        notification.setPublisherNotificationId("1");
+        notification.setPublisherNotificationId("3");
         notification.setTitle("title");
         notification.setBody("body");                
-        notification.setUun("existing");
+        notification.setNotificationUsers(Collections.emptyList());
+        
         notification.setPublisherKey("valid");
         notification.setAction("delete");
         emailNotificationHandlingService.processSingleNotification(notification);

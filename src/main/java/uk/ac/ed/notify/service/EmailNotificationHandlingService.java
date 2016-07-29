@@ -6,15 +6,18 @@ package uk.ac.ed.notify.service;
 
 import java.util.Date;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import uk.ac.ed.notify.entity.AuditActions;
 import uk.ac.ed.notify.entity.ErrorCodes;
 import uk.ac.ed.notify.entity.Notification;
 import uk.ac.ed.notify.entity.NotificationError;
+import uk.ac.ed.notify.entity.NotificationUser;
 import uk.ac.ed.notify.entity.PublisherDetails;
 import uk.ac.ed.notify.entity.UserNotificationAudit;
 import uk.ac.ed.notify.repository.NotificationErrorRepository;
@@ -60,31 +63,40 @@ public class EmailNotificationHandlingService {
                 handleNotification(AuditActions.CREATE_NOTIFICATION, notification);
             } else if (action.equalsIgnoreCase("update")) {
                 logger.info("action: update");
-                List<Notification> existingNotifications = notificationRepository.findByPublisherIdAndPublisherNotificationIdAndUun(notification.getPublisherId(), notification.getPublisherNotificationId(), notification.getUun());
-                if (existingNotifications.size() == 0) {
-                    logger.info("notification not exist in db, insert instead");
+                /*
+                 * notification can be identified by a unique combination of publisherId and publisherNotificationId 
+                 * there will be only one such combination
+                 */
+                Notification existingNotification = notificationRepository.findByPublisherIdAndPublisherNotificationId(notification.getPublisherId(), notification.getPublisherNotificationId());
+                if (existingNotification == null) {
+                    logger.info("notification does not exist in db, insert instead");
                     notification.setNotificationId(null);
                     handleNotification(AuditActions.CREATE_NOTIFICATION, notification);
                 } else {         
-                    for(int i = 0; i < existingNotifications.size(); i++){
-                        notification.setNotificationId(existingNotifications.get(i).getNotificationId());
-                        logger.info("index - " + i + " - existing notification found, update");
-                        handleNotification(AuditActions.UPDATE_NOTIFICATION, notification);
-                    }                                        
+                        notification.setNotificationId(existingNotification.getNotificationId());
+                        /*
+                         * where notification exists in database and update is to be done
+                         * set NotificationUser id.notificationId with notification's ID
+                         */
+                        List<NotificationUser> users = notification.getNotificationUsers();
+                        for(int i = 0; i < users.size(); i++){
+                        	users.get(i).getId().setNotificationId(existingNotification.getNotificationId());
+                        }
+                        notification.setNotificationUsers(users);
+                        logger.info("existing notification found, update");
+                        handleNotification(AuditActions.UPDATE_NOTIFICATION, notification);                                       
                 }
             } else if (action.equalsIgnoreCase("delete")) {
                 logger.info("action: delete");
-                List<Notification> existingNotifications = notificationRepository.findByPublisherIdAndPublisherNotificationIdAndUun(notification.getPublisherId(), notification.getPublisherNotificationId(), notification.getUun());
-                if (existingNotifications.size() == 0) {
+                Notification existingNotification = notificationRepository.findByPublisherIdAndPublisherNotificationId(notification.getPublisherId(), notification.getPublisherNotificationId());
+                if (existingNotification == null) {
                     logger.info("notification not exist in db, ignore");
                     notification.setNotificationId(null);
                     handleNotification(AuditActions.CREATE_NOTIFICATION, notification);
                 } else {
-                    for(int i = 0; i < existingNotifications.size(); i++){
-                        notification.setNotificationId(existingNotifications.get(i).getNotificationId());
-                        logger.info("index - " + i + " - existing notification found, delete");
+                        notification.setNotificationId(existingNotification.getNotificationId());
+                        logger.info("existing notification found, delete");
                         handleNotification(AuditActions.DELETE_NOTIFICATION, notification);
-                    }
                 }
             }
         } else {
@@ -118,8 +130,8 @@ public class EmailNotificationHandlingService {
             userNotificationAudit.setAction(action);
             userNotificationAudit.setAuditDate(new Date());
             userNotificationAudit.setPublisherId(notification.getPublisherId());
-            userNotificationAudit.setUun(notification.getUun());
-            userNotificationAuditRepository.save(userNotificationAudit);                 
+           // userNotificationAudit.setUun(notification.getUun());
+           // userNotificationAuditRepository.save(userNotificationAudit);                 
     }  
     
     public void logErrorNotification(String errorCode, Exception e){
@@ -130,6 +142,4 @@ public class EmailNotificationHandlingService {
             notificationError.setErrorDate(new Date());
             notificationErrorRepository.save(notificationError);        
     }    
-    
-
 }

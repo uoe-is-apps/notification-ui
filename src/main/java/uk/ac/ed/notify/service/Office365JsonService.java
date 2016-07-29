@@ -5,14 +5,20 @@
 package uk.ac.ed.notify.service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import uk.ac.ed.notify.entity.Notification;
+import uk.ac.ed.notify.entity.NotificationUser;
+import uk.ac.ed.notify.entity.NotificationUserPK;
 import uk.ac.ed.notify.entity.Office365Subscription;
 
 /**
@@ -110,7 +116,6 @@ public class Office365JsonService {
 
             JSONObject jsonNotification = new JSONObject(content);
 
-            //notification.setNotificationId(jsonNotification.getString("")); //auto generate
             notification.setTitle(jsonNotification.getString("title"));
             notification.setBody(jsonNotification.getString("body"));
             notification.setTopic(jsonNotification.getString("topic"));
@@ -120,7 +125,19 @@ public class Office365JsonService {
             notification.setStartDate(dateFormat.parse(jsonNotification.getString("startDate")));
             notification.setEndDate(dateFormat.parse(jsonNotification.getString("endDate")));
             notification.setUrl(jsonNotification.getString("url"));
-            notification.setUun(jsonNotification.getString("uun"));
+            
+            JSONArray users = jsonNotification.getJSONArray("notificationUsers");
+            
+            List<NotificationUser> userList = new ArrayList<NotificationUser>();
+            NotificationUser user = null;
+            for(int i = 0; i < users.length(); i++){
+            	user = new NotificationUser();
+            	user.setNotification(notification);
+            	user.setId(new NotificationUserPK(null,users.getJSONObject(i).getJSONObject("user").getString("uun")));
+            	userList.add(user);
+            }
+            notification.setNotificationUsers(userList);
+            
             try{notification.setAction(jsonNotification.getString("action"));}catch(Exception e){};
             try{notification.setPublisherKey(jsonNotification.getString("publisherKey"));}catch(Exception e){};
             notification.setLastUpdated(new Date());

@@ -6,19 +6,23 @@ package uk.ac.ed.notify.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Hashtable;
-import org.junit.After;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
-import org.junit.Before;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import uk.ac.ed.notify.TestApplication;
 import uk.ac.ed.notify.entity.Notification;
-
+import uk.ac.ed.notify.entity.NotificationUser;
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = TestApplication.class)
@@ -27,6 +31,37 @@ public class Office365JsonServiceTest {
     @Autowired 
     Office365JsonService office365JsonService;
 
+    
+    @Test
+    public void testParseNotificationJson() throws Exception {
+    	
+    	String notificationJson = "<script type=\"application/ld+json\">{\"@type\":\"Notification\",\"publisherId\":\"euclid\",\"publisherNotificationId\":\"6\",\"publisherKey\":\"004TFE5E177023ABE05642144F00F4CC\",\"topic\":\"Development testing\",\"title\":\"Test test test\",\"body\":\"<h4>Good day</h4>\",\"url\":\"http://www.ed.ac.uk\",\"notificationUsers\":[{\"user\":{\"uun\":\"donald\"}},{\"user\":{\"uun\":\"bambi\"}},{\"user\":{\"uun\":\"gozer\"}}],\"startDate\":\"2016-05-27T08:30\",\"endDate\":\"2016-11-27T09:30\",\"action\":\"insert\"}</script>";
+    	
+        Notification parsedNotification = office365JsonService.parseNotification(notificationJson);
+        
+        List<NotificationUser> users = parsedNotification.getNotificationUsers();
+        assertThat(users, hasSize(3));
+        
+        List<String> uuns = new ArrayList<String>();
+        for(int i = 0; i < users.size(); i++){
+        	uuns.add(users.get(i).getId().getUun());
+        }
+        
+        assertThat(uuns, hasItems("gozer","donald","bambi"));
+        
+        assertThat(parsedNotification.getPublisherId(), is("euclid"));
+        assertThat(parsedNotification.getPublisherNotificationId(), is("6"));
+        assertThat(parsedNotification.getPublisherKey(), is("004TFE5E177023ABE05642144F00F4CC"));
+        assertThat(parsedNotification.getTopic(), is("Development testing"));
+        assertThat(parsedNotification.getTitle(), is("Test test test"));
+        assertThat(parsedNotification.getBody(), is("Good day"));
+        assertThat(parsedNotification.getTitle(), is("Test test test"));
+        assertThat(parsedNotification.getUrl(), is("http://www.ed.ac.uk"));
+        assertThat(parsedNotification.getStartDate(), is(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse("2016-05-27T08:30")));
+        assertThat(parsedNotification.getEndDate(), is(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse("2016-11-27T09:30")));
+       
+    }
+    
     
     @Test
     public void testParseSingleNotification() throws ParseException {
