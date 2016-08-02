@@ -20,11 +20,12 @@ public class UserNotificationAudit {
     @Column(name="AUDIT_ID")
     private String auditId;
 
+    @Lob
     @Column(name="AUDIT_DESCRIPTION")
     private String auditDescription;
 
-    @Column(name="UUN")
-    private String uun;
+    @Column(name="NOTIFICATION_ID")
+    private String notificationId;
 
     @Column(name="PUBLISHER_ID")
     private String publisherId;
@@ -45,15 +46,15 @@ public class UserNotificationAudit {
         this.auditId = auditId;
     }
 
-    public String getUun() {
-        return uun;
-    }
+    public String getNotificationId() {
+		return notificationId;
+	}
 
-    public void setUun(String uun) {
-        this.uun = uun;
-    }
+	public void setNotificationId(String notificationId) {
+		this.notificationId = notificationId;
+	}
 
-    public String getPublisherId() {
+	public String getPublisherId() {
         return publisherId;
     }
 
