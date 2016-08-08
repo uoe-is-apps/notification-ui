@@ -237,7 +237,7 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <plugin>
+       <!-- <plugin>
 		       <groupId>com.github.searls</groupId>
 		       <artifactId>jasmine-maven-plugin</artifactId>
 		       <version>2.0</version>
@@ -247,9 +247,8 @@
 		               <goal>test</goal>
 		             </goals>
 		          </execution>
-		       </executions>
-		 <!-- keep the configuration out of the execution so that the bdd goal has access to it -->
-		       <configuration>
+		       </executions> 
+		   <configuration>
 		           <jsSrcDir>src/main/resources/static/js</jsSrcDir>
 		           <sourceIncludes>
 		               <include>app.js</include>
@@ -269,7 +268,7 @@
 		               <source>webjars/angular-mocks.js</source>
 		           </preloadSources>
 		       </configuration>
-		 </plugin>
+		 </plugin> -->
         </plugins>
     </build>
 
