@@ -97,9 +97,9 @@
                  stripComments="true"/>
     </changeSet>
     
-    <changeSet id="alter_user_notification_audit_table" dbms="oracle" author="agajda">
+    <changeSet id="alter_user_notification_audit_table_oracle" dbms="oracle" author="agajda">
         <sqlFile encoding="utf8"
-                 path="db/changelog/sql/alter_user_notification_audit_table.sql"
+                 path="db/changelog/sql/alter_user_notification_audit_table_oracle.sql"
                  splitStatements="true"
                  stripComments="true"/>
     </changeSet>

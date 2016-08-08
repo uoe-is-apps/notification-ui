@@ -446,7 +446,6 @@ public class LearnService {
            }
     }
     
-    @Transactional
     public void handleNotificationByBatch(String action, List<Notification> notifications){
             try{
                  if(action.equals(AuditActions.CREATE_NOTIFICATION) || action.equals(AuditActions.UPDATE_NOTIFICATION)){                      

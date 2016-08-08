@@ -44,7 +44,7 @@ public class EmailNotificationHandlingService {
             
     @Autowired
     UserNotificationAuditRepository userNotificationAuditRepository;                
-    
+    //TODO add batch save capability
     public void processSingleNotification(Notification notification){
         logger.debug("handle notification..." + notification);
                 
