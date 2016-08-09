@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by rgood on 18/09/2015.
  */
-public interface NotificationRepository extends CrudRepository<Notification,String>{
+public interface NotificationRepository extends CrudRepository<Notification,String>, NotificationRepositoryAddon {
 
     Notification findByPublisherIdAndPublisherNotificationId (String publisherId, String publisherNotificationId);
     

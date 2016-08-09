@@ -15,6 +15,8 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import uk.ac.ed.notify.repository.NotificationRepositoryImpl;
+
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
@@ -44,5 +46,11 @@ public class NotifyDataSourceConfiguration
   public JpaTransactionManager notifyTransactionManager(@Qualifier("notifyEntityManagerFactory") final EntityManagerFactory factory)
   {
     return new JpaTransactionManager(factory);
+  }
+  
+  @Bean(name = "notificationRepositoryImpl")
+  public NotificationRepositoryImpl notificationRepositoryImpl() {
+	  
+	  return new NotificationRepositoryImpl();
   }
 }

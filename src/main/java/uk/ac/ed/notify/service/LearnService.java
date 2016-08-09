@@ -222,16 +222,15 @@ public class LearnService {
         logger.info("pullLearnNotifications job started");
        
         List<Users> activeLearnUsers = learnUserRepository.findAllActiveUsers();
+        logger.info("Total number of active users in learn - " + activeLearnUsers.size());
+        
         Map<Integer, String> userIdNamePair = new HashMap<Integer, String>();
-
         for(int i = 0; i < activeLearnUsers.size(); i++){
             userIdNamePair.put(activeLearnUsers.get(i).getPk1(), activeLearnUsers.get(i).getUserId());
         }
         
-        logger.info("total number of active users in learn - " + activeLearnUsers.size());
-        
         List<Notification> existingLearnNotificationsList = notificationRepository.findByPublisherId(publisherId);
-        logger.info("total number of Learn notifications in Notification Backbone - " + existingLearnNotificationsList.size());
+        logger.info("Total number of Learn notifications in Notification Backbone - " + existingLearnNotificationsList.size());
                
         List<String> processedLearnNotificationsList = new ArrayList<String>();
         
@@ -259,9 +258,11 @@ public class LearnService {
          * Learn assignments ???
          */
         
+        logger.info("Number of notifications to save " + actionsCache.get(AuditActions.CREATE_NOTIFICATION).size());
+        logger.info("Number of notifications to update " +  actionsCache.get(AuditActions.UPDATE_NOTIFICATION).size());
+        
         handleNotificationByBatch(AuditActions.CREATE_NOTIFICATION, actionsCache.get(AuditActions.CREATE_NOTIFICATION));
         handleNotificationByBatch(AuditActions.UPDATE_NOTIFICATION, actionsCache.get(AuditActions.UPDATE_NOTIFICATION));
-        
 
         logger.info("5.----------delete notification----------");                 
         logger.info("before delete, total number of current notifications in NB - " + existingLearnNotificationsList.size());
@@ -281,7 +282,7 @@ public class LearnService {
 
         handleNotificationByBatch(AuditActions.DELETE_NOTIFICATION, allCurrentNotificationsToBeDeleted);
 
-        logger.info("pullLearnNotifications completed ... " + new Date());
+        logger.info("pullLearnNotifications completed");
     }
     
     /**
@@ -326,7 +327,7 @@ public class LearnService {
             Date endDate = task.getDueDate();
             
             courseUsersList = learnCourseUserRepository.findByCrsmainPk1(task.getCrsmainPk1());
-            logger.info("task index [" + i + "] check insert/update for all these users ------------------ course id - " + task.getCrsmainPk1() + " number of users - " + courseUsersList.size());
+            logger.info("Task identified by " + publisherNotificationId + " for course id - " + task.getCrsmainPk1() + " has " + courseUsersList.size() + " users.");
             
             List<String> uunList = new ArrayList<String>();
             String uun = null;
@@ -340,8 +341,9 @@ public class LearnService {
             }   
             
             taskNotification = constructLearnNotification(null, publisherNotificationId, topic, title, body, notificationUrl, startDate, endDate, uunList);
-            String action = getAction(notificationTaskList, taskNotification);
             
+            String action = getAction(notificationTaskList, taskNotification);
+            logger.info("Task notification identified by " + publisherNotificationId + " to be handled as " + action);
             actionsCache.get(action).add(taskNotification);
             
             processedLearnNotificationsList.add(publisherNotificationId);
@@ -379,14 +381,14 @@ public class LearnService {
                 
                 systemNotification = constructLearnNotification(null, publisherNotificationId, category, title, body, notificationUrl, startDate, endDate, uunList);
      
-                logger.info(category + " - " + i + " " +  systemAnnouncement.getSubject());
+                logger.info("Constructed system announcement identified by " + publisherNotificationId + " with subject " + systemAnnouncement.getSubject());
      
                 existingNotification = getNotificationByPublisherIdAndPublisherNotificationId(existingLearnNotificationsList, publisherId, publisherNotificationId);
             
                 String action = getAction(existingNotification, systemNotification);
-            
+                
                 actionsCache.get(action).add(systemNotification);
-                logger.info("Added system notification identified by " + publisherNotificationId + " to cache for " + action);
+                logger.info("System notification identified by " + publisherNotificationId + " to be handled as " + action);
                 
                 processedLearnNotificationsList.add(publisherNotificationId);
             }
@@ -422,6 +424,7 @@ public class LearnService {
                Date endDate = courseAnnouncement.getEndDate();
                
                courseUsersList = learnCourseUserRepository.findByCrsmainPk1(courseAnnouncement.getCrsmainPk1());
+               logger.info("Course announcement identified by " + publisherNotificationId + " has " + courseUsersList.size() + " users.");
                
                List<String> uunList = new ArrayList<String>();
                String uun = null;
@@ -435,11 +438,12 @@ public class LearnService {
                }   
                
               courseNotification = constructLearnNotification(null, publisherNotificationId, category, title, body, notificationUrl, startDate, endDate, uunList);
-               
+              logger.info("Constructed course announcement identified by " + publisherNotificationId + " with subject " + courseAnnouncement.getSubject());
+              
               existingNotification = getNotificationByPublisherIdAndPublisherNotificationId(existingLearnNotificationsList, publisherId, publisherNotificationId);
               
               String action = getAction(existingNotification, courseNotification);
-               
+              logger.info("Course notification identified by " + publisherNotificationId + " to be handled as " + action);
               actionsCache.get(action).add(courseNotification);
               
               processedLearnNotificationsList.add(publisherNotificationId);            
@@ -449,7 +453,7 @@ public class LearnService {
     public void handleNotificationByBatch(String action, List<Notification> notifications){
             try{
                  if(action.equals(AuditActions.CREATE_NOTIFICATION) || action.equals(AuditActions.UPDATE_NOTIFICATION)){                      
-                     notificationRepository.save(notifications);
+                     notificationRepository.bulkSave(notifications);
                  }else if(action.equals(AuditActions.DELETE_NOTIFICATION)){                      
                      notificationRepository.delete(notifications);
                  } 
