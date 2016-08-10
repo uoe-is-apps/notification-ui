@@ -44,9 +44,9 @@ public class EmailNotificationHandlingService {
             
     @Autowired
     UserNotificationAuditRepository userNotificationAuditRepository;                
-    //TODO add batch save capability
+
     public void processSingleNotification(Notification notification){
-        logger.debug("handle notification..." + notification);
+        logger.debug("Handle notification: " + notification);
                 
         String action = notification.getAction();
         PublisherDetails publisher = publisherDetailsRepository.findOne(notification.getPublisherId());
@@ -54,9 +54,8 @@ public class EmailNotificationHandlingService {
                 && publisher.getKey() != null && notification.getPublisherKey() != null && publisher.getKey().equals(notification.getPublisherKey())
                 && action != null && (action.equalsIgnoreCase("insert") || action.equalsIgnoreCase("update") || action.equalsIgnoreCase("delete"))
                 ) {
-            logger.info("publisher key verified");
+            logger.info("Publisher key and action verified");
 
-            
             if (action.equalsIgnoreCase("insert")) {
                 logger.info("action: insert");
                 notification.setNotificationId(null);

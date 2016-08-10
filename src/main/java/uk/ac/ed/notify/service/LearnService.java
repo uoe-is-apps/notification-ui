@@ -450,23 +450,28 @@ public class LearnService {
            }
     }
     
-    public void handleNotificationByBatch(String action, List<Notification> notifications){
+    public void handleNotificationByBatch(String action, List<Notification> notifications) {
             try{
-                 if(action.equals(AuditActions.CREATE_NOTIFICATION) || action.equals(AuditActions.UPDATE_NOTIFICATION)){                      
-                     notificationRepository.bulkSave(notifications);
-                 }else if(action.equals(AuditActions.DELETE_NOTIFICATION)){                      
-                     notificationRepository.delete(notifications);
-                 } 
-                 
+            	if (notifications != null && !notifications.isEmpty()) {
+            		
+            		if(action.equals(AuditActions.CREATE_NOTIFICATION) || action.equals(AuditActions.UPDATE_NOTIFICATION)){                      
+                        notificationRepository.bulkSave(notifications);
+                        
+                    }else if(action.equals(AuditActions.DELETE_NOTIFICATION)){                      
+                        notificationRepository.delete(notifications);
+                    } 
+            	}
             }catch(Exception e){
                  if(action.equals(AuditActions.CREATE_NOTIFICATION)){
                      logErrorNotification(ErrorCodes.SAVE_ERROR ,e); 
+                     
                  }else if(action.equals(AuditActions.UPDATE_NOTIFICATION)){
                      logErrorNotification(ErrorCodes.SAVE_ERROR ,e); 
+                     
                  }else if(action.equals(AuditActions.DELETE_NOTIFICATION)){
                      logErrorNotification(ErrorCodes.DELETE_ERROR ,e); 
                  }
-            }        
+            }
     }    
      
     /**

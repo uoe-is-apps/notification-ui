@@ -139,7 +139,7 @@ public class EWSService   implements IAutodiscoverRedirectionUrl { //extends Ema
     
     public void processUnreadEmail(){
         try{
-            logger.info("processUnreadEmail starts... ");
+            logger.info("EWSService processing unread emails from exchange");
             
             microsoft.exchange.webservices.data.ExchangeService service = this.getExchangeService(ewsUser);
 
@@ -147,7 +147,7 @@ public class EWSService   implements IAutodiscoverRedirectionUrl { //extends Ema
             SearchFilter unreadFilter = new SearchFilter.SearchFilterCollection(LogicalOperator.And, new SearchFilter.IsEqualTo(EmailMessageSchema.IsRead, false));        
             FindItemsResults<Item> findResults = service.findItems(WellKnownFolderName.Inbox, unreadFilter, itemView);
 
-            logger.info("no. of email notification to be processed - " + findResults.getItems().size());
+            logger.info("Number of email notifications to be processed - " + findResults.getItems().size());
 
             PropertySet propSet = new PropertySet(BasePropertySet.IdOnly, ItemSchema.Body);   
             
