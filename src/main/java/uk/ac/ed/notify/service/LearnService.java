@@ -170,7 +170,14 @@ public class LearnService {
             return AuditActions.CREATE_NOTIFICATION;
             
         } else {  
-        	notification.setNotificationId(existingNotification.getNotificationId());
+        	String notificationId = existingNotification.getNotificationId();
+        	notification.setNotificationId(notificationId);
+        	
+        	List<NotificationUser> users = notification.getNotificationUsers();
+        	for(int i = 0; i < users.size(); i++) {
+        		users.get(i).getId().setNotificationId(notificationId);
+        	}
+            notification.setNotificationUsers(users);
             
         	logger.debug(notification.getTitle() + " update");
             return AuditActions.UPDATE_NOTIFICATION;
@@ -184,7 +191,15 @@ public class LearnService {
             return AuditActions.CREATE_NOTIFICATION;
         }
     	else {
-    		notification.setNotificationId(existingNotification.getNotificationId());
+    		String notificationId = existingNotification.getNotificationId();
+        	notification.setNotificationId(notificationId);
+        	
+        	List<NotificationUser> users = notification.getNotificationUsers();
+        	for(int i = 0; i < users.size(); i++) {
+        		users.get(i).getId().setNotificationId(notificationId);
+        	}
+            notification.setNotificationUsers(users);
+    		
             
         	logger.debug(notification.getTitle() + " update");
             return AuditActions.UPDATE_NOTIFICATION;
