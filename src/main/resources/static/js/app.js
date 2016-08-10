@@ -542,31 +542,12 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 	
 	$scope.notificationUser = user.user();
 	
-	var userNotificationList = [];
-	
 	$scope.getUserNotifications = function(uun) {
-
-		$http.get('/notifications/user/' + uun)
-		     .success(function(data) {
-		    	 userNotificationList = data;
-		    	 angular.forEach(userNotificationList, function(notification) {
-		    		 
-		    		 $http.get("/topic/" + notification.topic)
-					 .success(function(data) {
-					    	
-					    var topicSubscriberList = data; 
-					    
-					    var subscribers = [];
-						angular.forEach(topicSubscriberList, function(subscriber) {
-							
-							this.push(subscriber.subscriberId);
-						}, subscribers);
-						
-						notification.subscriberList = subscribers.toString();    
-		    	     });
-		         }); 
-	    });
 		
-		$scope.userNotificationList = userNotificationList;
-	}		
+		$http.get('/notifications/user/' + uun)
+	     .success(function(data) {
+	    	 $scope.userNotificationList = data;
+        });
+	};
+
 }]);
