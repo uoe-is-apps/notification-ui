@@ -17,7 +17,7 @@ public class NotificationRepositoryImpl implements NotificationRepositoryAddon {
 	@PersistenceContext(unitName="notifyPersistenceUnit")
 	private EntityManager entityManager;
 	 
-	@Value("${hibernate.jdbc.batch_size}")
+	@Value("${hibernate.jdbc.batch_size:25}")
 	private int batchSize;
 
 	@Override
