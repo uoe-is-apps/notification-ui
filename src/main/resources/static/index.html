@@ -22,11 +22,11 @@
     <div class="navbar-collapse collapse" id="uoe-navbar-collapse" aria-expanded="false" style="height: 1px;">
         <ul class="menu nav navbar-nav" role="tablist">
             <li ng-class="{active:route.current.activetab=='emergency-notifications'}"><a href="#/">Emergency Notification</a></li>
-            <li ng-class="{active:route.current.activetab=='user-administration'}"><a href="#/user-administration">User Administration</a></li>
-            <li ng-class="{active:route.current.activetab=='scheduled-tasks'}"><a href="#/scheduled-tasks">Scheduled Tasks</a></li>
             <li ng-class="{active:route.current.activetab=='publisher-subscriber'}"><a href="#/publisher-subscriber">Publisher Subscriber Details</a></li>
             <li ng-class="{active:route.current.activetab=='user-notifications'}"><a href="#/user-notifications">User Notifications</a></li>
-            <li ng-show="authenticated"><a href="" ng-click="logout()">logout</a></li>
+            <li ng-class="{active:route.current.activetab=='scheduled-tasks'}"><a href="#/scheduled-tasks">Scheduled Tasks</a></li>
+            <li ng-class="{active:route.current.activetab=='user-administration'}"><a href="#/user-administration">User Administration</a></li>
+            <li ng-show="authenticated"><a href="" ng-click="logout()">Logout</a></li>
         </ul>
     </div>
 
