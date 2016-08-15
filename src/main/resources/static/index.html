@@ -32,7 +32,114 @@
 
 </div>
 </nav>
-<div ng-view class="container"></div>
+
+<div class="jumbotron headercontainer">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-7 col-md-8">
+                <a href="http://www.ed.ac.uk/">
+                    <img src="../webjars/edgel-webjar/2.0.1/gel/images/logo.png" alt="The University of Edinburgh home" />
+                </a>
+            </div>
+
+            <div role="search" class="col-sm-5 col-md-4 uoe-search-block">
+                <p>
+                    <a href="//www.ed.ac.uk/schools-departments/">
+                        <span class="glyphicon glyphicon-chevron-right"></span>
+                        Schools &amp; departments
+                    </a>
+                </p>
+                <form class="form-inline uoe-search-form" action="//www.ed.ac.uk/search" method="get">
+                    <div class="form-group">
+                        <label for="uoe-search" class="sr-only">Search:</label>
+                        <div class="input-group">
+                            <input type="text" placeholder="Search"
+                                   class="form-control" data-items="4"
+                                   data-provide="typeahead" name="q" id="uoe-search">
+                            <span class="input-group-btn">
+                  <button class="btn btn-uoe">
+                      <span class="glyphicon glyphicon-search"></span>
+                      <span class="sr-only">Search</span>
+                  </button>
+                </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div ng-view class="container content"></div>
+<footer>
+
+    <div class="discover-uni">
+        <div class="container">
+            <h3>The University of Edinburgh</h3>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-4 col-md-4">
+                    <ul>
+                        <li><a href="http://www.ed.ac.uk/about/website/website-terms-conditions">Terms
+                            &amp; conditions</a></li>
+                        <li><a href="http://www.ed.ac.uk/about/website/privacy">Privacy
+                            &amp; cookies</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-sm-4 col-md-4">
+                    <ul>
+                        <li><a href="http://www.ed.ac.uk/about/website/accessibility">Website
+                            accessibility</a></li>
+                        <li><a href="http://www.ed.ac.uk/about/website/freedom-information">Freedom
+                            of information publication scheme</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-4 col-md-4 col-xs-6">
+                    <a href="//www.ed.ac.uk/about/mission-governance/affiliations">
+                        <img class="pull-right img-responsive"
+                             alt="University affiliations"
+                             src="../webjars/edgel-webjar/2.0.1/gel/images/footer-affiliations.png" />
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-4 col-md-4 col-sm-push-8">
+                    <a class="btn btn-uoe btn-sm pull-right"
+                       href="http://www.myed.ed.ac.uk/"> MyEd login <span
+                            class="glyphicon glyphicon-chevron-right"></span></a>
+                </div>
+                <div class="col-sm-8 col-md-8 col-sm-pull-4">
+                    <p>
+                        The University of Edinburgh is a charitable body,
+                        registered in Scotland, with registration number SC005336,
+                        VAT Registration Number GB&nbsp;592&nbsp;9507&nbsp;00, and is
+                        acknowledged by the UK authorities as a
+                        &ldquo;<a href="https://www.gov.uk/guidance/recognised-uk-degrees">Recognised body</a>&rdquo;
+                        which has been granted degree awarding powers.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container footer-copyright">
+        <div class="row">
+            <div class="col-md-12 copyright">
+                <p>Unless explicitly stated otherwise, all material is
+                    copyright &copy; The University of Edinburgh.</p>
+            </div>
+        </div>
+    </div>
+
+
+</footer>
 <script src="js/angular-jquery.js" type="text/javascript"></script>
 <script src="js/checklist-model.js" type="text/javascript"></script>
 <script src="js/app.js"></script>
