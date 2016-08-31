@@ -79,6 +79,12 @@ public class Notification {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "notification", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NotificationUser> notificationUsers = new ArrayList<NotificationUser>();
     
+    @PrePersist
+    @PreUpdate
+    public void onSave() {
+    	this.setLastUpdated(new Date());
+    }
+    
     public String getPublisherKey() {
         return publisherKey;
     }

@@ -97,8 +97,8 @@ public class LearnService {
     private final String courseAnnouncementCategory = "Learn Course Announcement";
     private final String assessmentCategory = "Learn Assessment";
  
-    private Notification constructLearnNotification(
-            String notificationId,
+    private Notification assembleNotification(
+    		String publisherId,
             String publisherNotificationId,
             String topic,
             String title,
@@ -110,16 +110,12 @@ public class LearnService {
 
         Notification notification = new Notification();
         
-        if(notificationId != null){
-            notification.setNotificationId(notificationId);
-        }
         title = (title != null) ? title : "";
-        
         notification.setTitle(title);
-        if (body == null || body.equals("")) {
-            body = title;
-        }
+        
+        body = (body == null || body.equals("")) ? title : body;
         notification.setBody(body);
+        
         notification.setTopic(topic);
         notification.setPublisherId(publisherId);
         notification.setPublisherNotificationId(publisherNotificationId);
@@ -132,13 +128,12 @@ public class LearnService {
         
         for (String uun : uuns){
         	user = new NotificationUser();
-        	user.setId(new NotificationUserPK(notificationId, uun));
+        	user.setId(new NotificationUserPK(null, uun));
         	user.setNotification(notification);
         	notificationUsers.add(user);
         }
         
         notification.setNotificationUsers(notificationUsers);
-        notification.setLastUpdated(new Date());
 
         return notification;
     }
@@ -178,6 +173,7 @@ public class LearnService {
         		users.get(i).getId().setNotificationId(notificationId);
         	}
             notification.setNotificationUsers(users);
+            notification.setLastUpdated(existingNotification.getLastUpdated());
             
         	logger.debug(notification.getTitle() + " update");
             return AuditActions.UPDATE_NOTIFICATION;
@@ -199,7 +195,7 @@ public class LearnService {
         		users.get(i).getId().setNotificationId(notificationId);
         	}
             notification.setNotificationUsers(users);
-    		
+            notification.setLastUpdated(existingNotification.getLastUpdated());
             
         	logger.debug(notification.getTitle() + " update");
             return AuditActions.UPDATE_NOTIFICATION;
@@ -355,7 +351,7 @@ public class LearnService {
                 uunList.add(uun);
             }   
             
-            taskNotification = constructLearnNotification(null, publisherNotificationId, topic, title, body, notificationUrl, startDate, endDate, uunList);
+            taskNotification = assembleNotification(publisherId, publisherNotificationId, topic, title, body, notificationUrl, startDate, endDate, uunList);
             
             String action = getAction(notificationTaskList, taskNotification);
             logger.info("Task notification identified by " + publisherNotificationId + " to be handled as " + action);
@@ -394,7 +390,7 @@ public class LearnService {
                 Date startDate = systemAnnouncement.getStartDate();
                 Date endDate = systemAnnouncement.getEndDate();
                 
-                systemNotification = constructLearnNotification(null, publisherNotificationId, category, title, body, notificationUrl, startDate, endDate, uunList);
+                systemNotification = assembleNotification(publisherId, publisherNotificationId, category, title, body, notificationUrl, startDate, endDate, uunList);
      
                 logger.info("Constructed system announcement identified by " + publisherNotificationId + " with subject " + systemAnnouncement.getSubject());
      
@@ -452,7 +448,7 @@ public class LearnService {
                    uunList.add(uun);
                }   
                
-              courseNotification = constructLearnNotification(null, publisherNotificationId, category, title, body, notificationUrl, startDate, endDate, uunList);
+              courseNotification = assembleNotification(publisherId, publisherNotificationId, category, title, body, notificationUrl, startDate, endDate, uunList);
               logger.info("Constructed course announcement identified by " + publisherNotificationId + " with subject " + courseAnnouncement.getSubject());
               
               existingNotification = getNotificationByPublisherIdAndPublisherNotificationId(existingLearnNotificationsList, publisherId, publisherNotificationId);
