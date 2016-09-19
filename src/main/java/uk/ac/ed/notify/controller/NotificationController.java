@@ -65,7 +65,7 @@ public class NotificationController {
     @RequestMapping(value = "/notifications/publisher/{publisher-id}", method = RequestMethod.GET)
     public JsonNotification[] getPublisherNotifications(@PathVariable("publisher-id") String publisherId) throws ServletException {
 
-        ResponseEntity<JsonNotification[]> response = restTemplate.getForEntity(notificationMsUrl + "/notifications/publisher/" + publisherId, JsonNotification[].class);
+        ResponseEntity<JsonNotification[]> response = restTemplate.getForEntity(notificationMsUrl + "s" + "/notifications/publisher/" + publisherId, JsonNotification[].class);
         return response.getBody();
     }
 
