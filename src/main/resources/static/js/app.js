@@ -155,17 +155,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 
 	$scope.credentials = {};
 
-	$scope.logout = function() {
-		$http.post('logout', {}).success(function() {
-		    alert("logout called");
-			$rootScope.authenticated = false;
-			$location.path("/");
-		}).error(function(data) {
-			console.log("Logout failed")
-			$rootScope.authenticated = false;
-		});
-	}
-
+ 
 })
 
 .controller('listEmergencyNotificationController', function($rootScope,$scope, $http,$route,notification,message,$location) {

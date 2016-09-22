@@ -26,7 +26,7 @@
             <li ng-class="{active:route.current.activetab=='user-notifications'}"><a href="#/user-notifications">User Notifications</a></li>
             <li ng-class="{active:route.current.activetab=='scheduled-tasks'}"><a href="#/scheduled-tasks">Scheduled Tasks</a></li>
             <li ng-class="{active:route.current.activetab=='user-administration'}"><a href="#/user-administration">User Administration</a></li>
-            <li ng-show="authenticated"><a href="" ng-click="logout()">Logout</a></li>
+            <li ng-show="authenticated"><a href="cgi-bin/cosign-logout.pl" >Logout</a></li>
         </ul>
     </div>
 
