@@ -1,0 +1,66 @@
+
+
+<div ng-if="successMessage" id="successMessage" ng-cloak>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-success">
+                <strong>Success:</strong>  {{successMessage}}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div ng-if="errorMessage" id="errorMessage" ng-cloak>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                <strong>Warning:</strong>  {{errorMessage}}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<br/>
+<div class="panel panel-default uoe-overview-high">
+    <div class="panel-heading"><h3>Create new notification</h3></div>
+    <div class="panel-body">
+        <button type="button" ng-click="createNotification()" class="btn btn-uoe btn-md">Create Group Notification</button>
+    </div>
+</div>
+
+<div class="panel panel-default uoe-overview-high">
+    <div class="panel-heading"><h3>Edit/Delete existing notifications</h3></div>
+    <div class="panel-body">
+        <div ng-if="!notificationList" class="progress">
+            <div class="progress-bar progress-bar-striped active" role="progressbar"
+                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                Loading
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table" ng-if="notificationList" ng-cloak>
+                <thead>
+                <th>Notification Title</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th></th>
+                <th></th>
+                </thead>
+                <tbody>
+                <tr ng-repeat="notification in notificationList">
+                    <td>{{notification.title}}</td>
+                    <td>{{notification.startDate}}</td>
+                    <td>{{notification.endDate}}</td>
+                    <td><button type="button" ng-click="editNotification(notification)" class="btn btn-warning">Edit</button></td>
+                    <td><button type="button" ng-click="deleteNotification(notification)" class="btn btn-danger">Delete</button></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+

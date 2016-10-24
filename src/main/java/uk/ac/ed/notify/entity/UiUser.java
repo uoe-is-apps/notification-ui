@@ -14,6 +14,8 @@ public class UiUser {
     @Column(name = "UUN")
     private String uun;
 
+    @Column(name = "ORG_GROUP_DN")
+    private String orgGroupDN;        
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(name="NOTIFICATION_UI_USER_ROLES", joinColumns = {@JoinColumn (name="UUN")},
@@ -36,4 +38,11 @@ public class UiUser {
         this.uiRoles = uiRoles;
     }
 
+    public String getOrgGroupDN() {
+        return orgGroupDN;
+    }
+
+    public void setOrgGroupDN(String orgGroupDN) {
+        this.orgGroupDN = orgGroupDN;
+    }    
 }

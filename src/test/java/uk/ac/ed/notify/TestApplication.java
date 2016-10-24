@@ -25,13 +25,24 @@ import javax.xml.crypto.Data;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import org.springframework.beans.factory.annotation.Value;
 
+import org.springframework.ldap.core.ContextSource;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.LdapContextSource;
 /**
  * Created by rgood on 23/10/2015.
  */
 @EnableAutoConfiguration
-@EntityScan({"uk.ac.ed.notify.entity","uk.ac.ed.notify.learn.entity"})
-@EnableJpaRepositories({"uk.ac.ed.notify.repository","uk.ac.ed.notify.learn.repository"})
+
+@EntityScan({"uk.ac.ed.notify.entity","uk.ac.ed.notify.learn.entity", "uk.ac.ed.notify.timetabling.entity","uk.ac.ed.notify.idm.entity"})
+
+@EnableJpaRepositories(
+        {"uk.ac.ed.notify.repository",
+         "uk.ac.ed.notify.learn.repository",
+         "uk.ac.ed.notify.timetabling.repository",
+         "uk.ac.ed.notify.idm.repository"})
+
 @ComponentScan("uk.ac.ed.notify.service")
 public class TestApplication {
 
@@ -60,6 +71,22 @@ public class TestApplication {
     public static void main(String[] args) {
         SpringApplication.run(TestApplication.class, args);
     }
+   
+    @Value("${java.naming.ldap.derefAliases}")
+    String derefAliases;
+    @Bean
+    @ConfigurationProperties(prefix="ldap.contextSource")
+    public LdapContextSource contextSource() {
+        LdapContextSource contextSource = new LdapContextSource();
+        Map<String,Object> baseEnvironmentProperties = new HashMap<>();
+        baseEnvironmentProperties.put("java.naming.ldap.derefAliases",derefAliases);
+        contextSource.setBaseEnvironmentProperties(baseEnvironmentProperties);
+        return contextSource;
+    }
 
+    @Bean
+    public LdapTemplate ldapTemplate(ContextSource contextSource) {
+        return new LdapTemplate(contextSource);
+    }    
 }
 

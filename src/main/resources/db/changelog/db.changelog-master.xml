@@ -104,4 +104,11 @@
                  stripComments="true"/>
     </changeSet>
 
+    <changeSet id="alter_user_notification_audit_table_oracle_add_group_name" dbms="oracle" author="agajda">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/alter_notifications_table_oracle_add_group_name.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+
 </databaseChangeLog>

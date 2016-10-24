@@ -15,12 +15,22 @@ import uk.ac.ed.notify.entity.JsonNotification;
 import javax.servlet.ServletException;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import uk.ac.ed.notify.entity.Notification;
+import uk.ac.ed.notify.entity.NotificationUser;
+import uk.ac.ed.notify.entity.NotificationUserPK;
+import uk.ac.ed.notify.service.LdapService;
 
 /**
  * Created by rgood on 28/10/2015.
  */
 @RestController
 public class NotificationController {
+
+    protected final Log logger = LogFactory.getLog(this.getClass());
 
     @Value("${zuul.routes.resource.url}")
     private String notificationMsUrl;
@@ -62,6 +72,9 @@ public class NotificationController {
         return response.getBody();
     }
 
+    @Autowired
+    LdapService ldapService;        
+
     @RequestMapping(value = "/notifications/publisher/{publisher-id}", method = RequestMethod.GET)
     public JsonNotification[] getPublisherNotifications(@PathVariable("publisher-id") String publisherId) throws ServletException {
 
@@ -71,8 +84,8 @@ public class NotificationController {
 
 
     @RequestMapping(value="/notification/", method=RequestMethod.POST)
-    public JsonNotification setNotification(@RequestBody JsonNotification notification) throws ServletException, JsonProcessingException {
-        
+    public JsonNotification setNotification(@RequestBody JsonNotification notification) throws ServletException, JsonProcessingException {              
+        notification = constructNotificationWithLdapGroup(notification);        
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity request= new HttpEntity(notification, headers);
@@ -82,7 +95,8 @@ public class NotificationController {
     }
 
     @RequestMapping(value="/notification/{notification-id}",method=RequestMethod.PUT)
-    public void updateNotification(@PathVariable("notification-id") String notificationId, @RequestBody JsonNotification notification) throws ServletException {
+    public void updateNotification(@PathVariable("notification-id") String notificationId, @RequestBody JsonNotification notification) throws ServletException {       
+        notification = constructNotificationWithLdapGroup(notification);        
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity request= new HttpEntity(notification, headers);
@@ -105,4 +119,50 @@ public class NotificationController {
         return response.getBody();
     }
 
+    private JsonNotification constructNotificationWithLdapGroup(JsonNotification notification){
+        logger.info("constructNotificationWithLdapGroup - " + notification);
+        
+        if(notification.getNotificationGroup() == null){
+            logger.info("user hasn't selected any ldap group");
+            return notification;
+        }else{        
+            String groupName = ldapService.getGroupName(notification.getNotificationGroup()); 
+            notification.setNotificationGroupName(groupName);
+
+            Notification dbNotification = new Notification();
+            dbNotification.setBody(notification.getBody());
+            dbNotification.setEndDate(notification.getEndDate());
+            dbNotification.setNotificationId(notification.getNotificationId());
+            dbNotification.setPublisherId(notification.getPublisherId());
+            dbNotification.setPublisherNotificationId(notification.getPublisherNotificationId());
+            dbNotification.setStartDate(notification.getStartDate());
+            dbNotification.setTitle(notification.getTitle());
+            dbNotification.setTopic(notification.getTopic());
+            dbNotification.setUrl(notification.getUrl());
+            dbNotification.setNotificationGroup(notification.getNotificationGroup()); 
+            dbNotification.setNotificationGroupName(groupName);
+
+            List<String> ldapUsers = ldapService.getMembers(notification.getNotificationGroup());
+
+            logger.info("user selected ldap group - selected - " + notification.getNotificationGroup()+ " name - " + groupName + " numOfUsers found - " + ldapUsers.size() );
+
+            ArrayList<NotificationUser> userList = new ArrayList<NotificationUser>();
+            for(int i = 0; i < ldapUsers.size(); i++){
+               NotificationUser user = new NotificationUser();
+
+               NotificationUserPK nupk = new NotificationUserPK();
+               nupk.setNotificationId(notification.getNotificationId());
+               nupk.setUun(ldapUsers.get(i));
+               user.setId(nupk);
+               user.setNotification(dbNotification);
+
+               userList.add(user);
+            }
+            notification.setNotificationUsers(userList);
+
+            return notification;
+        }
+    }
+    
+        
 }

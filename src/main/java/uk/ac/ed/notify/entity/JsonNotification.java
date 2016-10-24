@@ -44,7 +44,26 @@ public class JsonNotification {
         
         private List<NotificationUser> notificationUsers; 
         
+        private String notificationGroup;
 
+        public String getNotificationGroup() {
+            return notificationGroup;
+        }
+
+        public void setNotificationGroup(String notificationGroup) {
+            this.notificationGroup = notificationGroup;
+        }
+        
+        private String notificationGroupName;
+
+        public String getNotificationGroupName() {
+            return notificationGroupName;
+        }
+
+        public void setNotificationGroupName(String notificationGroupName) {
+            this.notificationGroupName = notificationGroupName;
+        }
+                
         public String getNotificationId() {
                 return notificationId;
         }

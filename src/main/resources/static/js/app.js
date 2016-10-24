@@ -1,15 +1,25 @@
 angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'checklist-model']).config(function($routeProvider, $httpProvider) {
 
 	$routeProvider.when('/', {
+		templateUrl : 'listGroupNotification.html',
+		controller : 'listGroupNotificationController',
+		activetab : 'group-notifications'
+	}).
+	when('/list-emergency-notification',{
 		templateUrl : 'listEmergencyNotification.html',
 		controller : 'listEmergencyNotificationController',
 		activetab : 'emergency-notifications'
-	}).
+	}).                                
 	when('/edit-emergency-notification',{
 		templateUrl : 'editEmergencyNotification.html',
 		controller : 'editEmergencyNotificationController',
 		activetab : 'emergency-notifications'
 	}).
+	when('/edit-group-notification',{
+		templateUrl : 'editGroupNotification.html',
+		controller : 'editGroupNotificationController',
+		activetab : 'group-notifications'
+	}).                
 	when('/user-administration',{
     		templateUrl : 'listUiUsers.html',
     		controller : 'listUiUsersController',
@@ -93,6 +103,25 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
      return this.notificationData;
    }
 })
+
+/*
+.service("groupNotification",function Notification()
+{
+
+   this.notificationData = { publisherId: "notify-ui", topic: "Group", startDate: new Date(), lastUpdated: new Date()};
+
+   this.setNotification = function(notification)
+   {
+     this.notificationData = notification;
+   }
+
+   this.notification = function()
+   {
+     return this.notificationData;
+   }
+})
+*/
+
 .service("user",function User()
 {
   this.userData = { uun: ""};
@@ -171,8 +200,15 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 
           });
     $scope.route = $route;
-	$http.get('notifications/publisher/notify-ui').success(function(data) {
-		$scope.notificationList = data;
+	$http.get('notifications/publisher/notify-ui').success(function(data) {            
+                var emergencyList = [];
+                for(var i = 0; i < data.length; i++){
+                 var topic = data[i].topic;                
+                 if(topic === 'Emergency'){
+                     emergencyList.push(data[i]);   
+                 }
+                }
+		$scope.notificationList = emergencyList;
 	});
 
 	$scope.createNotification = function()
@@ -196,11 +232,18 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
     {
 
         $http.delete("notification/"+notification.notificationId,notification)
-         .then(function successCallback(response)
-                        {
+         .then(function successCallback(response){
                             message.setSuccessMessage("Notification Deleted");
-                            $http.get('notification/publisher/notify-ui').success(function(data) {
-                            		$scope.notificationList = data;
+                            setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
+                            $http.get('notifications/publisher/notify-ui').success(function(data) {
+                            var emergencyList = [];
+                            for(var i = 0; i < data.length; i++){
+                             var topic = data[i].topic;                
+                             if(topic === 'Emergency'){
+                                 emergencyList.push(data[i]);   
+                             }
+                            }
+                            $scope.notificationList = emergencyList;
                             	});
                         },
                         function errorCallback(response)
@@ -213,6 +256,33 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 })
 
 .controller('editEmergencyNotificationController', function($rootScope,$scope, $http,$route,$location,message,notification) {
+
+    $('#notificationGroupTree').jstree({
+	'core' : {
+            'data' : {
+                    "url": function (node) {
+                           return "findGroups"; 
+                    },				
+                    data: function (node) {
+                           //alert(node.id);
+                           var json = {};                                 
+                           json["id"] = node.id;
+                           return json;
+                    },
+                    "dataType" : "json" 
+            }
+	}
+    });
+
+    $("#notificationGroupTree").bind('select_node.jstree', function(e) {        
+         jQuery('#notificationGroupName').val($('.jstree-clicked').text());    
+         jQuery('#notificationGroupName').trigger('input');  
+         angular.element($('#notificationGroupName')).triggerHandler('input');
+        
+         jQuery('#notificationGroup').val($("#notificationGroupTree").jstree("get_selected"));    
+         jQuery('#notificationGroup').trigger('input');  
+         angular.element($('#notificationGroup')).triggerHandler('input');
+    });
 
     $scope.route = $route;
 
@@ -300,11 +370,12 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
         console.log("Insert called");
         //TODO add validation on variables being set
         $http.post("notification/",notification).then(function successCallback(response) {
-                                                 message.setSuccessMessage("Notification Saved");
-                                                 $location.path("/");
-                                               }, function errorCallback(response) {
-                                                 message.setErrorMessage("Error saving notification:"+response.status+response.statusText);
-                                               });
+                    message.setSuccessMessage("Notification Saved");
+                    setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
+                    $location.path("/list-emergency-notification");
+                }, function errorCallback(response) {
+                    message.setErrorMessage("Error saving notification:"+response.status+response.statusText);
+                });
      }
      else
      {
@@ -312,7 +383,8 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
                 .then(function successCallback(response)
                 {
                     message.setSuccessMessage("Notification Saved");
-                     $location.path("/");
+                    setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
+                    $location.path("/list-emergency-notification");
                 },
                 function errorCallback(response)
                 {
@@ -324,6 +396,205 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 
 
   };
+
+})
+.controller('listGroupNotificationController', function($rootScope,$scope, $http,$route,notification,message,$location) {
+
+    $scope.successMessage = message.successMessage();
+    $scope.errorMessage = message.errorMessage();
+    $scope.$on('successMessageUpdated', function() {
+        $scope.successMessage = message.successMessage();
+
+    });
+    $scope.$on('errorMessageUpdated', function() {
+            $scope.errorMessage = message.errorMessage();
+    });
+    $scope.route = $route;
+	$http.get('notifications/publisher/notify-ui').success(function(data) {
+                var groupList = [];
+                for(var i = 0; i < data.length; i++){
+                 var topic = data[i].topic;                
+                 if(topic === 'Group'){
+                     groupList.push(data[i]);   
+                 }
+                }
+            $scope.notificationList = groupList;
+	});
+
+	$scope.createNotification = function()
+	{
+	   newNotification = { publisherId: "notify-ui", topic: "Group", startDate: new Date(), lastUpdated: new Date()};
+	   message.setSuccessMessage("");
+           message.setErrorMessage("");
+	   notification.setNotification(newNotification);
+	   $location.path("/edit-group-notification");
+	}
+
+	$scope.editNotification = function(notificationToEdit)
+	{
+	   message.setSuccessMessage("");
+           message.setErrorMessage("");
+	   notification.setNotification(notificationToEdit);
+	   $location.path("/edit-group-notification");
+	};
+	$scope.deleteNotification = function(notification)
+        {
+
+        $http.delete("notification/"+notification.notificationId,notification)
+         .then(function successCallback(response)
+                        {
+                            message.setSuccessMessage("Notification Deleted");
+                            setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
+                            $http.get('notifications/publisher/notify-ui').success(function(data) {
+                            var groupList = [];
+                                for(var i = 0; i < data.length; i++){
+                                 var topic = data[i].topic;                
+                                 if(topic === 'Group'){
+                                     groupList.push(data[i]);   
+                                 }
+                                }
+                            $scope.notificationList = groupList;
+                        });
+                        },
+                        function errorCallback(response)
+                        {
+                            message.setErrorMessage("Error deleting notification:"+response.status+response.statusText);
+                        });
+    }
+
+})
+
+.controller('editGroupNotificationController', function($rootScope,$scope, $http,$route,$location,message,notification) {
+
+    $('#notificationGroupTree').jstree({
+	'core' : {
+            'data' : {
+                    "url": function (node) {
+                           return "findGroups"; 
+                    },				
+                    data: function (node) {
+                           //alert(node.id);
+                           var json = {};                                 
+                           json["id"] = node.id;
+                           return json;
+                    },
+                    "dataType" : "json" 
+            }
+	}
+    });
+
+    $("#notificationGroupTree").bind('select_node.jstree', function(e) {        
+         jQuery('#notificationGroupName').val($('.jstree-clicked').text());    
+         jQuery('#notificationGroupName').trigger('input');  
+         angular.element($('#notificationGroupName')).triggerHandler('input');
+        
+         jQuery('#notificationGroup').val($("#notificationGroupTree").jstree("get_selected"));    
+         jQuery('#notificationGroup').trigger('input');  
+         angular.element($('#notificationGroup')).triggerHandler('input');
+    });
+
+    $scope.route = $route;
+    $scope.notification = notification.notification();
+
+    $scope.editorOptions = { };
+
+    $scope.today = function() {
+        $scope.dt = new Date();
+    };
+    $scope.today();
+
+    $scope.clear = function () {
+      $scope.dt = null;
+    };
+
+    $scope.toggleMin = function() {
+      $scope.minDate = $scope.minDate ? null : $scope.today();
+    };
+    $scope.toggleMin();
+
+    var sixMonthsFromNow = $scope.dt.setMonth($scope.dt.getMonth()+6);
+    var dd = sixMonthsFromNow.getDay;
+    var mm = sixMonthsFromNow.getMonth;
+    var yyyy = sixMonthsFromNow.getFullYear;
+    $scope.maxDate = new Date(dd,mm,yyyy);
+
+    $scope.openStartDate = function($event) {
+      $scope.startDateStatus.opened = true;
+    };
+
+    $scope.openEndDate = function($event) {
+        $scope.endDateStatus.opened = true;
+      };
+
+    $scope.dateOptions = {
+      formatYear: 'yy',
+      startingDay: 1
+    };
+
+    $scope.format = 'dd-MMMM-yyyy';
+
+    $scope.startDateStatus = {
+      opened: false
+    };
+
+    $scope.endDateStatus = {
+      opened: false
+    };
+
+    $scope.reset = function() {
+      $scope.notification = { publisherId: "notify-ui", topic: "Group", startDate: new Date(), lastUpdated: new Date()};
+    };
+
+    $scope.checkDates = function(notification){
+            var curDate = new Date();
+            curDate.setHours(0,0,0,0);
+
+            if(new Date(notification.startDate) > new Date(notification.endDate))
+            {
+              $scope.badEndDate = true;
+            }
+            else
+            {
+              $scope.badEndDate = null;
+            }
+            if(new Date(notification.startDate) < curDate)
+            {
+               $scope.badStartDate = true;
+            }
+            else
+            {
+              $scope.badStartDate = null;
+            }
+    };
+
+    $scope.update = function(notification)
+    {
+       if (notification.notificationId == null)
+       {
+          console.log("Insert called");
+          $http.post("notification/",notification).then(function successCallback(response) {
+                        message.setSuccessMessage("Notification Saved");
+                        setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
+                        $location.path("/list-group-notification");
+                   }, function errorCallback(response) {
+                        message.setErrorMessage("Error saving notification:"+response.status+response.statusText);
+          });                                       
+       }
+       else
+       {
+          $http.put("notification/"+notification.notificationId,notification)
+                  .then(function successCallback(response)
+                  {
+                        message.setSuccessMessage("Notification Saved");
+                        setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
+                        $location.path("/list-group-notification");
+                  },
+                  function errorCallback(response)
+                  {
+                        message.setErrorMessage("Error saving notification:"+response.status+response.statusText);
+                  });
+       }
+    };
 
 })
 .controller('listUiUsersController', function($rootScope,$scope, $http,$route,$location,message,user) {
@@ -368,6 +639,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
              .then(function successCallback(response)
                             {
                                 message.setSuccessMessage("User Deleted");
+                                setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
                                 $http.get('ui-users').success(function(data) {
                                 		$scope.userList = data;
                                 	});
@@ -405,6 +677,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
                        .then(function successCallback(response)
                        {
                            message.setSuccessMessage("User Saved");
+                           setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
                            $location.path("/user-administration");
                        },
                        function errorCallback(response)
@@ -477,7 +750,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 		      .then(function successCallback(response){
 		    	  
 		    	  message.setSuccessMessage("Topic subscription deleted.");
-		    	  
+		    	  setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
 		          $http.get('/topic-subscriptions').success(function(data) {
 		  		       $scope.topicSubscriptionList = data;
 		  	      });  
@@ -515,6 +788,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 			.then(function successCallback(response)
 	        {
 	            message.setSuccessMessage("Topic subscription saved");
+                    setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
 	            $location.path("/publisher-subscriber");
 	        },
 	        function errorCallback(response)

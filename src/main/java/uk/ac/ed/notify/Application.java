@@ -1,14 +1,21 @@
 package uk.ac.ed.notify;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.cloud.security.oauth2.resource.EnableOAuth2Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.ldap.core.ContextSource;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -90,4 +97,20 @@ public class Application extends SpringBootServletInitializer {
         }
     }
 
+    @Value("${java.naming.ldap.derefAliases}")
+    String derefAliases;
+    @Bean
+    @ConfigurationProperties(prefix="ldap.contextSource")
+    public LdapContextSource contextSource() {
+        LdapContextSource contextSource = new LdapContextSource();
+        Map<String,Object> baseEnvironmentProperties = new HashMap<>();
+        baseEnvironmentProperties.put("java.naming.ldap.derefAliases",derefAliases);
+        contextSource.setBaseEnvironmentProperties(baseEnvironmentProperties);
+        return contextSource;
+    }
+
+    @Bean
+    public LdapTemplate ldapTemplate(ContextSource contextSource) {
+        return new LdapTemplate(contextSource);
+    }    
 }

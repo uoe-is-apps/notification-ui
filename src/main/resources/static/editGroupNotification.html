@@ -19,7 +19,7 @@
 </div>
 <br/>
 <div class="panel panel-default uoe-overview-high">
-    <div class="panel-heading">Create/Edit Emergency Notification</div>
+    <div class="panel-heading">Create/Edit Group Notification</div>
     <div class="panel-body">
         <form name="editNotificationForm" novalidate class="form-horizontal">
 
@@ -53,19 +53,19 @@
                 <p class="help-block" ng-show="editNotificationForm.url.$touched && editNotificationForm.url.$invalid">
                     Please enter a URL in the format http(s)://(url), e.g. http://www.ed.ac.uk
                 </p>
-            </div>
+            </div>   
             
             <div class="form-group">                
               <label class="col-sm-2 control-label">Group:</label>              
               <div class="col-sm-10">
-                    <input id="notificationGroupName" name="notificationGroupName" ng-model="notification.notificationGroupName" placeholder="LDAP Group" readonly />                           
+                    <input id="notificationGroupName" name="notificationGroupName" ng-model="notification.notificationGroupName" placeholder="LDAP Group" required readonly />                           
                     <button ng-click="showDiv = !showDiv">Select Group</button>
                      <div ng-show="showDiv" >
-                         <input ng-show="false" id="notificationGroup" name="notificationGroup" type="text" ng-model="notification.notificationGroup" placeholder="Selected LDAP Group" readonly>
+                         <input ng-show="false" id="notificationGroup" name="notificationGroup" type="text" ng-model="notification.notificationGroup" placeholder="Selected LDAP Group" required readonly>
                         <div id="notificationGroupTree" class="demo"></div>	                
                      </div>
               </div>  
-            </div>            
+            </div>
             
             <div class="form-group">
                 <label class="col-sm-2 control-label">Topic:</label>

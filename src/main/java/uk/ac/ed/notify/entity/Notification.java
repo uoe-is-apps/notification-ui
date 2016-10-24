@@ -1,6 +1,7 @@
 package uk.ac.ed.notify.entity;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.text.SimpleDateFormat;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.jsoup.Jsoup;
@@ -78,6 +79,29 @@ public class Notification {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "notification", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NotificationUser> notificationUsers = new ArrayList<NotificationUser>();
+    
+    @Column(name="NOTIFICATION_GROUP")
+    private String notificationGroup;
+
+    public String getNotificationGroup() {
+        return notificationGroup;
+    }    
+    
+    public void setNotificationGroup(String notificationGroup) {
+        this.notificationGroup = notificationGroup;
+    }    
+    
+    @Column(name="NOTIFICATION_GROUP_NAME")
+    private String notificationGroupName;
+
+    public String getNotificationGroupName() {
+        return notificationGroupName;
+    }    
+    
+    public void setNotificationGroupName(String notificationGroupName) {
+        this.notificationGroupName = notificationGroupName;
+    }        
+    
     
     @PrePersist
     @PreUpdate
@@ -248,22 +272,22 @@ public class Notification {
             return false;
         }
         final Notification other = (Notification) obj;
-        if (!Objects.equals(this.publisherId, other.publisherId)) {
+        if (!Objects.equals(this.publisherId, other.publisherId)) {          
             return false;
         }
-        if (!Objects.equals(this.publisherNotificationId, other.publisherNotificationId)) {
+        if (!Objects.equals(this.publisherNotificationId, other.publisherNotificationId)) {           
             return false;
         }
-        if (!Objects.equals(this.url, other.url)) {
+        if (!Objects.equals(this.url, other.url)) {        
             return false;
         }        
-        if (!Objects.equals(this.topic, other.topic)) {
+        if (!Objects.equals(this.topic, other.topic)) {          
             return false;
         }
-        if (!Objects.equals(this.title, other.title)) {
+        if (!Objects.equals(this.title, other.title)) {         
             return false;
         }
-        if (!Objects.equals(this.body, other.body)) {
+        if (!Objects.equals(this.body, other.body)) {         
             return false;
         }
         if (!Objects.equals(this.startDate, other.startDate)) {
