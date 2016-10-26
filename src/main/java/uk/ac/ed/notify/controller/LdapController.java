@@ -64,8 +64,6 @@ public class LdapController {
         UiUser user = uiUserRepository.findOne(request.getRemoteUser());
         String ldapBase = user.getOrgGroupDN();
         
-        System.out.println(ldapBase);
-        
         if(id.equals("#")){
             root = ldapBase;
         }else{
@@ -75,19 +73,20 @@ public class LdapController {
         List<LdapGroup> nextLevelList = ldapService.getNextLevelGroups(root);
         
         List<JsonLdap> list = new ArrayList<JsonLdap>();
-        for(int i = 0; i < nextLevelList.size(); i++){            
-            LdapGroup group = nextLevelList.get(i);
-            String ou = group.getOu();
-            String description = group.getDescription();
-                    
-            JsonLdap ldap = new JsonLdap();        
-            ldap.setId("ou=" + ou + "," + root);
-            ldap.setText(description);
-            ldap.setChildren(true);
+        if(nextLevelList != null){
+            for(int i = 0; i < nextLevelList.size(); i++){            
+                LdapGroup group = nextLevelList.get(i);
+                String ou = group.getOu();
+                String description = group.getDescription();
 
-            list.add(ldap);
+                JsonLdap ldap = new JsonLdap();        
+                ldap.setId("ou=" + ou + "," + root);
+                ldap.setText(description);
+                ldap.setChildren(true);
+
+                list.add(ldap);
+            }
         }
-
         return list;
     }    
  
