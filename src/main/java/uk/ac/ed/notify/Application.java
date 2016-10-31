@@ -53,10 +53,11 @@ public class Application extends SpringBootServletInitializer {
                     .authenticationProvider(preauthAuthProvider())
                     .csrf().disable()
                     .authorizeRequests().anyRequest().authenticated()
-                    .antMatchers("/office365NewEmailCallback/**").permitAll()
-                    .antMatchers("/scheduled-tasks", "/publishers", "/subscribers", "/topic-subscriptions/**").hasRole("SYSSUPPORT")
-                    .antMatchers("/topic/**").hasRole("USRSUPPORT")
-                    .antMatchers("/").hasRole("EMERGENCY");        
+//                    .antMatchers("/office365NewEmailCallback/**").permitAll()
+//                    .antMatchers("/scheduled-tasks", "/publishers", "/subscribers", "/topic-subscriptions/**").hasRole("SYSSUPPORT")
+//                    .antMatchers("/topic/**").hasRole("USRSUPPORT")
+//                    .antMatchers("/").hasRole("EMERGENCY")                    
+                    .antMatchers("/scheduled-tasks").hasRole("SYSSUPPORT");
         }
 
         @Autowired
