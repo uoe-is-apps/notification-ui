@@ -19,6 +19,7 @@ import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
@@ -41,7 +42,8 @@ public class Application extends SpringBootServletInitializer {
         SpringApplication.run(Application.class, args);
     }
 
-    @Configuration
+@Configuration
+@EnableWebSecurity
     protected static class LoginConfig extends WebSecurityConfigurerAdapter {
 
         @Autowired
@@ -52,15 +54,14 @@ public class Application extends SpringBootServletInitializer {
             http.addFilterBefore(remoteUserAuthenticationFilter(), RequestHeaderAuthenticationFilter.class)
                     .authenticationProvider(preauthAuthProvider())
                     .csrf().disable()
-                    .authorizeRequests()
-                    
-                    //.anyRequest().authenticated()
-                    
-//                    .antMatchers("/office365NewEmailCallback/**").permitAll()
-//                    .antMatchers("/scheduled-tasks", "/publishers", "/subscribers", "/topic-subscriptions/**").hasRole("SYSSUPPORT")
-//                    .antMatchers("/topic/**").hasRole("USRSUPPORT")
-//                    .antMatchers("/").hasRole("EMERGENCY")                    
-                    .antMatchers("/scheduled-tasks").hasRole("SYSSUPPORT");
+                    .authorizeRequests().anyRequest().authenticated()
+                    .antMatchers("/office365NewEmailCallback/**").permitAll()
+                    .antMatchers("/scheduled-tasks").hasRole("SYSSUPPORT")
+                    .antMatchers("/publishers", "/subscribers", "/topic-subscriptions/**").hasRole("SYSSUPPORT")
+                    .antMatchers("/topic/**").hasRole("USRSUPPORT")
+                    .antMatchers("/").hasRole("EMERGENCY");      
+            
+            
         }
 
         @Autowired
@@ -101,6 +102,8 @@ public class Application extends SpringBootServletInitializer {
         }
     }
 
+
+    
     @Value("${java.naming.ldap.derefAliases}")
     String derefAliases;
     @Bean
