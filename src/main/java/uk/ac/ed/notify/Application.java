@@ -52,7 +52,10 @@ public class Application extends SpringBootServletInitializer {
             http.addFilterBefore(remoteUserAuthenticationFilter(), RequestHeaderAuthenticationFilter.class)
                     .authenticationProvider(preauthAuthProvider())
                     .csrf().disable()
-                    .authorizeRequests().anyRequest().authenticated()
+                    .authorizeRequests()
+                    
+                    //.anyRequest().authenticated()
+                    
 //                    .antMatchers("/office365NewEmailCallback/**").permitAll()
 //                    .antMatchers("/scheduled-tasks", "/publishers", "/subscribers", "/topic-subscriptions/**").hasRole("SYSSUPPORT")
 //                    .antMatchers("/topic/**").hasRole("USRSUPPORT")
