@@ -21,7 +21,8 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "NOTIFICATIONS")
-@NamedQueries({
+@NamedQueries({    
+        @NamedQuery(name = "Notification.findDeletableNotification", query = "SELECT a FROM Notification a WHERE a.endDate < (?1) "),        
         @NamedQuery(name = "Notification.findByPublisherIdAndTopic", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and a.topic = (?2)"),
         @NamedQuery(name = "Notification.findByPublisherId", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1)"),
         @NamedQuery(name = "Notification.findByPublisherIdAndPublisherNotificationId", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and a.publisherNotificationId  = (?2)")

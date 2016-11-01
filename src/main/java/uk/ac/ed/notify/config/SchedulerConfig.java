@@ -23,6 +23,7 @@ import uk.ac.ed.notify.spring.AutowiringSpringBeanJobFactory;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Properties;
+import uk.ac.ed.notify.job.NotificationTidyupJob;
 
 /**
  * Created by rgood on 05/10/15.
@@ -43,7 +44,8 @@ public class SchedulerConfig {
     public SchedulerFactoryBean schedulerFactoryBean(@Qualifier("notifyDataSource") DataSource dataSource,
                                                      JobFactory jobFactory,
                                                      @Qualifier("learnPullJobTrigger") Trigger learnPullJobTrigger,
-                                                     @Qualifier("office365PullJobTrigger") Trigger office365PullJobTrigger
+                                                     @Qualifier("notificationTidyupJobTrigger") Trigger notificationTidyupJobTrigger,
+                                                     @Qualifier("office365PullJobTrigger") Trigger office365PullJobTrigger                                                     
                                                      //@Qualifier("office365PushSubscriptionJobTrigger") Trigger office365PushSubscriptionJobTrigger
             ) throws IOException {
         SchedulerFactoryBean factory = new SchedulerFactoryBean();
@@ -53,7 +55,7 @@ public class SchedulerConfig {
         factory.setJobFactory(jobFactory);
 
         factory.setQuartzProperties(quartzProperties());
-        factory.setTriggers(new Trigger[] {learnPullJobTrigger,office365PullJobTrigger}); //office365PushSubscriptionJobTrigger
+        factory.setTriggers(new Trigger[] {learnPullJobTrigger,notificationTidyupJobTrigger,office365PullJobTrigger}); //office365PushSubscriptionJobTrigger
 
         return factory;
     }
@@ -78,6 +80,18 @@ public class SchedulerConfig {
         return createTrigger(jobDetail, frequency);
     }
 
+    @Bean
+    public JobDetailFactoryBean notificationTidyupJobDetail() {
+        return createJobDetail(NotificationTidyupJob.class);
+
+    }
+
+    @Bean(name = "notificationTidyupJobTrigger")
+    public SimpleTriggerFactoryBean notificationTidyupJobTrigger(@Qualifier("notificationTidyupJobDetail") JobDetail jobDetail,
+                                                     @Value("${notificationTidyupJob.frequency}") long frequency) {
+        return createTrigger(jobDetail, frequency);
+    }    
+    
     @Bean
     public JobDetailFactoryBean office365PullJobDetail() {
         return createJobDetail(Office365PullJob.class);
