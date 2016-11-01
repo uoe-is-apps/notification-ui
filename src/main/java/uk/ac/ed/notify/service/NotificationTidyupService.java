@@ -24,8 +24,8 @@ public class NotificationTidyupService {
          
     @Value("${notification.purge}")
     int purge;
-    
-    public void tidyupNotification(){
+       
+    public List<Notification> findDeletableNotification(){
         Date now = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime(now);
@@ -33,7 +33,12 @@ public class NotificationTidyupService {
         Date earlyDate = cal.getTime();        
         java.sql.Date sqlDate = new java.sql.Date(earlyDate.getTime());    
         
-        List<Notification> list = notificationRepository.findDeletableNotification(sqlDate);        
+        List<Notification> list = notificationRepository.findDeletableNotification(sqlDate);            
+        return list;
+    }
+    
+    public void tidyupNotification(){
+        List<Notification> list = findDeletableNotification();   
         logger.info("tidyupNotification, found [" + list.size() + "] notifications which end date is earlier than (sysdate - " + purge + ") date, these will be purged");        
         notificationRepository.delete(list);
     }
