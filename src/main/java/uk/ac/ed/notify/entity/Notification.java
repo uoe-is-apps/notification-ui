@@ -236,10 +236,12 @@ public class Notification {
     }
 
     public void setUrl(String url) {
-
-        String cleaned = Jsoup.clean(url, Whitelist.basic());
-        if (!cleaned.equals(url)) {
-            logger.debug("notification url for "+notificationId+"cleaned, was ("+url);
+        String cleaned = null;
+        if(url != null){
+            cleaned = Jsoup.clean(url, Whitelist.basic());
+            if (!cleaned.equals(url)) {
+                logger.debug("notification url for "+notificationId+"cleaned, was ("+url);
+            }
         }
         this.url = cleaned;
     }
