@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import org.apache.commons.validator.UrlValidator;
 
 /**
  * Created by rgood on 18/09/2015.
@@ -236,14 +237,13 @@ public class Notification {
     }
 
     public void setUrl(String url) {
-        String cleaned = null;
         if(url != null){
-            cleaned = Jsoup.clean(url, Whitelist.basic());
-            if (!cleaned.equals(url)) {
-                logger.debug("notification url for "+notificationId+"cleaned, was ("+url);
+            url = url.trim();
+            UrlValidator urlValidator = new UrlValidator();
+            if (!urlValidator.isValid(url)) {
+                this.url = null;
             }
         }
-        this.url = cleaned;
     }
     
     public List<NotificationUser> getNotificationUsers() {
