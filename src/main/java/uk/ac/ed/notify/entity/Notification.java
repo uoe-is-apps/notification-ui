@@ -239,9 +239,12 @@ public class Notification {
     public void setUrl(String url) {
         if(url != null){
             url = url.trim();
-            UrlValidator urlValidator = new UrlValidator();
+            String[] schemes = {"http","https"}; 
+            UrlValidator urlValidator = new UrlValidator(schemes);
             if (!urlValidator.isValid(url)) {
                 this.url = null;
+            }else{
+                this.url = url;
             }
         }
     }
