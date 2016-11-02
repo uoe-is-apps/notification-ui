@@ -119,6 +119,17 @@ public class NotificationController {
         return response.getBody();
     }
 
+    @RequestMapping(value = "/checkIfLdapGroupContainMember/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String checkIfLdapGroupContainMember(@RequestBody JsonNotification notification) {
+        if(notification.getNotificationGroup() != null){
+            List<String> ldapUsers = ldapService.getMembers(notification.getNotificationGroup());
+            if(ldapUsers.size() > 0){
+                return "{\"member\": \"yes\"}";
+            }
+        }
+        return "{\"member\": \"no\"}";
+    }    
+    
     private JsonNotification constructNotificationWithLdapGroup(JsonNotification notification){
         logger.info("constructNotificationWithLdapGroup - " + notification);
         

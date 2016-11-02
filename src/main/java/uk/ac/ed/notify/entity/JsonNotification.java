@@ -152,5 +152,5 @@ public class JsonNotification {
 
 		public void setNotificationUsers(List<NotificationUser> notificationUsers) {
 			this.notificationUsers = notificationUsers;
-		}
+		}           
 }
