@@ -590,7 +590,9 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
        }
        else
        {
-          $http.put("notification/"+notification.notificationId,notification)
+          $http.post("checkIfLdapGroupContainMember/",notification).then(function successCallback(response) {
+              if(response.data.member == 'yes'){
+                    $http.put("notification/"+notification.notificationId,notification)
                   .then(function successCallback(response)
                   {
                         message.setSuccessMessage("Notification Saved");
@@ -601,6 +603,15 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
                   {
                         message.setErrorMessage("Error saving notification:"+response.status+response.statusText);
                   });
+              }else{
+                  message.setErrorMessage("Error saving notification: Your selected group does not contain any members");
+                  $location.path("/list-group-notification");
+              }  
+           }, function errorCallback(response) {
+                message.setErrorMessage("Error saving notification:"+response.status+response.statusText);
+          });                 
+           
+       
        }
     };
 
