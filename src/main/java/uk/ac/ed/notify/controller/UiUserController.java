@@ -1,5 +1,6 @@
 package uk.ac.ed.notify.controller;
 
+import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ed.notify.entity.UiRole;
@@ -10,6 +11,7 @@ import uk.ac.ed.notify.repository.UiUserRepository;
 import uk.ac.ed.notify.repository.UiUserRoleRepository;
 
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by rgood on 29/10/2015.
@@ -61,4 +63,11 @@ public class UiUserController {
         return (List<UiRole>)uiRoleRepository.findAll();
     }
 
+    @RequestMapping(value="/user-role", method = RequestMethod.GET)
+    public UiUser getUserRole(HttpServletRequest request)
+    {
+       String uun = request.getRemoteUser();
+       return uiUserRepository.findOne(uun); 
+    }
+    
 }

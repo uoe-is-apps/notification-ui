@@ -1,60 +1,219 @@
 angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'checklist-model']).config(function($routeProvider, $httpProvider) {
 
+        /*
+        Role Definition from WEB010 SDS:
+        EMERGENCY – Role which gives access to emergency notification creation screen
+        GROUP – Role which gives access to group notification creation screen        
+        USRSUPPORT – Role which gives access to user notification support
+        SYSSUPPORT – Role which gives access to system support screens
+        USERADMIN – Role which gives access to user administrative screens
+        SUPERADMIN – Role which gives access to all screens
+        */
+
 	$routeProvider.when('/', {
 		templateUrl : 'listGroupNotification.html',
 		controller : 'listGroupNotificationController',
-		activetab : 'group-notifications'
-	}).
-	when('/list-emergency-notification',{
-		templateUrl : 'listEmergencyNotification.html',
-		controller : 'listEmergencyNotificationController',
-		activetab : 'emergency-notifications'
-	}).                                
-	when('/edit-emergency-notification',{
-		templateUrl : 'editEmergencyNotification.html',
-		controller : 'editEmergencyNotificationController',
-		activetab : 'emergency-notifications'
+		activetab : 'group-notifications',
+                resolve: { access: ["Access", function (Access) { return Access.hasRole("GROUP"); }] }   
 	}).
 	when('/edit-group-notification',{
 		templateUrl : 'editGroupNotification.html',
 		controller : 'editGroupNotificationController',
-		activetab : 'group-notifications'
-	}).                
+		activetab : 'group-notifications',
+                resolve: { access: ["Access", function (Access) { return Access.hasRole("GROUP"); }] }   
+	}).                     
+                
+                
+                
+                
+                
+	when('/list-emergency-notification',{
+		templateUrl : 'listEmergencyNotification.html',
+		controller : 'listEmergencyNotificationController',
+		activetab : 'emergency-notifications',
+                resolve: { access: ["Access", function (Access) { return Access.hasRole("EMERGENCY"); }] }   
+	}).                                
+	when('/edit-emergency-notification',{
+		templateUrl : 'editEmergencyNotification.html',
+		controller : 'editEmergencyNotificationController',
+		activetab : 'emergency-notifications',
+                resolve: { access: ["Access", function (Access) { return Access.hasRole("EMERGENCY"); }] }   
+	}).
+           
+                
+                
+                
+                
+                
 	when('/user-administration',{
     		templateUrl : 'listUiUsers.html',
     		controller : 'listUiUsersController',
-    		activetab : 'user-administration'
-    }).
-    when('/edit-user',{
-        		templateUrl : 'editUiUser.html',
-        		controller : 'editUiUsersController',
-        		activetab : 'user-administration'
-    }).
-    when('/scheduled-tasks',{
-		templateUrl : 'listScheduledTasks.html',
-		controller : 'listScheduledTasksController',
-		activetab : 'scheduled-tasks'
-    }).
-    when('/publisher-subscriber',{
-		templateUrl : 'listPublisherSubscriberDetails.html',
-		controller : 'listPublisherSubscriberDetailsController',
-		activetab : 'publisher-subscriber'
-    }).
-    when('/edit-topic-subscription',{
-		templateUrl : 'editTopicSubscription.html',
-		controller : 'editTopicSubscriptionController',
-		activetab : 'publisher-subscriber'
-    }).
-    when('/user-notifications',{
-		templateUrl : 'listUserNotifications.html',
-		controller : 'listUserNotificationsController',
-		activetab : 'user-notifications'
-    }).
+    		activetab : 'user-administration',                
+                resolve: { access: ["Access", function (Access) { return Access.hasRole("USERADMIN"); }]}                                
+        }).                
+        when('/edit-user',{
+        	templateUrl : 'editUiUser.html',
+        	controller : 'editUiUsersController',
+        	activetab : 'user-administration',
+                resolve: { access: ["Access", function (Access) { return Access.hasRole("USERADMIN"); }]} 
+        }).
+            
+            
+            
+            
+            
+            
+        when('/scheduled-tasks',{
+                    templateUrl : 'listScheduledTasks.html',
+                    controller : 'listScheduledTasksController',
+                    activetab : 'scheduled-tasks',
+                    resolve: { access: ["Access", function (Access) { return Access.hasRole("SYSSUPPORT"); }]}                   
+        }).
+        when('/publisher-subscriber',{
+                    templateUrl : 'listPublisherSubscriberDetails.html',
+                    controller : 'listPublisherSubscriberDetailsController',
+                    activetab : 'publisher-subscriber',
+                    resolve: { access: ["Access", function (Access) { return Access.hasRole("SYSSUPPORT"); }]}    
+        }).
+        when('/edit-topic-subscription',{
+                    templateUrl : 'editTopicSubscription.html',
+                    controller : 'editTopicSubscriptionController',
+                    activetab : 'publisher-subscriber',
+                    resolve: { access: ["Access", function (Access) { return Access.hasRole("SYSSUPPORT"); }]}    
+        }).
+                
+                
+                
+                
+                
+        when('/user-notifications',{
+                    templateUrl : 'listUserNotifications.html',
+                    controller : 'listUserNotificationsController',
+                    activetab : 'user-notifications',
+                    resolve: { access: ["Access", function (Access) { return Access.hasRole("USRSUPPORT"); }]}    
+        }).
+           
+           
+           
+                        
+        when('/forbidden',{
+                    templateUrl : 'forbidden.html',
+                    controller : 'forbiddenController'
+        }).          
 	otherwise('/');
 
 	$httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 })
+
+.factory("Access", ["$q", "UserProfile", function ($q, UserProfile) {
+
+  var Access = {
+    OK: 200,
+    UNAUTHORIZED: 401,
+    FORBIDDEN: 403,
+
+    hasRole: function (role) {
+      return UserProfile.then(function (userProfile) {
+        if (userProfile.$hasRole(role)) {
+          return Access.OK;
+        } else if (userProfile.$isAnonymous()) {
+          return $q.reject(Access.UNAUTHORIZED);
+        } else {
+          return $q.reject(Access.FORBIDDEN);
+        }
+      });
+    },
+
+    hasAnyRole: function (roles) {
+      return UserProfile.then(function (userProfile) {
+        if (userProfile.$hasAnyRole(roles)) {
+          return Access.OK;
+        } else if (userProfile.$isAnonymous()) {
+          return $q.reject(Access.UNAUTHORIZED);
+        } else {
+          return $q.reject(Access.FORBIDDEN);
+        }
+      });
+    },
+
+    isAnonymous: function () {
+      return UserProfile.then(function (userProfile) {
+        if (userProfile.$isAnonymous()) {
+          return Access.OK;
+        } else {
+          return $q.reject(Access.FORBIDDEN);
+        }
+      });
+    },
+
+    isAuthenticated: function () {
+      return UserProfile.then(function (userProfile) {
+        if (userProfile.$isAuthenticated()) {
+          return Access.OK;
+        } else {
+          return $q.reject(Access.UNAUTHORIZED);
+        }
+      });
+    }
+
+  };
+  return Access;
+}])
+
+.factory("UserProfile", ["Auth", function (Auth) {
+
+  var userProfile = {};
+
+  var fetchUserProfile = function () {
+    return Auth.getProfile().then(function (response) {
+      for (var prop in userProfile) {
+        if (userProfile.hasOwnProperty(prop)) {
+          delete userProfile[prop];
+        }
+      }
+
+      return angular.extend(userProfile, response.data, {
+
+        $refresh: fetchUserProfile,
+
+        $hasRole: function (role) {            
+            //JSON.stringify(userProfile)
+            //alert(JSON.stringify(userProfile.uiRoles));
+            var arr = userProfile.uiRoles;
+            for(var i = 0; i < arr.length; i++){
+                if(arr[i].roleCode.indexOf(role) >= 0 || arr[i].roleCode.indexOf("SUPERADMIN") >= 0 ){
+                    return true;
+                }
+            }            
+            return false;
+        },
+        $hasAnyRole: function (roles) {
+          return !!userProfile.roles.filter(function (role) {
+            return roles.indexOf(role) >= 0;
+          }).length;
+        },
+        $isAnonymous: function () {
+          return userProfile.anonymous;
+        },
+        $isAuthenticated: function () {
+          return !userProfile.anonymous;
+        }
+      });
+    });
+  };
+  return fetchUserProfile();
+}])
+.service("Auth", ["$http", function ($http) {
+  this.getProfile = function () {
+    return $http.get("user-role");
+  };
+}])
+.run(["$rootScope", "Access", "$location", function ($rootScope, Access, $location) {
+  $rootScope.$on("$routeChangeError", function (event, current, previous, rejection) { //rejection == Access.UNAUTHORIZED    
+    $location.path("/forbidden");
+  });  
+}])
 .service("message", function ErrorMessage ($rootScope)
 {
 
@@ -86,7 +245,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
   }
 
 
-
+ 
 })
 .service("notification",function Notification()
 {
@@ -103,25 +262,6 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
      return this.notificationData;
    }
 })
-
-/*
-.service("groupNotification",function Notification()
-{
-
-   this.notificationData = { publisherId: "notify-ui", topic: "Group", startDate: new Date(), lastUpdated: new Date()};
-
-   this.setNotification = function(notification)
-   {
-     this.notificationData = notification;
-   }
-
-   this.notification = function()
-   {
-     return this.notificationData;
-   }
-})
-*/
-
 .service("user",function User()
 {
   this.userData = { uun: ""};
@@ -833,4 +973,9 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
         });
 	};
 
-}]);
+}])
+.controller('forbiddenController', ['$scope', '$http','user', function($scope, $http, user) {
+
+}])
+;
+
