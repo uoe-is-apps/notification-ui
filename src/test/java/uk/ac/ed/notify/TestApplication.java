@@ -5,26 +5,19 @@
 package uk.ac.ed.notify;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.autoconfigure.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import uk.ac.ed.notify.repository.NotificationRepositoryImpl;
-
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
-import javax.xml.crypto.Data;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.ldap.core.ContextSource;

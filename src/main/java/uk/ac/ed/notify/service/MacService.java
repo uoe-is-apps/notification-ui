@@ -4,10 +4,6 @@
  */
 package uk.ac.ed.notify.service;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import org.apache.log4j.Logger;
-import org.springframework.stereotype.Service;
 
 //Ref: https://www.jira.is.ed.ac.uk/browse/WEB007-6 
 public class MacService {}

@@ -9,10 +9,8 @@ import com.microsoft.aad.adal4j.AuthenticationContext;
 import com.microsoft.aad.adal4j.AuthenticationResult;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -21,19 +19,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ed.notify.entity.AuditActions;
-import uk.ac.ed.notify.entity.ErrorCodes;
 import uk.ac.ed.notify.entity.Notification;
-import uk.ac.ed.notify.entity.NotificationError;
 import uk.ac.ed.notify.repository.Office365Repository;
 import uk.ac.ed.notify.entity.Office365Subscription;
-import uk.ac.ed.notify.entity.PublisherDetails;
-import uk.ac.ed.notify.entity.UserNotificationAudit;
-import uk.ac.ed.notify.repository.NotificationErrorRepository;
-import uk.ac.ed.notify.repository.NotificationRepository;
-import uk.ac.ed.notify.repository.PublisherDetailsRepository;
-import uk.ac.ed.notify.repository.UserNotificationAuditRepository;
 
 /**
  *

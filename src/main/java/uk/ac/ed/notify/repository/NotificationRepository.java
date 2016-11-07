@@ -1,6 +1,5 @@
 package uk.ac.ed.notify.repository;
 
-import java.util.Calendar;
 import java.util.Date;
 import org.springframework.data.repository.CrudRepository;
 import uk.ac.ed.notify.entity.Notification;

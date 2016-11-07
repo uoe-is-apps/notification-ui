@@ -8,9 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -25,7 +23,6 @@ import uk.ac.ed.notify.learn.entity.Tasks;
 import uk.ac.ed.notify.learn.repository.LearnAnnouncementRepository;
 import uk.ac.ed.notify.learn.repository.LearnCourseUserRepository;
 import uk.ac.ed.notify.learn.repository.LearnTaskRepository;
-import uk.ac.ed.notify.repository.NotificationRepository;
 
 import java.util.Arrays;
 import java.util.Date;

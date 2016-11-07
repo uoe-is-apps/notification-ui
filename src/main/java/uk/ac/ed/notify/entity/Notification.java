@@ -1,7 +1,6 @@
 package uk.ac.ed.notify.entity;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.text.SimpleDateFormat;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.jsoup.Jsoup;
