@@ -17,7 +17,6 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 import uk.ac.ed.notify.job.LearnPullJob;
 import uk.ac.ed.notify.job.Office365PullJob;
-import uk.ac.ed.notify.job.Office365PushSubscriptionJob;
 import uk.ac.ed.notify.spring.AutowiringSpringBeanJobFactory;
 
 import javax.sql.DataSource;
@@ -104,11 +103,11 @@ public class SchedulerConfig {
         return createTrigger(jobDetail, frequency);
     }
 
-    @Bean
-    public JobDetailFactoryBean office365PushSubscriptionJobDetail() {
-        return createJobDetail(Office365PushSubscriptionJob.class);
-
-    }
+//    @Bean
+//    public JobDetailFactoryBean office365PushSubscriptionJobDetail() {
+//        return createJobDetail(Office365PushSubscriptionJob.class);
+//
+//    }
 
 //    @Bean(name = "office365PushSubscriptionJobTrigger")
 //    public SimpleTriggerFactoryBean office365PushSubscriptionJobTrigger(@Qualifier("office365PushSubscriptionJobDetail") JobDetail jobDetail,
