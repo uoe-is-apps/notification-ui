@@ -328,13 +328,18 @@ public class LearnService {
                  * assemble notification
                  */
                 
+                //fix for WEB010-15 Learn Task start date is not set
+                if(taskNotification.getStartDate() == null){
+                    taskNotification.setStartDate(new Date()); 
+                }
+                
                 taskNotification = assembleNotification(Learn.PUBLISHER_ID, 
                 		publisherNotificationId, 
                 		topic, 
                 		title, 
                 		body,
                 		notificationUrl, 
-                		null, 
+                		taskNotification.getStartDate(), 
                 		endDate, 
                 		uunList, 
                 		taskNotification);
