@@ -118,7 +118,7 @@
                  stripComments="true"/>
     </changeSet>
 
-    <changeSet id="insert_notification_ui_group_role" dbms="oracle" author="hsun1">
+    <changeSet id="alter_notification_error_table" dbms="oracle" author="hsun1">
         <sqlFile encoding="utf8"
                  path="db/changelog/sql/alter_notification_error_table.sql"
                  splitStatements="true"
