@@ -6,6 +6,7 @@ package uk.ac.ed.notify.entity;
 public interface ErrorCodes {
 
     String SAVE_ERROR = "SAVE_ERROR";
+    String UPDATE_ERROR = "UPDATE_ERROR";
     String DELETE_ERROR = "DELETE_ERROR";
     String GET_ERROR = "GET_ERROR";
 }

@@ -4,6 +4,8 @@
  */
 package uk.ac.ed.notify.service;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -176,7 +178,7 @@ public class LearnService {
         }
         return notifications;
     }    
-    
+    int index = 0;
     public void pullLearnNotifications() {
         logger.info("pullLearnNotifications job started");
        
@@ -223,7 +225,7 @@ public class LearnService {
         handleNotificationByBatch(AuditActions.CREATE_NOTIFICATION, actionsCache.get(AuditActions.CREATE_NOTIFICATION));
         handleNotificationByBatch(AuditActions.UPDATE_NOTIFICATION, actionsCache.get(AuditActions.UPDATE_NOTIFICATION));
 
-        logger.info("5.----------delete notification----------");                 
+        logger.info("5.----------delete notification----------" + index++);                 
         logger.info("before delete, total number of current notifications in NB - " + existingLearnNotificationsList.size());
         logger.info("before delete, total number of source items(sys, course announce, task, assessment) in Learn - " + processedLearnNotificationsList.size());
         
@@ -493,8 +495,13 @@ public class LearnService {
             	if (notifications != null && !notifications.isEmpty()) {
             		
             		if(action.equals(AuditActions.CREATE_NOTIFICATION) || action.equals(AuditActions.UPDATE_NOTIFICATION)){                      
-                        notificationRepository.bulkSave(notifications);
-                        
+ 
+                        try{
+                            notificationRepository.bulkSave(notifications);
+                        }catch(Exception e){
+                            logger.error("Hibernate error occurred during processing learn data in this run, data will be fixed in the next learn job run");
+                        }
+                            
                     }else if(action.equals(AuditActions.DELETE_NOTIFICATION)){                      
                         notificationRepository.delete(notifications);
                     } 
@@ -504,8 +511,7 @@ public class LearnService {
                      logErrorNotification(ErrorCodes.SAVE_ERROR ,e); 
                      
                  }else if(action.equals(AuditActions.UPDATE_NOTIFICATION)){
-                     logErrorNotification(ErrorCodes.SAVE_ERROR ,e); 
-                     
+                     logErrorNotification(ErrorCodes.UPDATE_ERROR ,e);                      
                  }else if(action.equals(AuditActions.DELETE_NOTIFICATION)){
                      logErrorNotification(ErrorCodes.DELETE_ERROR ,e); 
                  }
@@ -518,10 +524,14 @@ public class LearnService {
      * @param e
      */
     private void logErrorNotification(String errorCode, Exception e){
-            
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String stacktrace = e.toString();  
+        
             NotificationError notificationError = new NotificationError();
             notificationError.setErrorCode(errorCode);
-            notificationError.setErrorDescription(e.getMessage());
+            notificationError.setErrorDescription(e.toString() + e.getMessage());
             notificationError.setErrorDate(new Date());
             notificationErrorRepository.save(notificationError);        
     }
