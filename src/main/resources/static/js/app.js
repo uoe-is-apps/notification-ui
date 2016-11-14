@@ -415,13 +415,15 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
     });
 
     $("#notificationGroupTree").bind('select_node.jstree', function(e) {        
-         jQuery('#notificationGroupName').val($('.jstree-clicked').text());    
-         jQuery('#notificationGroupName').trigger('input');  
-         angular.element($('#notificationGroupName')).triggerHandler('input');
-        
-         jQuery('#notificationGroup').val($("#notificationGroupTree").jstree("get_selected"));    
-         jQuery('#notificationGroup').trigger('input');  
-         angular.element($('#notificationGroup')).triggerHandler('input');
+        var $scopeNotificationGroupName = angular.element($('#notificationGroupName')).scope();
+        $scopeNotificationGroupName.$apply(function () {
+             $scopeNotificationGroupName.notification.notificationGroupName = $('.jstree-clicked').text();
+        });    
+          
+        var $scopeNotificationGroup = angular.element($('#notificationGroup')).scope();
+        $scopeNotificationGroup.$apply(function () {
+             $scopeNotificationGroup.notification.notificationGroup = $("#notificationGroupTree").jstree("get_selected")[0];
+        });  
     });
 
     $scope.route = $route;
@@ -623,14 +625,16 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 	}
     });
 
-    $("#notificationGroupTree").bind('select_node.jstree', function(e) {        
-         jQuery('#notificationGroupName').val($('.jstree-clicked').text());    
-         jQuery('#notificationGroupName').trigger('input');  
-         angular.element($('#notificationGroupName')).triggerHandler('input');
-        
-         jQuery('#notificationGroup').val($("#notificationGroupTree").jstree("get_selected"));    
-         jQuery('#notificationGroup').trigger('input');  
-         angular.element($('#notificationGroup')).triggerHandler('input');
+    $("#notificationGroupTree").bind('select_node.jstree', function(e) {   
+        var $scopeNotificationGroupName = angular.element($('#notificationGroupName')).scope();
+        $scopeNotificationGroupName.$apply(function () {
+             $scopeNotificationGroupName.notification.notificationGroupName = $('.jstree-clicked').text();
+        });    
+          
+        var $scopeNotificationGroup = angular.element($('#notificationGroup')).scope();
+        $scopeNotificationGroup.$apply(function () {
+             $scopeNotificationGroup.notification.notificationGroup = $("#notificationGroupTree").jstree("get_selected")[0];
+        });            
     });
 
     $scope.route = $route;
@@ -711,6 +715,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
     {
        if (notification.notificationId == null)
        {
+          //alert(JSON.stringify(notification));
           $http.post("checkIfLdapGroupContainMember/",notification).then(function successCallback(response) {
               if(response.data.member == 'yes'){
                  $http.post("notification/",notification).then(function successCallback(response) {
