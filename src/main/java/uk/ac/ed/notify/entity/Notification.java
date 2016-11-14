@@ -24,9 +24,9 @@ import org.apache.commons.validator.UrlValidator;
 @NamedQueries({    
         @NamedQuery(name = "Notification.findDeletableNotification", query = "SELECT a FROM Notification a WHERE a.endDate < (?1) "),        
         @NamedQuery(name = "Notification.findByPublisherIdAndTopic", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and a.topic = (?2)"),
-        @NamedQuery(name = "Notification.findByPublisherId", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1)"),
+        @NamedQuery(name = "Notification.findByPublisherId", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and (a.endDate is null or CURRENT_TIMESTAMP < a.endDate) "),
         @NamedQuery(name = "Notification.findByPublisherIdAndPublisherNotificationId", query = "SELECT a FROM Notification a WHERE a.publisherId = (?1) and a.publisherNotificationId  = (?2)")
-})
+}) 
 public class Notification {
 
 

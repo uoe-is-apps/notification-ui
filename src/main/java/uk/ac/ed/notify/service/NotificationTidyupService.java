@@ -40,6 +40,12 @@ public class NotificationTidyupService {
     public void tidyupNotification(){
         List<Notification> list = findDeletableNotification();   
         logger.info("tidyupNotification, found [" + list.size() + "] notifications which end date is earlier than (sysdate - " + purge + ") date, these will be purged");        
+         
+        //debug print
+        for(int i = 0; i < list.size(); i++){
+            logger.info(i + " topic:" + list.get(i).getTopic() + " end date:" + list.get(i).getEndDate() + " title" + list.get(i).getTitle() + " will be deleted");
+        }        
+        
         notificationRepository.delete(list);
     }
  

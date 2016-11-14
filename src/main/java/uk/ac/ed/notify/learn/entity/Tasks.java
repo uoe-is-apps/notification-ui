@@ -39,6 +39,11 @@ import javax.persistence.TemporalType;
      "AND ((m.availableInd = 'Y' and m.endDate is null) or (m.availableInd = 'Y' and sysdate <= m.endDate))  " +  //CourseMain 
 
         
+        
+     "AND (   (v.dueDate is null) or (sysdate <= v.dueDate)   )  " +  //Tasks         
+        
+        
+        
      "order by m.dtcreated desc "
      ),    
 

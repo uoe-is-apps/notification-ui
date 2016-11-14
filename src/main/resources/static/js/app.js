@@ -264,7 +264,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 })
 .service("user",function User()
 {
-  this.userData = { uun: ""};
+  this.userData = { uun: "", notificationStatus: "active"};
 
   this.setUser = function(user)
   {
@@ -964,13 +964,32 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 .controller('listUserNotificationsController', ['$scope', '$http','user', function($scope, $http, user) {
 	
 	$scope.notificationUser = user.user();
-	
-	$scope.getUserNotifications = function(uun) {
-		
-		$http.get('/notifications/user/' + uun)
-	     .success(function(data) {
-	    	 $scope.userNotificationList = data;
-        });
+	        
+	$scope.getUserNotifications = function(uun, notificationStatus) {
+            $http.get('/notifications/user/' + uun).success(function(data) {                  
+                    var now = (new Date()).toISOString(); 
+                    
+                    if(notificationStatus === 'active'){                           
+                        var activeList = [];
+                        for(var i = 0; i < data.length; i++){
+                           var endDate = data[i].endDate;                
+                           if(endDate === undefined || now < endDate){
+                               activeList.push(data[i]);
+                           }                           
+                        }                     
+                        $scope.userNotificationList = activeList;
+                    }else if(notificationStatus === 'expired'){ 
+                        var expiredList = [];
+                        for(var i = 0; i < data.length; i++){
+                           var endDate = data[i].endDate;     
+                           if(endDate < now){
+                               expiredList.push(data[i]);
+                           }                           
+                        }
+                        $scope.userNotificationList = expiredList;
+                    }
+                    
+            });
 	};
 
 }])

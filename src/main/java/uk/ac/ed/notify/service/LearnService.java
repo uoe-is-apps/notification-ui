@@ -179,7 +179,13 @@ public class LearnService {
         return notifications;
     }    
     int index = 0;
-    public void pullLearnNotifications() {
+    public void pullLearnNotifications(boolean triggerFromJob) {
+        if(triggerFromJob){ 
+            ifCanPullAgain = true;
+        }else{
+            ifCanPullAgain = false;
+        }
+        
         logger.info("pullLearnNotifications job started");
        
         List<Users> activeLearnUsers = learnUserRepository.findAllActiveUsers();
@@ -225,7 +231,7 @@ public class LearnService {
         handleNotificationByBatch(AuditActions.CREATE_NOTIFICATION, actionsCache.get(AuditActions.CREATE_NOTIFICATION));
         handleNotificationByBatch(AuditActions.UPDATE_NOTIFICATION, actionsCache.get(AuditActions.UPDATE_NOTIFICATION));
 
-        logger.info("5.----------delete notification----------" + index++);                 
+        logger.info("STEP 4. ----------delete notification----------");                 
         logger.info("before delete, total number of current notifications in NB - " + existingLearnNotificationsList.size());
         logger.info("before delete, total number of source items(sys, course announce, task, assessment) in Learn - " + processedLearnNotificationsList.size());
         
@@ -243,7 +249,8 @@ public class LearnService {
 
         handleNotificationByBatch(AuditActions.DELETE_NOTIFICATION, allCurrentNotificationsToBeDeleted);
 
-        logger.info("pullLearnNotifications completed");
+        logger.info("pullLearnNotifications completed - no. of run since server started - [" + index++ + "]");
+                
     }
     
     /**
@@ -490,6 +497,7 @@ public class LearnService {
            } 
     }
     
+    boolean ifCanPullAgain = false;
     public void handleNotificationByBatch(String action, List<Notification> notifications) {
             try{
             	if (notifications != null && !notifications.isEmpty()) {
@@ -499,17 +507,25 @@ public class LearnService {
                         try{
                             notificationRepository.bulkSave(notifications);
                         }catch(Exception e){
-                            logger.error("Hibernate error occurred during processing learn data in this run, data will be fixed in the next learn job run");
+                            if(ifCanPullAgain){
+                                logger.error("Hibernate exception (at org.hibernate.engine.spi.CollectionEntry.toString) occurred during processing learn data in this run, pull from learn again");                            
+                                pullLearnNotifications(false);                                
+                            }
                         }
                             
                     }else if(action.equals(AuditActions.DELETE_NOTIFICATION)){                      
-                        notificationRepository.delete(notifications);
+                        //notificationRepository.delete(notifications);
+                        
+                        for(int i = 0; i < notifications.size(); i++){
+                            notifications.get(i).setEndDate(new Date());
+                        }
+                        
+                        
                     } 
             	}
             }catch(Exception e){
                  if(action.equals(AuditActions.CREATE_NOTIFICATION)){
-                     logErrorNotification(ErrorCodes.SAVE_ERROR ,e); 
-                     
+                     logErrorNotification(ErrorCodes.SAVE_ERROR ,e);                      
                  }else if(action.equals(AuditActions.UPDATE_NOTIFICATION)){
                      logErrorNotification(ErrorCodes.UPDATE_ERROR ,e);                      
                  }else if(action.equals(AuditActions.DELETE_NOTIFICATION)){

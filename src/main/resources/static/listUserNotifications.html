@@ -11,14 +11,41 @@
 	              <input type="text" name="uun" ng-model="notificationUser.uun" required/>   
 	              
 	              <div ng-show="uunSearchForm.$submitted || uunSearchForm.uun.$touched">
-					      <p class="alert-danger" ng-show="uunSearchForm.uun.$error.required">Uun is required.</p> 
-				  </div>
+                        <p class="alert-danger" ng-show="uunSearchForm.uun.$error.required">Uun is required.</p> 
+                      </div>
 	            </div> 
-	            
-	            <div class="col-sm-10">
-	              <input type="submit" ng-disabled="uunSearchForm.$invalid" ng-click="getUserNotifications(notificationUser.uun)" class="btn btn-primary" value="Search" />     
-	    	    </div>
 	    	</div>
+            
+	    	<div class="form-group">
+	    	    <label for="uun" class="col-sm-2 control-label">Notification Status</label>
+	    	    
+	    	    <div class="col-sm-10">
+                            <div class="radio">
+                                <label>
+                                    <input id="activeRadio" type="radio" ng-model="notificationUser.notificationStatus" value="active" required />
+                                    Active
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input id="expiredRadio" type="radio" ng-model="notificationUser.notificationStatus" value="expired" required />
+                                    Expired
+                                </label>
+                            </div>                        
+	            </div> 
+                    
+
+	    	</div>        
+            
+            
+                <div class="form-group">
+                    <label for="uun" class="col-sm-2 control-label"></label>
+                    <div class="col-sm-10">
+                          <input type="submit" ng-disabled="uunSearchForm.$invalid" ng-click="getUserNotifications(notificationUser.uun, notificationUser.notificationStatus)" class="btn btn-primary" value="Search" />     
+                    </div>
+                </div>   
+            
+            
     	</form>
     </div>
     
