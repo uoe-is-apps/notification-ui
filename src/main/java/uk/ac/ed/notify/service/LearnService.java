@@ -510,6 +510,8 @@ public class LearnService {
                             if(ifCanPullAgain){
                                 logger.error("Hibernate exception (at org.hibernate.engine.spi.CollectionEntry.toString) occurred during processing learn data in this run, pull from learn again");                            
                                 pullLearnNotifications(false);                                
+                            }else{
+                                throw e;
                             }
                         }
                             
