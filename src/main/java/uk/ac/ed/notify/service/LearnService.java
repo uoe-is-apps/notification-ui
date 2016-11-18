@@ -180,14 +180,9 @@ public class LearnService {
     }    
     int index = 0;
     public void pullLearnNotifications(boolean triggerFromJob) {
-        if(triggerFromJob){ 
-            ifCanPullAgain = true;
-        }else{
-            ifCanPullAgain = false;
-        }
-        
         logger.info("pullLearnNotifications job started");
        
+        logger.info("(A). Start querying learn ...");
         List<Users> activeLearnUsers = learnUserRepository.findAllActiveUsers();
         logger.info("Total number of active users in learn - " + activeLearnUsers.size());
         
@@ -196,6 +191,7 @@ public class LearnService {
             userIdNamePair.put(activeLearnUsers.get(i).getPk1(), activeLearnUsers.get(i).getUserId());
         }
         
+        logger.info("(B). Start querying notification backbone ...");
         List<Notification> existingLearnNotificationsList = notificationRepository.findByPublisherId(Learn.PUBLISHER_ID);
         logger.info("Total number of Learn notifications in Notification Backbone - " + existingLearnNotificationsList.size());
                
@@ -206,6 +202,7 @@ public class LearnService {
         actionsCache.put(AuditActions.CREATE_NOTIFICATION, new ArrayList<Notification>());
         actionsCache.put(AuditActions.UPDATE_NOTIFICATION, new ArrayList<Notification>());
         
+        logger.info("(C). Start processing task, system announcements, course announcements ...");
         /*
          * Learn tasks
          */
@@ -497,32 +494,32 @@ public class LearnService {
            } 
     }
     
-    boolean ifCanPullAgain = false;
     public void handleNotificationByBatch(String action, List<Notification> notifications) {
             try{
             	if (notifications != null && !notifications.isEmpty()) {
             		
             		if(action.equals(AuditActions.CREATE_NOTIFICATION) || action.equals(AuditActions.UPDATE_NOTIFICATION)){                      
- 
-                        try{
-                            notificationRepository.bulkSave(notifications);
-                        }catch(Exception e){
-                            if(ifCanPullAgain){
-                                logger.error("Hibernate exception (at org.hibernate.engine.spi.CollectionEntry.toString) occurred during processing learn data in this run, pull from learn again");                            
-                                pullLearnNotifications(false);                                
-                            }else{
-                                throw e;
-                            }
-                        }
+                            logger.info("notifications is not empty - total notificatinos - " + notifications.size());
                             
+                            List<Notification> notificationsToAction = new ArrayList<Notification>();
+                            for(int i = 0; i < notifications.size(); i++){
+                                Notification notification = notifications.get(i);
+                                if( notification.getBody() == null || notification.getBody().equals("") ){
+                                    notification.setBody(notification.getTitle());
+                                }
+                                notificationsToAction.add(notification);
+                            }
+                            
+                            logger.info("start inserting or updating, this may take a while");
+                            notificationRepository.bulkSave(notificationsToAction);
+                            logger.info("finished... ");
+
                     }else if(action.equals(AuditActions.DELETE_NOTIFICATION)){                      
                         //notificationRepository.delete(notifications);
                         
                         for(int i = 0; i < notifications.size(); i++){
                             notifications.get(i).setEndDate(new Date());
                         }
-                        
-                        
                     } 
             	}
             }catch(Exception e){
