@@ -264,7 +264,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 })
 .service("user",function User()
 {
-  this.userData = { uun: "", notificationStatus: "active"};
+  this.userData = { uun: "", orgUnitDN: "", notificationStatus: "active"};
 
   this.setUser = function(user)
   {
