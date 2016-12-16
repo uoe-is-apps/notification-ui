@@ -163,10 +163,10 @@ public class LearnService {
     }
     
     /**
+     * @param existingLearnNotifications List of all Learn notifications in Notification Backbone (where publisher id is learn)
+     * @param topic
      * @return a list of Learn Notifications with given topic
-     * @param List of all Learn notifications in Notification Backbone (where publisher id is learn)
-     * @param String topic
-     */
+     **/
     private List<Notification> getLearnNotificationsByTopic(List<Notification> existingLearnNotifications, String topic){
         List<Notification> notifications = new ArrayList<Notification>();
 
@@ -516,10 +516,12 @@ public class LearnService {
 
                     }else if(action.equals(AuditActions.DELETE_NOTIFICATION)){                      
                         //notificationRepository.delete(notifications);
-                        
+                        logger.info("deleting notifications (setting end dates");
                         for(int i = 0; i < notifications.size(); i++){
                             notifications.get(i).setEndDate(new Date());
                         }
+                        notificationRepository.bulkSave(notifications);
+                        logger.info("bulk save complete");
                     } 
             	}
             }catch(Exception e){
