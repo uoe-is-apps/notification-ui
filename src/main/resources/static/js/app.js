@@ -1,4 +1,4 @@
-angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'checklist-model']).config(function($routeProvider, $httpProvider) {
+angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'checklist-model', 'ngSanitize']).config(function($routeProvider, $httpProvider) {
 
         /*
         Role Definition from WEB010 SDS:
@@ -340,11 +340,24 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 
           });
     $scope.route = $route;
-	$http.get('notifications/publisher/notify-ui').success(function(data) {            
+	$http.get('notifications/publisher/notify-ui').success(function(data) { 
+                var now = (new Date()).toISOString(); 
+            
                 var emergencyList = [];
                 for(var i = 0; i < data.length; i++){
                  var topic = data[i].topic;                
-                 if(topic === 'Emergency'){
+                 if(topic === 'Emergency'){      
+                     var startDate = data[i].startDate;    
+                     var endDate = data[i].endDate;     
+                     
+                     if(endDate < now){
+                         data[i].status = '<span class="glyphicon glyphicon-remove"></span>'; 
+                     }else if(now < startDate){
+                         data[i].status = '<span class="glyphicon glyphicon-time"></span>'; 
+                     }else{
+                         data[i].status = '<span class="glyphicon glyphicon-ok"></span>'; 
+                     }
+                     
                      emergencyList.push(data[i]);   
                  }
                 }
@@ -373,12 +386,26 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 
         $http.delete("notification/"+notification.notificationId,notification)
          .then(function successCallback(response){
-                            message.setSuccessMessage("Notification Deleted");
+                            var now = (new Date()).toISOString(); 
+                            
+                            message.setSuccessMessage("This notification has been ended");
                             setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
                             $http.get('notifications/publisher/notify-ui').success(function(data) {
                             var emergencyList = [];
                             for(var i = 0; i < data.length; i++){
-                             var topic = data[i].topic;                
+                            var topic = data[i].topic;    
+                             
+                            var startDate = data[i].startDate;    
+                            var endDate = data[i].endDate;     
+
+                            if(endDate < now){
+                                data[i].status = '<span class="glyphicon glyphicon-remove"></span>'; 
+                            }else if(now < startDate){
+                                data[i].status = '<span class="glyphicon glyphicon-time"></span>'; 
+                            }else{
+                                data[i].status = '<span class="glyphicon glyphicon-ok"></span>'; 
+                            }
+                             
                              if(topic === 'Emergency'){
                                  emergencyList.push(data[i]);   
                              }
@@ -512,7 +539,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
         console.log("Insert called");
         //TODO add validation on variables being set
         $http.post("notification/",notification).then(function successCallback(response) {
-                    message.setSuccessMessage("Notification Saved");
+                    message.setSuccessMessage("This notification has been saved");
                     setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
                     $location.path("/list-emergency-notification");
                 }, function errorCallback(response) {
@@ -524,7 +551,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
         $http.put("notification/"+notification.notificationId,notification)
                 .then(function successCallback(response)
                 {
-                    message.setSuccessMessage("Notification Saved");
+                    message.setSuccessMessage("This notification has been saved");
                     setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
                     $location.path("/list-emergency-notification");
                 },
@@ -553,9 +580,23 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
     });
     $scope.route = $route;
 	$http.get('notifications/publisher/notify-ui').success(function(data) {
+                var now = (new Date()).toISOString(); 
                 var groupList = [];
+                
                 for(var i = 0; i < data.length; i++){
-                 var topic = data[i].topic;                
+                 var topic = data[i].topic;   
+                 
+                 var startDate = data[i].startDate;    
+                 var endDate = data[i].endDate;     
+                     
+                 if(endDate < now){
+                         data[i].status = '<span class="glyphicon glyphicon-remove"></span>'; 
+                 }else if(now < startDate){
+                        data[i].status = '<span class="glyphicon glyphicon-time"></span>'; 
+                 }else{
+                         data[i].status = '<span class="glyphicon glyphicon-ok"></span>'; 
+                 }                
+                 
                  if(topic === 'Group'){
                      groupList.push(data[i]);   
                  }
@@ -585,12 +626,25 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
         $http.delete("notification/"+notification.notificationId,notification)
          .then(function successCallback(response)
                         {
-                            message.setSuccessMessage("Notification Deleted");
+                            var now = (new Date()).toISOString(); 
+                            message.setSuccessMessage("This notification has been ended");
                             setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
                             $http.get('notifications/publisher/notify-ui').success(function(data) {
                             var groupList = [];
                                 for(var i = 0; i < data.length; i++){
-                                 var topic = data[i].topic;                
+                                 var topic = data[i].topic;    
+                                 
+                                 var startDate = data[i].startDate;    
+                                 var endDate = data[i].endDate;     
+
+                                 if(endDate < now){
+                                    data[i].status = '<span class="glyphicon glyphicon-remove"></span>'; 
+                                 }else if(now < startDate){
+                                    data[i].status = '<span class="glyphicon glyphicon-time"></span>'; 
+                                 }else{
+                                    data[i].status = '<span class="glyphicon glyphicon-ok"></span>'; 
+                                 }                                 
+                                 
                                  if(topic === 'Group'){
                                      groupList.push(data[i]);   
                                  }
@@ -719,7 +773,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
           $http.post("checkIfLdapGroupContainMember/",notification).then(function successCallback(response) {
               if(response.data.member == 'yes'){
                  $http.post("notification/",notification).then(function successCallback(response) {
-                        message.setSuccessMessage("Notification Saved");
+                        message.setSuccessMessage("This notification has been saved");
                         setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
                         $location.path("/list-group-notification");
                    }, function errorCallback(response) {
@@ -740,7 +794,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
                     $http.put("notification/"+notification.notificationId,notification)
                   .then(function successCallback(response)
                   {
-                        message.setSuccessMessage("Notification Saved");
+                        message.setSuccessMessage("This notification has been saved");
                         setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
                         $location.path("/list-group-notification");
                   },
@@ -802,7 +856,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
             $http.delete("ui-user/"+user.uun,user)
              .then(function successCallback(response)
                             {
-                                message.setSuccessMessage("User Deleted");
+                                message.setSuccessMessage("This user has been deleted");
                                 setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
                                 $http.get('ui-users').success(function(data) {
                                 		$scope.userList = data;
@@ -840,7 +894,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
        $http.put("ui-user/"+user.uun,user)
                        .then(function successCallback(response)
                        {
-                           message.setSuccessMessage("User Saved");
+                           message.setSuccessMessage("This user has been saved");
                            setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
                            $location.path("/user-administration");
                        },
@@ -913,7 +967,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 		 $http.delete("topic-subscriptions/" + topicSubscription.subscriptionId)
 		      .then(function successCallback(response){
 		    	  
-		    	  message.setSuccessMessage("Topic subscription deleted.");
+		    	  message.setSuccessMessage("This topic subscription has been deleted");
 		    	  setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
 		          $http.get('/topic-subscriptions').success(function(data) {
 		  		       $scope.topicSubscriptionList = data;
@@ -951,7 +1005,7 @@ angular.module('notify-ui-app', [ 'ngRoute' , 'ngCkeditor' , 'ui.bootstrap', 'ch
 		$http.post("/topic-subscriptions", topicSubscription)
 			.then(function successCallback(response)
 	        {
-	            message.setSuccessMessage("Topic subscription saved");
+	            message.setSuccessMessage("This topic subscription has been saved");
                     setTimeout(function(){ message.setSuccessMessage(""); }, 2000);
 	            $location.path("/publisher-subscriber");
 	        },

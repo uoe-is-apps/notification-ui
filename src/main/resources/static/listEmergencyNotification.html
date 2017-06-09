@@ -31,7 +31,7 @@
 </div>
 
 <div class="panel panel-default uoe-overview-high">
-    <div class="panel-heading"><h3>Edit/Delete existing notifications</h3></div>
+    <div class="panel-heading"><h3>Edit/End existing notifications</h3></div>
     <div class="panel-body">
         <div ng-if="!notificationList" class="progress">
             <div class="progress-bar progress-bar-striped active" role="progressbar"
@@ -41,20 +41,22 @@
         </div>
         <div class="table-responsive">
             <table class="table" ng-if="notificationList" ng-cloak>
-                <thead>
+                <thead>                
                 <th>Notification Title</th>
                 <th>Start Date</th>
                 <th>End Date</th>
+                <th>Status</th>
                 <th></th>
                 <th></th>
                 </thead>
                 <tbody>
-                <tr ng-repeat="notification in notificationList">
+                <tr ng-repeat="notification in notificationList">                    
                     <td>{{notification.title}}</td>
                     <td>{{notification.startDate}}</td>
                     <td>{{notification.endDate}}</td>
-                    <td><button type="button" ng-click="editNotification(notification)" class="btn btn-warning">Edit</button></td>
-                    <td><button type="button" ng-click="deleteNotification(notification)" class="btn btn-danger">Delete</button></td>
+                    <td><p ng-bind-html="notification.status"></p></td>
+                    <td><button type="button" ng-click="editNotification(notification)" class="btn btn-warning">Edit Notification</button></td>
+                    <td><button type="button" ng-click="deleteNotification(notification)" class="btn btn-danger">End Notification</button></td>
                 </tr>
                 </tbody>
             </table>
