@@ -293,12 +293,12 @@
     </build>
 
     <repositories>
-        <repository>
-            <url>http://maven.is.ed.ac.uk:8080/nexus/content/repositories/public/</url>
-            <id>maven.is.ed.ac.uk</id>
-            <layout>default</layout>
-            <name>Maven 2 repository</name>
-        </repository>
+<repository>
+  <url>https://nexus.is.ed.ac.uk/repository/public/</url>
+  <id>nexus.is.ed.ac.uk</id>
+  <layout>default</layout>
+  <name>Maven 2 repository</name>        
+</repository>
     </repositories>
     <name>notification-ui</name>
 
