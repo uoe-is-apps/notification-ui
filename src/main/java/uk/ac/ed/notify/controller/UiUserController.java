@@ -62,6 +62,10 @@ public class UiUserController {
         return (List<UiRole>)uiRoleRepository.findAll();
     }
 
+
+    /*
+      User retrieval based on single sign on
+     */
     @RequestMapping(value="/user-role", method = RequestMethod.GET)
     public UiUser getUserRole(HttpServletRequest request)
     {

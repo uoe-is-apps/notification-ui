@@ -1,10 +1,37 @@
 <groups xmlns="http://www.isdc.ro/wro">
-    <group name="angular-jquery">
-        <css>file:${project.basedir}/src/main/wro/main.less</css>
-        <js>webjar:jquery/2.1.1/jquery.min.js</js>
-        <js>webjar:angularjs/1.3.8/angular.min.js</js>
-        <js>webjar:angularjs/1.3.8/angular-route.min.js</js>
-        <js>webjar:angular-ui-bootstrap/0.13.3/ui-bootstrap.min.js</js>
-        <js>webjar:angular-ui-bootstrap/0.13.3/ui-bootstrap-tpls.js</js>
+    <group name="ui-scripts">
+        <js>webjar:jquery/@jquery.version@/jquery.js</js>
+        <js>webjar:momentjs/@momentjs.version@/moment.js</js>
+        <js>webjar:bootstrap/@bootstrap.version@/js/bootstrap.js</js>
+        <js>webjar:bootstrap/@bootstrap.version@/js/transition.js</js>
+        <js>webjar:bootstrap/@bootstrap.version@/js/collapse.js</js>
+        <css>webjar:bootstrap/@bootstrap.version@/css/bootstrap.css</css> <!-- do not load when using EdGel -->
     </group>
+
+    <group name="angular-scripts">
+        <js>webjar:angularjs/@angularjs.version@/angular.js</js>
+        <js>webjar:angularjs/@angularjs.version@/angular-route.js</js>
+    </group>
+
+    <group name="angular-addons">
+        <!-- angular ui widgets -->
+        <js>/js/third-party/bootstrap-datetimepicker-4.17.47/bootstrap-datetimepicker.js</js>
+        <css>/js/third-party/bootstrap-datetimepicker-4.17.47/bootstrap-datetimepicker.css</css>
+        <js>/js/third-party/angular-eonasdan-datetimepicker.js</js>
+
+        <js>/js/third-party/ui-grid-4.0.7/ui-grid.js</js>
+        <css>/js/third-party/ui-grid-4.0.7/ui-grid.css</css>
+    </group>
+
+    <group name="ui-addons">
+        <!-- jQuery ui widgets -->
+        <js>/js/third-party/jstree-3.3.4/jstree.js</js>
+        <css>/js/third-party/jstree-3.3.4/jstree-style.css</css>
+
+    </group>
+
+    <group name="notify-ui">
+        <!-- all our custom angular scripts go here -->
+    </group>
+
 </groups>
