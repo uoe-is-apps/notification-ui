@@ -31,7 +31,15 @@
     </group>
 
     <group name="notify-ui">
-        <!-- all our custom angular scripts go here -->
+        <!-- notify-ui scripts
+        <js>/app/app.module.js</js>
+        <js>/app/app.config.js</js>
+        <js>/app/app.service.js</js>
+        <js>/app/app.component.js</js>
+        <js>/app/app.controller.js</js>
+
+         etc. preserve the correct order of scripts when loading
+        -->
     </group>
 
 </groups>
