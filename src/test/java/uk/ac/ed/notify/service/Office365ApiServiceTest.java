@@ -215,7 +215,7 @@ public class Office365ApiServiceTest {
         notification.setPublisherNotificationId("3");
         notification.setTitle("title");
         notification.setBody("body");                
-        notification.setNotificationUsers(Collections.emptyList());
+        //notification.setNotificationUsers(Collections.emptyList());
         
         notification.setPublisherKey("valid");
         notification.setAction("delete");
