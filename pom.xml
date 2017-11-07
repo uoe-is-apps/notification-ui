@@ -175,7 +175,7 @@
             <artifactId>momentjs</artifactId>
             <version>${momentjs.version}</version>
         </dependency>
-<!-- fail build on bamboo, disable this
+<!--
         <dependency>
             <groupId>org.webjars.bower</groupId>
             <artifactId>jasmine</artifactId>
@@ -294,6 +294,7 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <!--
             <plugin>
                 <groupId>com.github.searls</groupId>
                 <artifactId>jasmine-maven-plugin</artifactId>
@@ -359,6 +360,7 @@
                        </preloadSources>
                    </configuration>
              </plugin>
+             -->
         </plugins>
     </build>
 
