@@ -5,17 +5,23 @@ angular.module('useradmin')
             var self = this;
             self.loading = true; // progress bar
 
-            UserService.all().then(function(response) {
+            self.refresh = function() {
+                 self.loading  = true;
 
-                self.users = response.data;
-            })
-                .catch(function(response) {
-                    // log error
-                    console.error(response.status, response.data);
-                })
-                .finally(function() {
-                    self.loading = false;
-                });
+                 UserService.all().then(function(response) {
+                      self.users = response.data;
+                 })
+                 .catch(function(response) {
+                      // log error
+                      console.error(response.status, response.data);
+                 })
+                 .finally(function() {
+                      self.loading = false;
+                 });
+            };
+
+            self.refresh();
+
 
             // controller API
             self.editUser = function(user) {
@@ -30,12 +36,14 @@ angular.module('useradmin')
 
             self.deleteUser = function(user) {
                 UserService.delete(user).then(function(response) {
-                    messenger.setSuccess('User deleted');
+                        messenger.setMessage(messenger.types.SUCCESS, "User '" + user.uun + "' has been deleted.");                      
+                        self.refresh();
                 })
                     .catch(function(response) {
+
                         // log error
                         console.error(response.status, response.data);
-                    });
+                    });      
             };
         }]
     })
@@ -60,7 +68,7 @@ angular.module('useradmin')
             self.saveUser = function(user) {
 
                 UserService.save(user).then(function(response) {
-                    messenger.setSuccess('User saved');
+                    //messenger.setSuccess('User saved');
 
                     _user.reset();
                     $location.path('/user-administration');

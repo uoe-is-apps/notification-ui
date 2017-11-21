@@ -87,6 +87,22 @@ angular.module('notify-ui-app')
 
                 activetab: 'publisher-subscriber'
             })
+            .when('/edit-subscription', {
+                template: '<edit-subscription></edit-subscription>',
+                resolve: {access: ['Access', function(Access) {
+                    return Access.hasRole('SYSSUPPORT');
+                }]},
+
+                activetab: 'publisher-subscriber'
+            })        
+            .when('/edit-scheduledjobs', {
+                template: '<edit-scheduledjobs></edit-scheduledjobs>',
+                resolve: {access: ['Access', function(Access) {
+                    return Access.hasRole('SYSSUPPORT');
+                }]},
+
+                activetab: 'publisher-subscriber'
+            })                
             .when('/forbidden', {
                 template: '<forbidden></forbidden>',
                 activetab: 'home'

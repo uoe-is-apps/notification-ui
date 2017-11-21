@@ -1,0 +1,39 @@
+<div class="panel panel-default uoe-overview-high">
+    <div class="panel-heading"><h3>Edit Scheduled Job</h3></div>
+    <div class="panel-body">
+        <form name="form" novalidate class="form-horizontal">
+
+            <div class="form-group">  
+                    <label class="col-sm-2 control-label">Job Name:</label>
+                    <div class="col-sm-10">
+                        <input ng-disabled="true" size="50" type="text" ng-model="$ctrl.scheduledjob.jobName" placeholder="scheduledjob" 
+                               ng-required="true" ng-value="$ctrl.scheduledjob.jobName"/>
+                    </div>
+            </div>
+
+
+            <div class="form-group">  
+                    <label class="col-sm-2 control-label">Interval (in seconds):</label>   
+                    <div class="col-sm-10">
+                    <input type="text" ng-model="$ctrl.scheduledjob.newInterval" 
+                           placeholder="scheduledjob" ng-required="true" ng-value="$ctrl.scheduledjob.repeatInterval/1000"
+                           onkeypress="return /\d/.test(String.fromCharCode(((event||window.event).which||(event||window.event).which)));"
+                           />
+                    <button type="button" ng-click="$ctrl.rescheduleJob($ctrl.scheduledjob)" class="btn btn-primary">Reschedule</button>
+                    </div>
+            </div>      
+
+
+            <div class="form-group">     
+                <label class="col-sm-2 control-label"></label>    
+                <div class="col-sm-10">
+                <button type="button" ng-click="$ctrl.startJob($ctrl.scheduledjob)" class="btn btn-primary">Start</button>
+                <button type="button" ng-click="$ctrl.stopJob($ctrl.scheduledjob)" class="btn btn-primary">Stop</button>            
+                <button type="button" ng-click="$ctrl.cancel()" class="btn btn-default">Cancel</button>
+                </div>
+            </div>    
+        
+        </form>
+    </div>
+</div>
+

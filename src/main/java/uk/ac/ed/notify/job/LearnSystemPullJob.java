@@ -15,17 +15,17 @@ import uk.ac.ed.notify.service.LearnService;
  * Created by rgood on 05/10/15.
  */
 @DisallowConcurrentExecution
-public class LearnPullJob implements Job {
-    private static final Logger logger = LoggerFactory.getLogger(LearnPullJob.class);
-     
+public class LearnSystemPullJob implements Job {
+    private static final Logger logger = LoggerFactory.getLogger(LearnSystemPullJob.class);
+      
     @Autowired
     LearnService learnService;
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         //if(true) return;
-        logger.info("LearnPullJob started");
+        logger.info("LearnSystemPullJob started");
         learnService.pullLearnNotifications(true);
-        logger.info ("LearnPullJob finished successfully");
+        logger.info ("LearnSystemPullJob finished successfully");
     }
 }
