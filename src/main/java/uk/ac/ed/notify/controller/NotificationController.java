@@ -17,6 +17,7 @@ import javax.servlet.ServletException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ed.notify.entity.Notification;
@@ -66,9 +67,11 @@ public class NotificationController {
     }
 
     @RequestMapping(value = "/notification/{notification-id}", method = RequestMethod.GET)
-    public JsonNotification getNotification(@PathVariable("notification-id") String notificationId) throws ServletException {
+    public JsonNotification getNotification(HttpServletRequest httpRequest, @PathVariable("notification-id") String notificationId) throws ServletException {
+        logger.info("getNotification called by [" + httpRequest.getRemoteUser() + "]");        
+        logger.info("notificationId - " + notificationId);        
         ResponseEntity<JsonNotification> response = restTemplate.getForEntity(notificationMsUrl + "/notification/" + notificationId, JsonNotification.class);
-
+        logger.info("response - " + response);
         return response.getBody();
     }
 
@@ -76,46 +79,59 @@ public class NotificationController {
     LdapService ldapService;        
 
     @RequestMapping(value = "/notifications/publisher/{publisher-id}", method = RequestMethod.GET)
-    public JsonNotification[] getPublisherNotifications(@PathVariable("publisher-id") String publisherId) throws ServletException {
-
+    public JsonNotification[] getPublisherNotifications(HttpServletRequest httpRequest, @PathVariable("publisher-id") String publisherId) throws ServletException {
+        logger.info("getPublisherNotifications called by [" + httpRequest.getRemoteUser() + "]");
+        logger.info("publisherId - " + publisherId);        
         ResponseEntity<JsonNotification[]> response = restTemplate.getForEntity(notificationMsUrl + "/notifications/publisher/" + publisherId, JsonNotification[].class);
+        logger.info("response - " + response);
         return response.getBody();
     }
 
 
     @RequestMapping(value="/notification/", method=RequestMethod.POST)
-    public JsonNotification setNotification(@RequestBody JsonNotification notification) throws ServletException, JsonProcessingException {              
+    public JsonNotification setNotification(HttpServletRequest httpRequest, @RequestBody JsonNotification notification) throws ServletException, JsonProcessingException {              
+        logger.info("setNotification called by [" + httpRequest.getRemoteUser() + "]");
+        logger.info("notification - " + notification);        
         notification = constructNotificationWithLdapGroup(notification);        
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity request= new HttpEntity(notification, headers);
         ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/", HttpMethod.POST, request, JsonNotification.class);
+        logger.info("response - " + response);
         return response.getBody();
 
     }
 
     @RequestMapping(value="/notification/{notification-id}",method=RequestMethod.PUT)
-    public void updateNotification(@PathVariable("notification-id") String notificationId, @RequestBody JsonNotification notification) throws ServletException {       
+    public void updateNotification(HttpServletRequest httpRequest, @PathVariable("notification-id") String notificationId, @RequestBody JsonNotification notification) throws ServletException {       
+        logger.info("updateNotification called by [" + httpRequest.getRemoteUser() + "]");
+        logger.info("notificationId - " + notificationId);      
+        logger.info("notification - " + notification);      
         notification = constructNotificationWithLdapGroup(notification);        
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity request= new HttpEntity(notification, headers);
         ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/"+notificationId, HttpMethod.PUT, request, JsonNotification.class);
+        logger.info("response - " + response);
     }
 
     @RequestMapping(value="/notification/{notification-id}",method=RequestMethod.DELETE)
-    public void deleteNotification(@PathVariable("notification-id") String notificationId) throws ServletException {
-
+    public void deleteNotification(HttpServletRequest httpRequest, @PathVariable("notification-id") String notificationId) throws ServletException {
+        logger.info("deleteNotification called by [" + httpRequest.getRemoteUser() + "]");
+        logger.info("notificationId - " + notificationId);      
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity request= new HttpEntity("", headers);
         ResponseEntity<String> response = restTemplate.exchange(notificationMsUrl + "/notification/"+notificationId, HttpMethod.DELETE, request, String.class);
+        logger.info("response - " + response);
     }
     
     @RequestMapping(value="/notifications/user/{uun}", method= RequestMethod.GET)
-    public JsonNotification[] getUserNotifications(@PathVariable("uun") String uun) {
-    	
+    public JsonNotification[] getUserNotifications(HttpServletRequest httpRequest, @PathVariable("uun") String uun) {
+        logger.info("getUserNotifications called by [" + httpRequest.getRemoteUser() + "]");
+        logger.info("notificationId - " + uun);      
     	ResponseEntity<JsonNotification[]> response = restTemplate.getForEntity(notificationMsUrl + "/notifications/user/" + uun, JsonNotification[].class);
+        logger.info("response - " + response);
         return response.getBody();
     }
 
