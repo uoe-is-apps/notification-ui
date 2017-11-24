@@ -37,6 +37,7 @@ public class Office365PullJob implements Job {
             if(token.length() > 0) office365Service.processUnreadEmail(token);
             
         }else if(source.equals("exchange")){
+            logger.info("fetching email from exchange: " + source);
             ewsService.processUnreadEmail();
         }
         
