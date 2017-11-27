@@ -7,7 +7,9 @@ package uk.ac.ed.notify.service;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,6 +146,13 @@ public class LearnService {
         notification.setUrl(url);
         
         notification.setStartDate(startDate);
+        //DTI020-21 if no end date is set, set it as 7 days after start date
+        if(endDate == null){
+            GregorianCalendar cal = new GregorianCalendar();
+            cal.setTime(endDate);
+            cal.add(Calendar.DATE, 7);
+            endDate = cal.getTime();
+        }
         notification.setEndDate(endDate);
         
         List<NotificationUser> notificationUsers = notification.getNotificationUsers();
