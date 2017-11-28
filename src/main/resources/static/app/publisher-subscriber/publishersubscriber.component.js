@@ -119,8 +119,8 @@ angular.module('publishersubscriber')
     
   .component('editSubscription', {
         templateUrl: 'app/publisher-subscriber/edit-subscription.tpl.html',
-        controller: ['user', 'subscription', 'UserService', 'RolesService', 'SubscriberService', 'SubscriptionService', '$location','messenger', '$scope',
-                      function(_user, _subscription, UserService, RolesService, SubscriberService, SubscriptionService, $location, messenger, $scope) {
+        controller: ['user', 'subscription', 'UserService', 'RolesService', 'SubscriberService', 'SubscriptionService', 'TopicService', '$location','messenger', '$scope',
+                      function(_user, _subscription, UserService, RolesService, SubscriberService, SubscriptionService, TopicService, $location, messenger, $scope) {
 
             var self = this;
             self.user = _user.getUser();
@@ -147,11 +147,20 @@ angular.module('publishersubscriber')
                     console.error(response.status, response.data);
                 });
 
+
+                TopicService.all().then(function(response) {
+                    self.topics = response.data;
+                    self.loading = false;
+                }).catch(function(response) {
+                    console.error(response.status, response.data);
+                });
+
             };
             
             
 
             self.saveSubscription = function(subscription) {
+                
                 subscription.status = 'A';
                 subscription.lastUpdated = (new Date()).toJSON();
 

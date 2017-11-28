@@ -4,16 +4,7 @@
         
         <form name="form" novalidate class="form-horizontal">
                 
-            <div class="form-group">
-                <label class="col-sm-2 control-label">Subscribers:</label>
-                <div class="col-sm-10">
-                <select ng-model="$ctrl.subscription.subscriberId" required>
-                        <option ng-repeat="subscriber in $ctrl.subscribers" value="{{subscriber.subscriberId}}">{{subscriber.description}}</option>
-                </select>
-                </div>
-            </div>
-                
-          
+            <!-- read topics from db, free text topic is not allowed anymore, disable
             <div class="form-group">
                 <label class="col-sm-2 control-label">Topic:</label>
                 <div class="col-sm-10">
@@ -23,6 +14,27 @@
                 </p>
                 </div>
             </div>
+            --> 
+            
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Topics:</label>
+                <div class="col-sm-10">
+                <select ng-model="$ctrl.subscription.topic" required>
+                        <option ng-repeat="topic in $ctrl.topics" value="{{topic.topicId}}">{{topic.topicId}}</option>
+                </select>
+                </div>
+            </div>            
+            
+            
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Subscribers:</label>
+                <div class="col-sm-10">
+                <select ng-model="$ctrl.subscription.subscriberId" required>
+                        <option ng-repeat="subscriber in $ctrl.subscribers" value="{{subscriber.subscriberId}}">{{subscriber.description}}</option>
+                </select>
+                </div>
+            </div>
+                
             
             
             <div class="form-group">  

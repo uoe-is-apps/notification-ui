@@ -91,9 +91,11 @@ public class SupportController {
 	}
 	
 	@RequestMapping(value="/topic-subscriptions", method = RequestMethod.POST)
-        public void saveTopicSubscription(@RequestBody TopicSubscription topicSubscription) {
-		
-		topicSubscriptionRepository.save(topicSubscription);
+        public void saveTopicSubscription(@RequestBody TopicSubscription topicSubscription) {		
+            List<TopicSubscription> list = topicSubscriptionRepository.findBySubscriberIdAndTopic(topicSubscription.getSubscriberId(), topicSubscription.getTopic());
+            if(list.size() == 0){
+                topicSubscriptionRepository.save(topicSubscription);
+            }
 	}
         
         

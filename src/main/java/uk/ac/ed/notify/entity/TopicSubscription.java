@@ -13,6 +13,10 @@ import java.util.Date;
  */
 @Entity
 @Table(name="TOPIC_SUBSCRIPTIONS")
+@NamedQueries({
+        @NamedQuery(name = "TopicSubscription.findBySubscriptionId", query = "SELECT a FROM TopicSubscription a WHERE a.subscriptionId = (?1)"),
+        @NamedQuery(name = "TopicSubscription.findBySubscriberIdAndTopic", query = "SELECT a FROM TopicSubscription a WHERE a.subscriberId = (?1) and a.topic = (?2)")
+})
 public class TopicSubscription {
 
     @Id
