@@ -1,10 +1,10 @@
 angular.module('publishersubscriber')
     .component('publisherSubscriber', {
         templateUrl: 'app/publisher-subscriber/publisher-subscriber.tpl.html',
-        controller: ['SubscriberService', 'PublisherService', 'SubscriptionService', '$location', 'messenger',
-            function(SubscriberService, PublisherService, SubscriptionService, $location, messenger) { //, messenger
+        controller: ['SubscriberService', 'PublisherService', 'SubscriptionService', 'TopicService', '$location', 'messenger',
+            function(SubscriberService, PublisherService, SubscriptionService, TopicService, $location, messenger) { //, messenger
 
-
+ 
             var self = this;
 
 
@@ -27,9 +27,6 @@ angular.module('publishersubscriber')
                     self.publishers = response.data;
                     // you can use ui-grid if you need advanced sorting and filtering functionality
                     // using plain HTML table
-                    
-                    //alert('publishers');
-                    //alert(JSON.stringify(self.publishers));
                 })
                 .catch(function(response) {
                     console.error(response.status, response.data);
@@ -37,6 +34,19 @@ angular.module('publishersubscriber')
                 .finally(function(){
                     self.loading = false;
                 });
+                    
+                //get Topics
+                TopicService.all().then(function (response) {
+                    self.topics = response.data;
+                    // you can use ui-grid if you need advanced sorting and filtering functionality
+                    // using plain HTML table
+                })
+                .catch(function(response) {
+                    console.error(response.status, response.data);
+                })
+                .finally(function(){
+                    self.loading = false;
+                });                    
                     
                 //get Subscription    
                 SubscriptionService.all().then(function (response) {

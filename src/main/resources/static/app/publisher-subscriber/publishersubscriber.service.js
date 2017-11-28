@@ -18,6 +18,14 @@ angular.module('publishersubscriber')
         };
     }])
 
+    .service('TopicService', ['$http', function($http) {
+        return {
+            all: function() {
+                return $http.get('topics');
+            }
+        };
+    }])
+
     .service('SubscriberService', ['$http', function($http) {
         return {
             all: function() {
@@ -44,14 +52,6 @@ angular.module('publishersubscriber')
             },                
             all: function() {
                 return $http.get('topic-subscriptions');
-            }
-        };
-    }])
-
-    .service('TopicService', ['$http', function($http) {
-        return {
-            all: function() {
-                return $http.get('/ui-roles', {cache: true});
             }
         };
     }])

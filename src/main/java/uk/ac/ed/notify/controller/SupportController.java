@@ -28,10 +28,12 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ed.notify.entity.PublisherDetails;
 import uk.ac.ed.notify.entity.QuartzTrigger;
 import uk.ac.ed.notify.entity.SubscriberDetails;
+import uk.ac.ed.notify.entity.TopicDetails;
 import uk.ac.ed.notify.entity.TopicSubscription;
 import uk.ac.ed.notify.repository.PublisherDetailsRepository;
 import uk.ac.ed.notify.repository.QuartzTriggerRepository;
 import uk.ac.ed.notify.repository.SubscriberDetailsRepository;
+import uk.ac.ed.notify.repository.TopicDetailsRepository;
 import uk.ac.ed.notify.repository.TopicSubscriptionRepository;
 
 @RestController
@@ -46,6 +48,9 @@ public class SupportController {
 	public PublisherDetailsRepository publisherDetailsRepository;
 	
 	@Autowired
+	public TopicDetailsRepository topicDetailsRepository;	                
+        
+	@Autowired
 	public SubscriberDetailsRepository subscriberDetailsRepository;
 	
 	@Autowired
@@ -58,11 +63,15 @@ public class SupportController {
 	}
 	
 	@RequestMapping(value="/publishers", method = RequestMethod.GET)
-	public List<PublisherDetails> getPublisherDetails() {
-		
+	public List<PublisherDetails> getPublisherDetails() {		
 		return publisherDetailsRepository.findAll();
 	}
 	
+	@RequestMapping(value="/topics", method = RequestMethod.GET)
+	public List<TopicDetails> getTopicDetails() {		
+		return topicDetailsRepository.findAll();
+	}        
+        
 	@RequestMapping(value="/subscribers", method = RequestMethod.GET)
 	public List<SubscriberDetails> getSubscriberDetails() {
 		
