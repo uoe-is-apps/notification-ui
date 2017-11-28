@@ -125,4 +125,11 @@
                  stripComments="true"/>
     </changeSet>
     
+    <changeSet id="create_topic_table_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/create_topic_table_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>    
+    
 </databaseChangeLog>
