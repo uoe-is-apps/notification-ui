@@ -149,7 +149,7 @@ public class LearnService {
         //DTI020-21 if no end date is set, set it as 7 days after start date
         if(endDate == null){
             GregorianCalendar cal = new GregorianCalendar();
-            cal.setTime(endDate);
+            cal.setTime(startDate);
             cal.add(Calendar.DATE, 7);
             endDate = cal.getTime();
         }
