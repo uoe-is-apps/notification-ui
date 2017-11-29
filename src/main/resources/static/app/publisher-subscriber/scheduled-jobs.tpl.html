@@ -9,10 +9,7 @@
             </div>
         </div>
 
-        <!-- TODO this should be displayed by publisher, this is not informative enough
-             maybe name a job with meaningful prefix
-             or keep that info somewhere and read it in
-             -->
+        <!-- this is plain table implemenation, deprecated, use ui-grid instead
         <div class="table-responsive" ng-if="!$ctrl.loading && $ctrl.jobs.length > 0">
             <table class="table table-striped table-bordered" cellspacing="0" width="100%">
                 <thead>
@@ -41,6 +38,9 @@
                 </tbody>
             </table>
         </div>
+        -->
+             
+        <div ui-grid="$ctrl.gridOptions" ui-grid-resize-columns class="grid"></div>
     </div>
 </div>
 

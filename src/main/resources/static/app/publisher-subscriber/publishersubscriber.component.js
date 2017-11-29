@@ -1,11 +1,149 @@
 angular.module('publishersubscriber')
     .component('publisherSubscriber', {
         templateUrl: 'app/publisher-subscriber/publisher-subscriber.tpl.html',
-        controller: ['SubscriberService', 'PublisherService', 'SubscriptionService', 'TopicService', '$location', 'messenger',
-            function(SubscriberService, PublisherService, SubscriptionService, TopicService, $location, messenger) { //, messenger
+        controller: ['SubscriberService', 'PublisherService', 'SubscriptionService', 'TopicService', '$location', 'messenger', '$scope',
+            function(SubscriberService, PublisherService, SubscriptionService, TopicService, $location, messenger, $scope) { //, messenger
 
  
+            $scope.deleteSubscription = function(subscription) {
+                  SubscriptionService.delete(subscription).then(function(response) {
+                    //messenger.setMessage(messenger.types.SUCCESS, "Subscription '" + subscription.subscriptionId + "' has been deleted.");                      
+                    self.refresh();
+                }).catch(function(response) {
+                    console.error(response.status, response.data);
+                });
+           };
+ 
             var self = this;
+ 
+            self.gridOptionsSubscriptions = {
+                enableSorting: true,
+                columnDefs: [
+                    {
+                        field: 'subscriptionId',
+                        width: '*'
+                    },
+                    {
+                        field: 'topic',
+                        width: '*'
+                    },
+                    {
+                        field: 'subscriberId',
+                        width: '*'
+                    },                    
+                    {
+                        field: 'status',
+                        width: '*'
+                    },
+                    {
+                        field: 'lastUpdated',
+                        cellFilter: 'date: "dd/MM/yyyy H:mm"',
+                        width: '*'
+                    },
+                    {
+                        name: 'view',
+                        enableSorting: false,
+ 
+cellTemplate: '<div><button ng-click="grid.appScope.deleteSubscription(row.entity)" class="btn btn-danger">Delete</button></div>',                      
+                  
+                        width: '*'
+                    }                   
+                    
+                ]
+            };
+                  
+                
+                
+            self.gridOptionsTopics = {
+                enableSorting: true,
+                columnDefs: [
+                    {
+                        field: 'topicId',
+                        width: '*'
+                    },
+                    {
+                        field: 'description',
+                        width: '*'
+                    },
+                    {
+                        field: 'publisherId',
+                        width: '*'
+                    },
+                    {
+                        field: 'status',
+                        width: '*'
+                    },
+                    {
+                        field: 'lastUpdated',
+                        cellFilter: 'date: "dd/MM/yyyy H:mm"',
+                        width: '*'
+                    },                    
+                    
+                ]
+            };
+                   
+            
+            self.gridOptionsPublishers = {
+                enableSorting: true,
+                columnDefs: [
+                    {
+                        field: 'publisherId',
+                        width: '*'
+                    },
+                    {
+                        field: 'description',
+                        width: '*'
+                    },
+                    {
+                        field: 'key',
+                        width: '*'
+                    },
+                    
+                    {
+                        field: 'publisherType',
+                        width: '*'
+                    },
+                    {
+                        field: 'status',
+                        width: '*'
+                    },
+                    {
+                        field: 'lastUpdated',
+                        cellFilter: 'date: "dd/MM/yyyy H:mm"',
+                        width: '*'
+                    },                    
+                    
+                ]
+            };
+                     
+            self.gridOptionsSubscribers = {
+                enableSorting: true,
+                columnDefs: [
+                    {
+                        field: 'subscriberId',
+                        width: '*'
+                    },
+                    {
+                        field: 'description',
+                        width: '*'
+                    },
+                    {
+                        field: 'type',
+                        width: '*'
+                    },
+                    {
+                        field: 'status',
+                        width: '*'
+                    },
+                    {
+                        field: 'lastUpdated',
+                        cellFilter: 'date: "dd/MM/yyyy H:mm"',
+                        width: '*'
+                    },                    
+                    
+                ]
+            };            
+                  
 
 
             self.refresh = function() {
@@ -14,6 +152,7 @@ angular.module('publishersubscriber')
                 //get Subscribers
                 SubscriberService.all().then(function (response) {
                     self.subscribers = response.data;
+                    self.gridOptionsSubscribers.data = response.data;                    
                 })
                 .catch(function(response) {
                     // error
@@ -25,8 +164,7 @@ angular.module('publishersubscriber')
                 //get Publishers
                 PublisherService.all().then(function (response) {
                     self.publishers = response.data;
-                    // you can use ui-grid if you need advanced sorting and filtering functionality
-                    // using plain HTML table
+                    self.gridOptionsPublishers.data = response.data;
                 })
                 .catch(function(response) {
                     console.error(response.status, response.data);
@@ -38,8 +176,7 @@ angular.module('publishersubscriber')
                 //get Topics
                 TopicService.all().then(function (response) {
                     self.topics = response.data;
-                    // you can use ui-grid if you need advanced sorting and filtering functionality
-                    // using plain HTML table
+                    self.gridOptionsTopics.data = response.data;
                 })
                 .catch(function(response) {
                     console.error(response.status, response.data);
@@ -51,13 +188,14 @@ angular.module('publishersubscriber')
                 //get Subscription    
                 SubscriptionService.all().then(function (response) {
                     self.subscriptions = response.data;
+                    self.gridOptionsSubscriptions.data = response.data;
                 })
                 .catch(function(response) {
                     console.error(response.status, response.data);
                 })
                 .finally(function(){
                     self.loading = false;
-                });     
+                });                  
             };
             
 
@@ -66,16 +204,6 @@ angular.module('publishersubscriber')
             };
 
 
-            self.deleteSubscription = function(subscription) {                
-                    SubscriptionService.delete(subscription).then(function(response) {
-                    //messenger.setMessage(messenger.types.SUCCESS, "Subscription '" + subscription.subscriptionId + "' has been deleted.");                      
-                    self.refresh();
-                }).catch(function(response) {
-                    console.error(response.status, response.data);
-                });
-            };            
-            
-            
             self.refresh();
         }]
   })
@@ -89,11 +217,51 @@ angular.module('publishersubscriber')
 
             var self = this;
 
+            self.gridOptions = {
+                enableSorting: true,
+                columnDefs: [
+                    {
+                        field: 'jobName',
+                        width: '*'
+                    },
+                    {
+                        field: 'prevRun',
+                        cellFilter: 'date: "dd/MM/yyyy H:mm"',
+                        width: '*',
+                    },
+                    {
+                        field: 'nextRun',
+                        cellFilter: 'date: "dd/MM/yyyy H:mm"',
+                        width: '*'
+                    },
+                    {
+                        field: 'triggerState',
+                        width: '*'
+                    },
+                    {
+                        field: 'repeatInterval',
+                        width: '*'
+                    },   
+                    {
+                        field: 'timesExecuted',
+                        width: '*'
+                    },
+                    {
+                        name: 'view',
+                        enableSorting: false,
+                        cellTemplate: '<span><notification-edit-btn edit="grid.appScope.$ctrl.editScheduledjobs(row.entity)"></notification-edit-btn></span>',
+                        width: '*'
+                    }                   
+                    
+                ]
+            };
+
             self.refresh = function() {
                 self.loading  = true;
 
                 ScheduledTaskService.all().then(function (response) {
                     self.jobs = response.data;
+                    self.gridOptions.data = response.data;
                 })
                 .catch(function(response) {
                     console.error(response.status, response.data);
