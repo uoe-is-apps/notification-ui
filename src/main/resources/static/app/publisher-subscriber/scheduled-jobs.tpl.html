@@ -9,37 +9,6 @@
             </div>
         </div>
 
-        <!-- this is plain table implemenation, deprecated, use ui-grid instead
-        <div class="table-responsive" ng-if="!$ctrl.loading && $ctrl.jobs.length > 0">
-            <table class="table table-striped table-bordered" cellspacing="0" width="100%">
-                <thead>
-                <tr>
-                    <th>Job Name</th>
-                    <th>Last Run</th>
-                    <th>Next Run</th>
-                    <th>State</th>
-                    <th>Repeat Interval (in sec)</th>
-                    <th>Times Executed</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="job in $ctrl.jobs">
-                    <td>{{job.jobName}}</td>
-                    <td>{{job.prevRun}}</td>
-                    <td>{{job.nextRun}}</td>
-                    <td>{{job.triggerState}}</td>
-                    <td>{{job.repeatInterval/1000}}</td>
-                    <td>{{job.timesExecuted}}</td>
-                    <td>                        
-                    <button type="button" ng-click="$ctrl.editScheduledjobs(job)" class="btn btn-primary">Edit</button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        -->
-             
         <div ui-grid="$ctrl.gridOptions" ui-grid-resize-columns class="grid"></div>
     </div>
 </div>

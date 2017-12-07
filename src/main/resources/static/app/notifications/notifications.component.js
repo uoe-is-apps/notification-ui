@@ -40,7 +40,8 @@ angular.module('notifications')
                     {
                         name: 'view',
                         enableSorting: false,
-                        cellTemplate: '<span ng-if="row.entity.status != \'remove\' "><notification-edit-btn edit="grid.appScope.$ctrl.editNotification(row.entity)"></notification-edit-btn></span>',
+                        //cellTemplate: '<span ng-if="row.entity.status != \'remove\' "><notification-edit-btn edit="grid.appScope.$ctrl.editNotification(row.entity)"></notification-edit-btn></span>',
+                        cellTemplate: '<span><notification-edit-btn edit="grid.appScope.$ctrl.editNotification(row.entity)"></notification-edit-btn></span>',                        
                         width: '*'
                     }
                 ]
