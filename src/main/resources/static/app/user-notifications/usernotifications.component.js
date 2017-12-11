@@ -1,16 +1,14 @@
 angular.module('usernotifications')
     .component('userNotifications', {
         templateUrl: 'app/user-notifications/usernotifications.tpl.html',
-        controller: ['UserNotificationService', function(UserNotificationService) {
-
+        controller: ['UserNotificationService', 'uiGridConstants', function(UserNotificationService, uiGridConstants) {
             var self  = this;
-
             self.gridOptions = {
                 enableSorting: true,
                 columnDefs: [
                     {
                         field: 'title',
-                        width: '*'
+                        width: '*'                                                
                     },
                     {
                         field: 'topic',
@@ -20,15 +18,16 @@ angular.module('usernotifications')
                         field: 'startDate',
                         type: 'date',
                         cellFilter: 'date: "dd/MM/yyyy H:mm"',
-                        width: '*' // TODO why auto width does not work ?
+                        width: '*',
+                        sort: { direction: uiGridConstants.DESC, priority: 0 }
                     },
                     {
                         field: 'endDate',
                         type: 'date',
                         cellFilter: 'date: "dd/MM/yyyy H:mm"',
-                        width: '*'
-                    },
-                    // TODO view notification
+                        width: '*',
+                        sort: { direction: uiGridConstants.DESC, priority: 1 }
+                    }
                 ]
             };
 

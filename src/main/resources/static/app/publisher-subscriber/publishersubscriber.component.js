@@ -1,8 +1,8 @@
 angular.module('publishersubscriber')
     .component('publisherSubscriber', {
         templateUrl: 'app/publisher-subscriber/publisher-subscriber.tpl.html',
-        controller: ['SubscriberService', 'PublisherService', 'SubscriptionService', 'TopicService', '$location', 'messenger', '$scope',
-            function(SubscriberService, PublisherService, SubscriptionService, TopicService, $location, messenger, $scope) { //, messenger
+        controller: ['SubscriberService', 'PublisherService', 'SubscriptionService', 'TopicService', '$location', 'messenger', '$scope', 'uiGridConstants', 
+            function(SubscriberService, PublisherService, SubscriptionService, TopicService, $location, messenger, $scope, uiGridConstants) { //, messenger
 
  
             $scope.deleteSubscription = function(subscription) {
@@ -25,7 +25,8 @@ angular.module('publishersubscriber')
                     },
                     {
                         field: 'topic',
-                        width: '*'
+                        width: '*',
+                        sort: { direction: uiGridConstants.ASC, priority: 0 }
                     },
                     {
                         field: 'subscriberId',
@@ -59,7 +60,8 @@ cellTemplate: '<div><button ng-click="grid.appScope.deleteSubscription(row.entit
                 columnDefs: [
                     {
                         field: 'topicId',
-                        width: '*'
+                        width: '*',
+                        sort: { direction: uiGridConstants.ASC, priority: 0 }
                     },
                     {
                         field: 'description',
@@ -88,7 +90,8 @@ cellTemplate: '<div><button ng-click="grid.appScope.deleteSubscription(row.entit
                 columnDefs: [
                     {
                         field: 'publisherId',
-                        width: '*'
+                        width: '*',
+                        sort: { direction: uiGridConstants.ASC, priority: 0 }
                     },
                     {
                         field: 'description',
@@ -121,7 +124,8 @@ cellTemplate: '<div><button ng-click="grid.appScope.deleteSubscription(row.entit
                 columnDefs: [
                     {
                         field: 'subscriberId',
-                        width: '*'
+                        width: '*',
+                        sort: { direction: uiGridConstants.ASC, priority: 0 }
                     },
                     {
                         field: 'description',
