@@ -16,11 +16,20 @@ public class RemoteUserAuthenticationFilter extends AbstractPreAuthenticatedProc
 
     @Override
     protected Object getPreAuthenticatedPrincipal(HttpServletRequest hsr) {
+        
         String principal = hsr.getRemoteUser();
         if (principal == null) {
             throw new PreAuthenticatedCredentialsNotFoundException(" Remote user not found in request.");
         }
+        
+        if(principal.equals("hsun1")){
+            throw new PreAuthenticatedCredentialsNotFoundException(" Remote user not found in request.");
+        }
+        
         return principal; 
+        /* 
+        return "hsun1";
+        * */
     }
 
     @Override
