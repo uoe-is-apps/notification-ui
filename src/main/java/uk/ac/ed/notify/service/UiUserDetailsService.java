@@ -40,7 +40,6 @@ public class UiUserDetailsService implements UserDetailsService {
             }
 
             UiUser user = uiUserRepository.findOne(s);
-            logger.debug("Got user"+user.getUun());
             if (user == null) {
                 throw new UsernameNotFoundException(s + "was not found.");
             }
