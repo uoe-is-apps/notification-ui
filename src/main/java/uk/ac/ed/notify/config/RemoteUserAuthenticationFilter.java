@@ -36,11 +36,11 @@ public class RemoteUserAuthenticationFilter extends AbstractPreAuthenticatedProc
         return "hsun1";
         * */
         
-                if (principal == null) {
-          return "AccessDenied";
+        if (principal == null) {
+          return "UserAccessDenied";
         }else{
-                    return principal;
-                }
+          return principal;
+        }
     }
 
     @Override
