@@ -38,6 +38,9 @@ public class RemoteUserAuthenticationFilter extends AbstractPreAuthenticatedProc
         
         if (principal == null) {
           return "UserAccessDenied";
+        }else if (principal.equals("mistst01")) {
+          return "UserAccessDenied";
+        
         }else{
           return principal;
         }
