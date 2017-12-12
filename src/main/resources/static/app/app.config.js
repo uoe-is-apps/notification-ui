@@ -4,10 +4,20 @@ angular.module('notify-ui-app')
         $routeProvider
             .when('/', {
                 template: '<home></home>',
+
+                resolve: {access: ['Access', function(Access) {                    
+                    return Access.hasRole('ANY');
+                }]},
+               
                 activetab: 'home'
             })
             .when('/home', {
                 template: '<home></home>',
+                
+                resolve: {access: ['Access', function(Access) {                    
+                    return Access.hasRole('ANY');
+                }]},
+
                 activetab: 'home'
             })
             .when('/notifications/:topic', {

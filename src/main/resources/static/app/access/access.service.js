@@ -26,16 +26,37 @@ angular.module('access')
                 if (profile) {
                     profile._isAuthenticated = true;
 
-                    profile._hasRole = function(role) {
+                    profile._hasSuperAdminRole = function() {
                         var roles = profile.uiRoles;
-
                         for (var i = 0; i < roles.length; i++) {
-                            if (roles[i].roleCode == role || roles[i].roleCode == 'SUPERADMIN') {
+                            if (roles[i].roleCode == 'SUPERADMIN') {
                                 return true;
                             }
                         }
                         return false;
-                    };
+                    }
+
+                    profile._hasDenyAccessRole = function() {
+                        var roles = profile.uiRoles;
+                        for (var i = 0; i < roles.length; i++) {
+                            if (roles[i].roleCode == 'DENYACCESS'){
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+
+
+                    profile._hasRole = function(role) {
+                        var roles = profile.uiRoles;
+
+                        for (var i = 0; i < roles.length; i++) {
+                            if (roles[i].roleCode == role) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    };                  
                 }
 
                 return angular.extend(userProfile, profile);
@@ -64,10 +85,14 @@ angular.module('access')
             hasRole: function(role) {
                 return UserProfile.then(function(profile) {
 
-                    if (profile._isAuthenticated && profile._hasRole(role)) {
+                    if (profile._hasDenyAccessRole()){
+                        return $q.reject(Access.FORBIDDEN);
+                    }else if (profile._hasSuperAdminRole()){
+                        return Access.OK;                   
+                    }else if (profile._hasRole(role)){
                         return Access.OK;
                     }
-                    return $q.reject(Access.FORBIDDEN);
+   
                 });
             },
 
