@@ -214,8 +214,8 @@ angular.module('publishersubscriber')
     
   .component('scheduledJobs', {
         templateUrl: 'app/publisher-subscriber/scheduled-jobs.tpl.html',
-        controller: ['scheduledjob', 'ScheduledTaskService', '$location', 'messenger', 
-                    function(_scheduledjob, ScheduledTaskService, $location, messenger) {
+        controller: ['scheduledjob', 'ScheduledTaskService', '$location', 'messenger', '$scope',
+                    function(_scheduledjob, ScheduledTaskService, $location, messenger, $scope) {
 
             var self = this;
 
@@ -275,7 +275,7 @@ angular.module('publishersubscriber')
 
 
             // controller API
-            self.editScheduledjobs = function(scheduledjob) {               
+            self.editScheduledjobs = function(scheduledjob) {   
                 _scheduledjob.setScheduledjob(scheduledjob);
                 $location.path('/edit-scheduledjobs');
             };
@@ -365,6 +365,17 @@ angular.module('publishersubscriber')
             var self = this;
             self.user = _user.getUser();
             self.scheduledjob = _scheduledjob.getScheduledjob();
+
+
+
+            self.isPaused = function(scheduledjob) {
+                if(scheduledjob.triggerState === 'PAUSED'){
+                    return true;
+                }else{
+                    return false;
+                }
+            }; 
+
 
 
             self.startJob = function(scheduledjob) {
