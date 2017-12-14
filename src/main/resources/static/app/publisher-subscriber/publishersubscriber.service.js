@@ -2,10 +2,12 @@ angular.module('publishersubscriber')
     .service('ScheduledTaskService', ['$http', function($http) {
         return {
             start: function(scheduledjob) {
-                return $http.post('start-job/' + scheduledjob);
+                var id = scheduledjob.jobName;
+                return $http.post('start-job/' + id);
             },
             stop: function(scheduledjob) {
-                return $http.post('stop-job/' + scheduledjob);
+                var id = scheduledjob.jobName;
+                return $http.post('stop-job/' + id);
             },  
             reschedule: function(scheduledjob) {
                 var id = scheduledjob.jobName;

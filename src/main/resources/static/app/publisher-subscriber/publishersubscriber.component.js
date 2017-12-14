@@ -43,10 +43,8 @@ angular.module('publishersubscriber')
                     },
                     {
                         name: 'view',
-                        enableSorting: false,
- 
-cellTemplate: '<div><button ng-click="grid.appScope.deleteSubscription(row.entity)" class="btn btn-danger">Delete</button></div>',                      
-                  
+                        enableSorting: false, 
+                        cellTemplate: '<div><button ng-click="grid.appScope.deleteSubscription(row.entity)" class="btn btn-danger">Delete</button></div>',                                        
                         width: '*'
                     }                   
                     

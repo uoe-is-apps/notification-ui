@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
@@ -104,15 +105,23 @@ public class SupportController {
         
 	@RequestMapping(value="/start-job/{id}", method = RequestMethod.POST)
         public void startJob(@PathVariable("id") String id) {
-                schedulerFactoryBean.start();
-                logger.info("startJob - " + id + " - " + schedulerFactoryBean.isRunning());
+              try {
+                  schedulerFactoryBean.getScheduler().resumeJob(new JobKey(id,"DEFAULT"));
+                    } catch (Exception ex) {
+                  logger.error("startJob - " + id + " - " + ex.toString());  
+              }
+              logger.info("startJob - " + id + " - " + schedulerFactoryBean.isRunning());
 	}        
 
         
 	@RequestMapping(value="/stop-job/{id}", method = RequestMethod.POST)
-        public void stopJob(@PathVariable("id") String id) {
-		schedulerFactoryBean.stop();
-                logger.info("stopJob - " + id + " - " + schedulerFactoryBean.isRunning());  
+        public void stopJob(@PathVariable("id") String id) throws SchedulerException {
+              try {
+                 schedulerFactoryBean.getScheduler().pauseJob(new JobKey(id,"DEFAULT"));
+              } catch (Exception ex) {
+                  logger.error("stopJob - " + id + " - " + ex.toString());  
+              }                            
+              logger.info("stopJob - " + id + " - " + schedulerFactoryBean.isRunning());  
         }                    
                    
                 
@@ -142,7 +151,7 @@ public class SupportController {
                               .withIntervalInSeconds( interval )
                               .withRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY)                       
                          ).build(); 
-
+                 
                   schedulerFactoryBean.getScheduler().rescheduleJob(triggerList.get(0).getKey(), trigger);
                   logger.info("success");  
               } catch (Exception ex) {
