@@ -41,7 +41,13 @@ angular.module('notifications')
                         name: 'view',
                         enableSorting: false,
                         //cellTemplate: '<span ng-if="row.entity.status != \'remove\' "><notification-edit-btn edit="grid.appScope.$ctrl.editNotification(row.entity)"></notification-edit-btn></span>',
-                        cellTemplate: '<span><notification-edit-btn edit="grid.appScope.$ctrl.editNotification(row.entity)"></notification-edit-btn></span>',                        
+                        //works cellTemplate: '<span><notification-edit-btn edit="grid.appScope.$ctrl.editNotification(row.entity)"></notification-edit-btn></span>',                        
+                        //works <notification-edit-btn edit="grid.appScope.$ctrl.editNotification(row.entity)"></notification-edit-btn>
+                        cellTemplate: 
+'<span>' + 
+'<button ng-click="grid.appScope.$ctrl.editNotification(row.entity)" class="btn btn-primary">Edit</button>' + 
+'<button ng-click="grid.appScope.$ctrl.deleteNotification(row.entity)" class="btn btn-danger">Terminate</button>' + 
+'</span>',                        
                         width: '*'
                     }
                 ]
@@ -96,6 +102,22 @@ angular.module('notifications')
                 _notification.setNotification(notification);
                 $location.path('/notification/edit/' + notification.topic.toLowerCase());
             };
+            
+            this.deleteNotification = function(notification) {
+                if (notification.notificationId != null) {
+                    NotificationService.delete(notification).then(function(response) {
+
+                        messenger.setMessage(messenger.types.SUCCESS, "Notification '" + notification.title + "' has been deleted.");
+                        location.reload();
+                    })
+                        .catch(function(response) {
+                            // log error
+                            console.error(response.data);
+                            self.error = 'Error deleting notification.';
+                        });
+                }
+            };            
+            
         }]
     })
     .component('editNotification', {
@@ -133,7 +155,7 @@ angular.module('notifications')
                             messenger.setMessage(messenger.types.SUCCESS, "Notification '" + notification.title + "' has been updated.");
 
                             _notification.reset();
-                            self.back();
+                            //self.back();
                         })
                             .catch(function(response) {
 
@@ -150,7 +172,7 @@ angular.module('notifications')
                             messenger.setMessage(messenger.types.SUCCESS, "Notification '" + notification.title + "' has been saved.");
 
                             _notification.reset();
-                            self.back();
+                            //self.back();
                         })
                             .catch(function(response) {
 
@@ -162,22 +184,6 @@ angular.module('notifications')
                 }
             };
 
-            this.deleteNotification = function(notification) {
-                if (notification.notificationId != null) {
-
-                    NotificationService.delete(notification).then(function(response) {
-
-                        messenger.setMessage(messenger.types.SUCCESS, "Notification '" + notification.title + "' has been deleted.");
-                        self.back();
-                    })
-                        .catch(function(response) {
-
-                            // log error
-                            console.error(response.data);
-                            self.error = 'Error deleting notification.';
-                        });
-                }
-            };
 
             self.back = function() {
                 $location.path('/notifications/' + self.topic);
