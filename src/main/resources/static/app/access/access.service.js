@@ -84,13 +84,20 @@ angular.module('access')
 
             hasRole: function(role) {
                 return UserProfile.then(function(profile) {
-
+                    console.log('called hasRole - ' + role);
+                    
                     if (profile._hasDenyAccessRole()){
+                        console.log('_hasDenyAccessRole');
                         return $q.reject(Access.FORBIDDEN);
                     }else if (profile._hasSuperAdminRole()){
+                        console.log('_hasSuperAdminRole');
                         return Access.OK;                   
                     }else if (profile._hasRole(role)){
+                        console.log('_hasRole - ' + role);
                         return Access.OK;
+                    } else {
+                        console.log('reject - rest');
+                        return $q.reject(Access.FORBIDDEN);
                     }
    
                 });

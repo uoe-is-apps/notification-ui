@@ -44,10 +44,10 @@ angular.module('notifications')
                         //works cellTemplate: '<span><notification-edit-btn edit="grid.appScope.$ctrl.editNotification(row.entity)"></notification-edit-btn></span>',                        
                         //works <notification-edit-btn edit="grid.appScope.$ctrl.editNotification(row.entity)"></notification-edit-btn>
                         cellTemplate: 
-'<span>' + 
-'<button ng-click="grid.appScope.$ctrl.editNotification(row.entity)" class="btn btn-primary">Edit</button>' + 
-'<button ng-click="grid.appScope.$ctrl.deleteNotification(row.entity)" class="btn btn-danger">Terminate</button>' + 
-'</span>',                        
+                        '<span>' + 
+                        '<button ng-click="grid.appScope.$ctrl.editNotification(row.entity)" class="btn btn-primary">Edit</button>' + 
+                        '<button ng-click="grid.appScope.$ctrl.deleteNotification(row.entity)" class="btn btn-danger">Terminate</button>' + 
+                        '</span>',                        
                         width: '*'
                     }
                 ]
