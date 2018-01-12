@@ -155,7 +155,7 @@ angular.module('notifications')
                             messenger.setMessage(messenger.types.SUCCESS, "Notification '" + notification.title + "' has been updated.");
 
                             _notification.reset();
-                            //self.back();
+                            self.back();
                         })
                             .catch(function(response) {
 
@@ -172,7 +172,7 @@ angular.module('notifications')
                             messenger.setMessage(messenger.types.SUCCESS, "Notification '" + notification.title + "' has been saved.");
 
                             _notification.reset();
-                            //self.back();
+                            self.back();
                         })
                             .catch(function(response) {
 
