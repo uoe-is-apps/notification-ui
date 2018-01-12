@@ -184,7 +184,6 @@ angular.module('notifications')
                 }
             };
 
-
             self.back = function() {
                 $location.path('/notifications/' + self.topic);
             };
@@ -213,6 +212,18 @@ angular.module('notifications')
 
             self.toggle = function() {
                 self.showTree = !self.showTree;
+            };
+
+            self.ifHideStartDate = function(startDate, endDate) {
+                var currentTime = (new Date()).getTime();
+                try{              
+                  if(startDate < currentTime && currentTime < endDate){
+                      return true;
+                  } 
+                  return false;
+                }catch(e){
+                    return false;
+              }              
             };
 
             $('#groupTree').jstree({
