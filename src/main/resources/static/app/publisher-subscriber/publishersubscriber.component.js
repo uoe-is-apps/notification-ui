@@ -369,7 +369,7 @@ angular.module('publishersubscriber')
 
 
             self.isPaused = function(scheduledjob) {
-                if(scheduledjob.triggerState === 'PAUSED'){
+                if(scheduledjob.triggerState === 'PAUSED' || scheduledjob.triggerState === 'PAUSED_BLOCKED'){
                     return true;
                 }else{
                     return false;
