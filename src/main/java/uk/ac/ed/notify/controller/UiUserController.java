@@ -73,4 +73,16 @@ public class UiUserController {
        return uiUserRepository.findOne(uun); 
     }
     
+    
+    /*
+      Invalidate session
+     */
+    @RequestMapping(value="/invalidate-session", method = RequestMethod.GET)
+    public void invalidateSession(HttpServletRequest request)
+    {       
+       request.getSession().invalidate();
+       
+    }    
+    
+    
 }

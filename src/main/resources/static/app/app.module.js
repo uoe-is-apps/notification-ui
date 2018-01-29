@@ -7,6 +7,7 @@ angular.module('notify-ui-app', [
     //custom
     'access',
     'home',
+    'logout',
     'forbidden',
     'notifications',
     'useradmin',

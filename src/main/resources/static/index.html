@@ -48,7 +48,8 @@
                     <li ng-show="USRSUPPORT" ng-class="{active:isActiveTab('/user-notifications')}"><a href="#!/user-notifications">User Notifications</a></li>
                     <li ng-show="SYSSUPPORT" ng-class="{active:isActiveTab('/publisher-subscriber')}"><a href="#!/publisher-subscriber">Publisher Subscriber</a></li>
                     <li ng-show="SYSSUPPORT" ng-class="{active:isActiveTab('/scheduled-jobs')}"><a href="#!/scheduled-jobs">Scheduled Jobs</a></li>                    
-                    <li ng-show="USERADMIN" ng-class="{active:isActiveTab('/user-administration')}"><a href="#!/user-administration">User Administration</a></li>
+                    <li ng-show="USERADMIN" ng-class="{active:isActiveTab('/user-administration')}"><a href="#!/user-administration">User Administration</a></li>                    
+                    <li ng-class="{active:isActiveTab('/logout')}"><a href="#!/logout">Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -192,6 +193,9 @@
     <script src="app/home/home.module.js" type="text/javascript"></script>
     <script src="app/home/home.component.js" type="text/javascript"></script>
 
+    <script src="app/logout/logout.module.js" type="text/javascript"></script>
+    <script src="app/logout/logout.component.js" type="text/javascript"></script>    
+    
     <script src="app/access/access.module.js" type="text/javascript"></script>
     <script src="app/access/access.service.js" type="text/javascript"></script>
 

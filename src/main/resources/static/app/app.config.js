@@ -20,6 +20,15 @@ angular.module('notify-ui-app')
 
                 activetab: 'home'
             })
+            .when('/logout', {
+                template: '<logout></logout>',
+                
+                resolve: {access: ['Access', function(Access) {                    
+                    return Access.hasRole('ANY');
+                }]},
+
+                activetab: 'logout'
+            })            
             .when('/notifications/:topic', {
                 template: '<notifications></notifications>',
 
