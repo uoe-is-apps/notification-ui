@@ -169,10 +169,13 @@ public class NotificationController {
             dbNotification.setNotificationGroup(notification.getNotificationGroup()); 
             dbNotification.setNotificationGroupName(groupName);
 
-            List<String> ldapUsers = ldapService.getMembers(notification.getNotificationGroup());
+            List<String> ldapUsers = ldapService.getMembersFromParentGroup(notification.getNotificationGroup());
 
-            logger.info("user selected ldap group - selected - " + notification.getNotificationGroup()+ " name - " + groupName + " numOfUsers found - " + ldapUsers.size() );
-
+            logger.info("getMembersFromParentGroup - " + notification.getNotificationGroup()+ " name - " + groupName + " numOfUsers found - " + ldapUsers.size() );
+            for(int i = 0; i < ldapUsers.size(); i++){
+                System.out.println("ldapUsers - " + i + " " + ldapUsers.get(i));                  
+            } 
+            
             ArrayList<NotificationUser> userList = new ArrayList<NotificationUser>();
             for(int i = 0; i < ldapUsers.size(); i++){
                NotificationUser user = new NotificationUser();
