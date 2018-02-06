@@ -171,6 +171,7 @@ public class NotificationController {
 
             List<String> ldapUsers = ldapService.getMembersFromParentGroup(notification.getNotificationGroup());
 
+            logger.info("notification will be created for the following users");
             logger.info("getMembersFromParentGroup - " + notification.getNotificationGroup()+ " name - " + groupName + " numOfUsers found - " + ldapUsers.size() );
             for(int i = 0; i < ldapUsers.size(); i++){
                 System.out.println("ldapUsers - " + i + " " + ldapUsers.get(i));                  

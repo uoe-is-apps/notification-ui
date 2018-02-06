@@ -133,17 +133,13 @@ public class LdapService {
     {               
         //always clear the array before each invocation 
         results = new ArrayList<String>();
-        System.out.println("getMembersFromParentGroup - " + base);
 
         List<OrgUnitMembers> orgUnitMembers = new ArrayList<OrgUnitMembers>();
 		
         String reqHierarchy = base;
         String terminateToken = ",ou=org,ou=grouper2,dc=authorise,dc=ed,dc=ac,dc=uk";
         int hierarchySize = countOccurrences(reqHierarchy.replace(terminateToken, ""), '=');
-                
-        System.out.println("reqHierarchy - " + base);
-        System.out.println("hierarchySize - " + hierarchySize);
-                
+                 
         List<OrgUnit> orgunits = getLdapEntriesByOrgUnit(reqHierarchy, hierarchySize);
 	populateOrgUnitMembers(orgUnitMembers, orgunits);
 		
@@ -299,7 +295,7 @@ public class LdapService {
                  if (!amendBase.startsWith("ou=SU") &&  getNextLevelGroups(amendBase).size() >0   && level>0) {
                     traverseAllNodes(amendBase, getNextLevelGroups(amendBase),level); 
                  }else{
-                     System.out.println("exit exit exit");
+                     //exit recursive
                  }          
             }
              
