@@ -6,9 +6,17 @@ angular.module('logout')
                   
             $http.get('invalidate-session');                    
             
-            [].forEach.call(document.querySelectorAll('.navbar-nav'), function (el) {
-              el.style.visibility = 'hidden';
-            });            
+            //[].forEach.call(document.querySelectorAll('.navbar-nav'), function (el) {
+            //  el.style.visibility = 'hidden';
+            //});            
+            
+            if(window.location.href.indexOf("dev.") != -1){
+                 window.location.href = 'https://www-dev.ease.ed.ac.uk/logout.cgi';
+            }else if(window.location.href.indexOf("test.") != -1){
+                 window.location.href = 'https://www-test.ease.ed.ac.uk/logout.cgi';
+            }else{
+                 window.location.href = 'https://www.ease.ed.ac.uk/logout.cgi';
+            }   
             
     }]
 
