@@ -30,6 +30,7 @@ public class Office365PullJob implements Job {
     
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        //if(true) return;
         logger.info("Office365PullJob started, source: " + source);
         
         if(source.equals("office365")){

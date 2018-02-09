@@ -26,8 +26,9 @@ public class NotificationTidyupJob implements Job {
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        //if(true) return;
         logger.info("NotificationTidyupJob started");
-        notificationTidyupService.tidyupNotification();
+        //notificationTidyupService.tidyupNotification();
         logger.info ("NotificationTidyupJob finished successfully");
     }
 }
