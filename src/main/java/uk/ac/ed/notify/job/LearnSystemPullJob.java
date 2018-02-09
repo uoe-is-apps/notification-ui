@@ -25,7 +25,7 @@ public class LearnSystemPullJob implements Job {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         //if(true) return;
         logger.info("LearnSystemPullJob started");
-        //learnService.pullLearnNotifications(true);
+        learnService.pullLearnNotifications(true);
         logger.info ("LearnSystemPullJob finished successfully");
     }
 }
