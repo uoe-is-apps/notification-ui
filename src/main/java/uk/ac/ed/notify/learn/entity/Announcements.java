@@ -210,7 +210,7 @@ public class Announcements {
 
     @Override
     public String toString() {
-        return "Announcements{" + "pk1=" + pk1 + ", crsmainPk1=" + crsmainPk1 + ", usersPk1=" + usersPk1 + ", subject=" + subject + ", announcement=" + announcement + ", announcementType=" + announcementType + ", startDate=" + startDate + ", endDate=" + endDate + '}';
+        return "Announcements{" + "pk1=" + pk1 + ", crsmainPk1=" + crsmainPk1 + ", usersPk1=" + usersPk1 + ", subject=" + subject + ", announcement=..." + ", announcementType=" + announcementType + ", startDate=" + startDate + ", endDate=" + endDate + '}';
     }
 
 

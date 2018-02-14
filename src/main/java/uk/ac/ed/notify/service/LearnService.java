@@ -6,6 +6,7 @@ package uk.ac.ed.notify.service;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -13,6 +14,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,9 @@ import uk.ac.ed.notify.repository.UserNotificationAuditRepository;
 @Service
 public class LearnService {
     private static final Logger logger = LoggerFactory.getLogger(LearnService.class);
+    
+    @Value("${notification.purge}")
+    int purge;    
     
     @Autowired
     NotificationErrorRepository notificationErrorRepository;    
@@ -231,15 +236,15 @@ public class LearnService {
          * Learn assignments ???
          */
         
-        logger.info("Number of notifications to save " + actionsCache.get(AuditActions.CREATE_NOTIFICATION).size());
+        logger.info("Number of notifications to create " + actionsCache.get(AuditActions.CREATE_NOTIFICATION).size());
         logger.info("Number of notifications to update " +  actionsCache.get(AuditActions.UPDATE_NOTIFICATION).size());
         
         handleNotificationByBatch(AuditActions.CREATE_NOTIFICATION, actionsCache.get(AuditActions.CREATE_NOTIFICATION));
         handleNotificationByBatch(AuditActions.UPDATE_NOTIFICATION, actionsCache.get(AuditActions.UPDATE_NOTIFICATION));
 
         logger.info("STEP 4. ----------delete notification----------");                 
-        logger.info("before delete, total number of current notifications in NB - " + existingLearnNotificationsList.size());
-        logger.info("before delete, total number of source items(sys, course announce, task, assessment) in Learn - " + processedLearnNotificationsList.size());
+        logger.info("Total number of non-purgeable notifications in NB - " + existingLearnNotificationsList.size());
+        logger.info("Total number of source items(sys, course announce, task, assessment) in Learn has been processed of this run - " + processedLearnNotificationsList.size());
         
         ArrayList<Notification> allCurrentNotificationsToBeDeleted = new ArrayList<Notification>();
         
@@ -247,16 +252,19 @@ public class LearnService {
         	
             Notification notificationNB = existingLearnNotificationsList.get(i);
             if(!processedLearnNotificationsList.contains(notificationNB.getPublisherNotificationId())){
-                allCurrentNotificationsToBeDeleted.add(notificationNB);
+                
+                Date deletableNotificationEndDate = notificationNB.getEndDate();
+                if(deletableNotificationEndDate.after(new Date())){
+                    allCurrentNotificationsToBeDeleted.add(notificationNB);
+                }else{
+                    logger.info("deletable, but its end date is already passed, ignore - " + deletableNotificationEndDate);
+                }
             }
-        }
-         
+        }         
         logger.info("allCurrentNotificationsToBeDeleted - " + allCurrentNotificationsToBeDeleted.size());        
-
         handleNotificationByBatch(AuditActions.DELETE_NOTIFICATION, allCurrentNotificationsToBeDeleted);
 
-        logger.info("pullLearnNotifications completed - no. of run since server started - [" + index++ + "]");
-                
+        logger.info("pullLearnNotifications completed - no. of Learn Pull Job run since server started - [" + index++ + "]");                
     }
     
     /**
@@ -368,6 +376,73 @@ public class LearnService {
         }
     }
     
+    
+    //--------------------------------------------------------------------------
+    /*
+    public String ifSaveLearnNotification(List<Notification> existingNotificationInNB, String publisherId, String publisherNotificationId, String uun, Notification notification) {
+
+        Notification existingNotification = null;
+        for(int i = 0; i < existingNotificationInNB.size(); i++){
+            Notification noti = existingNotificationInNB.get(i);
+            
+            if(noti.getPublisherId().equals(publisherId) && noti.getPublisherNotificationId().equals(publisherNotificationId) && noti.getUun().equals(uun)){
+                existingNotification = noti;
+                break;
+            }            
+        }
+        
+        if (existingNotification == null) {
+            notification.setNotificationId(null);
+            logger.debug(notification.getTitle() + " insert");
+            return "insert";
+        } else {
+            if (!notification.equals(existingNotification)) {
+                notification.setNotificationId(existingNotification.getNotificationId());
+                        
+                logger.debug(notification.getTitle() + " update");
+                return "update";
+            }
+        }
+        
+        logger.debug(notification.getTitle() + " ignore");
+        return "ignore";
+    }
+    */
+    
+    
+    public String ifSaveLearnNotification(List<Notification> existingNotificationInNB, 
+            String publisherId, String publisherNotificationId, Notification notification) {
+
+        Notification existingNotification = null;
+        for(int i = 0; i < existingNotificationInNB.size(); i++){
+            Notification noti = existingNotificationInNB.get(i);
+            
+            if(noti.getPublisherId().equals(publisherId) && noti.getPublisherNotificationId().equals(publisherNotificationId)){
+                existingNotification = noti;
+                break;
+            }            
+        }
+        
+        if (existingNotification == null) {
+            notification.setNotificationId(null);
+            logger.debug(notification.getTitle() + " insert");
+            return "insert";
+        } else {            
+            if (!notification.equals(existingNotification)) {
+                notification.setNotificationId(existingNotification.getNotificationId());
+                
+                logger.debug(notification.getTitle() + " update");
+                return "update";
+            }
+        }
+
+        logger.debug(notification.getTitle() + " ignore");
+        return "ignore";
+    }
+    //--------------------------------------------------------------------------    
+    
+    
+    
     public void processSystemAnnouncements(List<Notification> existingLearnNotificationsList, Map<Integer, String> userIdNamePair, Map<String,List<Notification>> actionsCache, List<String> processedLearnNotificationsList) {
     	
     	logger.info("STEP 2. Processing system announcements");
@@ -381,19 +456,31 @@ public class LearnService {
         
         if (systemAnnouncementsCount > 0) {
         	
-        	List<Notification> systemNotificationsList = getLearnNotificationsByTopic(existingLearnNotificationsList, topic);
+            List<Notification> systemNotificationsList = getLearnNotificationsByTopic(existingLearnNotificationsList, topic);
             logger.info("Total number of system announcements in Notification Backbone - " + systemNotificationsList.size());
-            /*
-             * System announcements are sent to all active learn users
-             */
-        	List<String> uunList = new ArrayList<String>(userIdNamePair.values());
+            
+            for (int i = 0; i < systemNotificationsList.size(); i++) {
+                logger.info(i + "/" + systemNotificationsList.size() + " sysNotification - " + systemNotificationsList.get(i));
+            }
+            
+           /*
+            * System announcements are sent to all active learn users
+            */
+            List<String> uunList = new ArrayList<String>(userIdNamePair.values());
         	
-        	Notification systemNotification = null;
-        	Announcements systemAnnouncement = null;
+            Notification systemNotification = null;
+            Announcements systemAnnouncement = null;
         	
-        	for (int i = 0; i < systemAnnouncementsCount; i++) {
+            for (int i = 0; i < systemAnnouncementsCount; i++) {
+                logger.info(i + "/" + systemAnnouncementsCount + " ----------------------------");
                 systemAnnouncement = listOfSystemAnnouncements.get(i);  
      
+                Date includeStartDate = subtractDays(new Date(), purge);
+                if(systemAnnouncement.getEndDate() == null && systemAnnouncement.getStartDate().before(includeStartDate) ){
+                        //if this announcement has no end date and the start date is earlier than allowed start date, do not process
+                        logger.info(systemAnnouncement.getStartDate() + " - do not process");
+                        continue;                                                   
+                }                
                 
                 String publisherNotificationId = topic + Integer.toString(systemAnnouncement.getPk1());     
                 
@@ -401,17 +488,28 @@ public class LearnService {
                 String body = systemAnnouncement.getAnnouncement();
                 Date startDate = systemAnnouncement.getStartDate();
                 Date endDate = systemAnnouncement.getEndDate();
-                
+                                
                 systemNotification = fetchNotification(systemNotificationsList, publisherNotificationId);
                 String action = "";
+                 
+                String existingTitle = "";
+                String existingBody = "";
+                Date existingStartDate = null;
+                Date existingEndDate = null;
                 
                 if(systemNotification == null) {
-                	systemNotification = new Notification();
-                	action = AuditActions.CREATE_NOTIFICATION;
+                    systemNotification = new Notification();
+                    action = AuditActions.CREATE_NOTIFICATION;
+                } else {
+                    action = AuditActions.UPDATE_NOTIFICATION;
+                        
+                    existingTitle = systemNotification.getTitle();
+                    existingBody = systemNotification.getBody();
+                    existingStartDate = systemNotification.getStartDate();
+                    existingEndDate = systemNotification.getEndDate();                        
                 }
-                else {
-                	action = AuditActions.UPDATE_NOTIFICATION;
-                }
+                
+                logger.info("fetchNotification(existing or new) - " + systemNotification);                
                 
                 systemNotification = assembleNotification(Learn.PUBLISHER_ID, 
                 		publisherNotificationId, 
@@ -419,19 +517,76 @@ public class LearnService {
                 		title, 
                 		body, 
                 		notificationUrl, 
-                		startDate, 
+                		startDate,  
                 		endDate, 
                 		uunList,
                 		systemNotification);
                 
-                logger.info("System notification identified by " + publisherNotificationId + " to be handled as " + action);
+                logger.info("assembleNotification(to be created) - " + systemNotification);
                 
-                actionsCache.get(action).add(systemNotification);
+                if(ifEqual(
+                    notificationUrl, existingTitle, existingBody, existingStartDate, existingEndDate,
+                    notificationUrl, systemNotification.getTitle(), systemNotification.getBody(), systemNotification.getStartDate(), systemNotification.getEndDate() 
+                )){
+                    action = AuditActions.IGNORE_NOTIFICATION;
+                }
                 
-                processedLearnNotificationsList.add(publisherNotificationId);
-            }
+                logger.info(action + " " + publisherNotificationId);  
+                if(action.equals(AuditActions.CREATE_NOTIFICATION) || action.equals(AuditActions.UPDATE_NOTIFICATION)){                                   
+                    logger.info("final systemNotification - " + systemNotification);  
+                    actionsCache.get(action).add(systemNotification);                
+                    processedLearnNotificationsList.add(publisherNotificationId);
+                }                               
+            }            
         }
     }
+    
+    private static String formatDate(Date date){
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");            
+            return sdf.format(date);
+        }catch(Exception e){
+            return "0000-00-00 00:00:00";
+        }
+    }
+    
+    private static boolean ifEqual(
+            String existingUrl, String existingTitle, String existingBody, Date existingStartDate, Date existingEndDate,
+            String newUrl, String newTitle, String newBody, Date newStartDate, Date newEndDate
+            ){
+
+        logger.info(        
+            "[1]" + existingUrl + "[2]" + existingTitle + "[3]" + existingBody + "[4]" + existingStartDate + "[5]" + existingEndDate + 
+            "[6]" + newUrl + "[7]" + newTitle + "[8]" + newBody + "[9]" + newStartDate + "[10]" + newEndDate        
+        );
+           
+        if (!existingUrl.equals(newUrl)) {        
+            return false;
+        }        
+        if (!existingTitle.equals(newTitle)) {          
+            return false;
+        }
+        if (!existingBody.equals(newBody)) {         
+            return false;
+        }
+        if (!formatDate(existingStartDate).equals(formatDate(newStartDate))) {         
+            return false;
+        }
+        if (!formatDate(existingEndDate).equals(formatDate(newEndDate))) {
+            return false;
+        }
+ 
+        return true;
+            
+    }
+    
+    private static Date subtractDays(Date date, int days) {
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.setTime(date);
+		cal.add(Calendar.DATE, -days);
+				
+		return cal.getTime();
+    }    
     
     public void processCourseAnnouncements(List<Notification> existingLearnNotificationsList, Map<Integer, String> userIdNamePair, Map<String,List<Notification>> actionsCache, List<String> processedLearnNotificationsList) {
     	
@@ -444,8 +599,8 @@ public class LearnService {
     
            if (listOfCourseAnnouncements.size() > 0) {
         	   
-        	   List<Notification> courseNotificationsList = getLearnNotificationsByTopic(existingLearnNotificationsList, topic);
-               logger.info("Total number of system announcements in Notification Backbone - " + courseNotificationsList.size());
+               List<Notification> courseNotificationsList = getLearnNotificationsByTopic(existingLearnNotificationsList, topic);
+               logger.info("Total number of course announcements in Notification Backbone - " + courseNotificationsList.size());
                
                ArrayList<Integer> listOfCourseAnnouncementPks = new ArrayList<Integer>(); 
                
@@ -453,10 +608,22 @@ public class LearnService {
                List<CourseUsers> courseUsersList = null;
                Notification courseNotification = null;
                
-               for (int i = 0; i < listOfCourseAnnouncements.size(); i++) {
+               int size = listOfCourseAnnouncements.size();
+               for (int i = 0; i < size; i++) {
+
                    courseAnnouncement = listOfCourseAnnouncements.get(i);
 
+                   Date includeStartDate = subtractDays(new Date(), purge);
+                   if(courseAnnouncement.getEndDate() == null && courseAnnouncement.getStartDate().before(includeStartDate) ){
+                       //if this announcement has no end date and the start date is earlier than allowed start date, do not process
+                       //logger.info(i + "/" + size + "--------------------" + courseAnnouncement.getStartDate() + " - do not process");
+                       continue;                       
+                   }else{
+                       logger.info(i + "/" + size + "-------------------- process-" + courseAnnouncement);
+                   }
+                   
                    if(listOfCourseAnnouncementPks.contains(courseAnnouncement.getPk1())){
+                       logger.info("listOfCourseAnnouncementPks already contains, ignore");
                        continue;
                    }
                    listOfCourseAnnouncementPks.add(courseAnnouncement.getPk1());
@@ -471,6 +638,8 @@ public class LearnService {
                    courseUsersList = learnCourseUserRepository.findByCrsmainPk1(courseAnnouncement.getCrsmainPk1());
                    logger.info("Course announcement identified by " + publisherNotificationId + " has " + courseUsersList.size() + " users.");
                    
+                   logger.info("announcement - " + courseAnnouncement);                   
+                   
                    List<String> uunList = new ArrayList<String>();
                    String uun = null;
                    
@@ -481,24 +650,50 @@ public class LearnService {
                        
                       uunList.add(uun);
                   }   
-                   
+                  logger.info("uunList - " + uunList);                  
+
                   courseNotification = fetchNotification(courseNotificationsList, publisherNotificationId); 
+
                   String action = "";
+                 
+                  String existingTitle = "";
+                  String existingBody = "";
+                  Date existingStartDate = null;
+                  Date existingEndDate = null;
+                                  
+                  
                   if (courseNotification == null) {
-                	  courseNotification = new Notification();
-                	  action = AuditActions.CREATE_NOTIFICATION;
+                    courseNotification = new Notification();
+                    action = AuditActions.CREATE_NOTIFICATION;
                   }
                   else {
-                	  action = AuditActions.UPDATE_NOTIFICATION;
+                    action = AuditActions.UPDATE_NOTIFICATION;
+                  
+                    existingTitle = courseNotification.getTitle();
+                    existingBody = courseNotification.getBody();
+                    existingStartDate = courseNotification.getStartDate();
+                    existingEndDate = courseNotification.getEndDate();                      
                   }
-                   
+                  logger.info("fetchNotification(existing or new) - " + courseNotification);      
+                  
                   courseNotification = assembleNotification(Learn.PUBLISHER_ID, publisherNotificationId, topic, title, body, notificationUrl, startDate, endDate, uunList, courseNotification); 
-
-                  logger.info("Course notification identified by " + publisherNotificationId + " to be handled as " + action);
+                  logger.info("assembleNotification(to be created) - " + courseNotification);
+                
+                  if(ifEqual(
+                    notificationUrl, existingTitle, existingBody, existingStartDate, existingEndDate,
+                    notificationUrl, courseNotification.getTitle(), courseNotification.getBody(), courseNotification.getStartDate(), courseNotification.getEndDate() 
+                  )){
+                    action = AuditActions.IGNORE_NOTIFICATION;
+                  }
                   
-                  actionsCache.get(action).add(courseNotification);
+                  logger.info(action + " " + publisherNotificationId);  
+                  if(action.equals(AuditActions.CREATE_NOTIFICATION) || action.equals(AuditActions.UPDATE_NOTIFICATION)){                                   
+                     logger.info("final courseNotification - " + courseNotification);  
+                     actionsCache.get(action).add(courseNotification);                  
+                     processedLearnNotificationsList.add(publisherNotificationId); 
+                  }                  
                   
-                  processedLearnNotificationsList.add(publisherNotificationId);            
+           
                }
            } 
     }
@@ -508,7 +703,7 @@ public class LearnService {
             	if (notifications != null && !notifications.isEmpty()) {
             		
             		if(action.equals(AuditActions.CREATE_NOTIFICATION) || action.equals(AuditActions.UPDATE_NOTIFICATION)){                      
-                            logger.info("notifications is not empty - total notificatinos - " + notifications.size());
+                            logger.info("notifications is not empty - total notifications - " + notifications.size());
                             
                             List<Notification> notificationsToAction = new ArrayList<Notification>();
                             for(int i = 0; i < notifications.size(); i++){
@@ -518,18 +713,35 @@ public class LearnService {
                                 }
                                 notificationsToAction.add(notification);
                             }
+                                                                                    
+                            //notificationRepository.bulkSave(notificationsToAction);
                             
-                            logger.info("start inserting or updating, this may take a while");
-                            notificationRepository.bulkSave(notificationsToAction);
+                            int size = notificationsToAction.size();                            
+                            logger.info("start inserting or updating, this may take a while - [" + action + "] size - [" + size + "]");                                                        
+                            for(int i = 0; i < size; i++){
+                                logger.info(i + "/" + size + " save - " + notificationsToAction.get(i));
+                                notificationRepository.save(notificationsToAction.get(i));
+                            }
+                            
+                            
                             logger.info("finished... ");
 
                     }else if(action.equals(AuditActions.DELETE_NOTIFICATION)){                      
                         //notificationRepository.delete(notifications);
-                        logger.info("deleting notifications (setting end dates");
+                        
+                        logger.info("deleting notifications (setting end dates) - " +  notifications.size());
                         for(int i = 0; i < notifications.size(); i++){
                             notifications.get(i).setEndDate(new Date());
                         }
-                        notificationRepository.bulkSave(notifications);
+                        
+                        //notificationRepository.bulkSave(notifications);
+                        for(int i = 0; i < notifications.size(); i++){
+                            logger.info("process " + i + " - " + notifications.get(i));
+                            notificationRepository.save(notifications.get(i));
+                            logger.info("done");
+                        }
+                        
+                        
                         logger.info("bulk save complete");
                     } 
             	}

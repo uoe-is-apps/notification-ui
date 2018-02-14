@@ -174,7 +174,7 @@ public class NotificationController {
             logger.info("notification will be created for the following users");
             logger.info("getMembersFromParentGroup - " + notification.getNotificationGroup()+ " name - " + groupName + " numOfUsers found - " + ldapUsers.size() );
             for(int i = 0; i < ldapUsers.size(); i++){
-                System.out.println("ldapUsers - " + i + " " + ldapUsers.get(i));                  
+                logger.info("ldapUsers - " + i + " " + ldapUsers.get(i));                  
             } 
             
             ArrayList<NotificationUser> userList = new ArrayList<NotificationUser>();

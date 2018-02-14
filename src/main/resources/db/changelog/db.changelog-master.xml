@@ -139,4 +139,11 @@
                  stripComments="true"/>
     </changeSet>     
     
+    <changeSet id="alter_notification_users_table_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/alter_notification_users_table_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>       
+    
 </databaseChangeLog>

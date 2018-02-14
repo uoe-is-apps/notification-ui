@@ -24,7 +24,8 @@ public class NotificationTidyupService {
          
     @Value("${notification.purge}")
     int purge;
-       
+     
+    /*
     public List<Notification> findDeletableNotification(){
         Date now = new Date();
         Calendar cal = Calendar.getInstance();
@@ -48,5 +49,10 @@ public class NotificationTidyupService {
         
         notificationRepository.delete(list);
     }
- 
+    */
+    
+    public void tidyupNotification(){
+        notificationRepository.bulkDelete(purge);
+    }
+    
 }
