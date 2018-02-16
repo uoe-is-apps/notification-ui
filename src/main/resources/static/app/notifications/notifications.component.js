@@ -144,7 +144,9 @@ angular.module('notifications')
             // controller API
 
             self.save = function(notification) {
+                processingIndicator = true;        
 
+setTimeout(function(){  
                 if (notification) {
                     notification.lastUpdated = new Date();
 
@@ -182,6 +184,8 @@ angular.module('notifications')
                             });
                     }
                 }
+}, 1500);                
+                
             };
 
             self.back = function() {
@@ -225,6 +229,19 @@ angular.module('notifications')
                     return false;
               }              
             };
+
+            self.ifShowGroupSelectionTree = function(topic) {
+                if(topic === 'Emergency'){
+                    return false;
+                }else{
+                    return true;
+                }                
+            }
+            
+            var processingIndicator = false;
+            self.ifShowProcessingIndicator = function() {               
+                return processingIndicator;               
+            }            
 
             $('#groupTree').jstree({
                 'core' : {

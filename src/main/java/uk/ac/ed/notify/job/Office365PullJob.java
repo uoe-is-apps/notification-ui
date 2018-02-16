@@ -31,17 +31,17 @@ public class Office365PullJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         //if(true) return;
-        logger.info("Office365PullJob started, source: " + source);
+        logger.info("Office365PullJob started, source: " + source + ".............................scheduled jobs start");
         
         if(source.equals("office365")){
             String token = office365Service.acquireAccessToken();                
             if(token.length() > 0) office365Service.processUnreadEmail(token);
             
         }else if(source.equals("exchange")){
-            logger.info("fetching email from exchange: " + source);
+            logger.info("fetching email from exchange: " + source + ".............................scheduled jobs start");
             ewsService.processUnreadEmail();
         }
         
-        logger.info("Office365PullJob finished successfully");
+        logger.info("Office365PullJob finished successfully" + ".................................scheduled jobs completes");
     }
 }
