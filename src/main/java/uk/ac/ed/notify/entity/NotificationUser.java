@@ -58,9 +58,14 @@ public class NotificationUser {
 	
 	@Override
 	public int hashCode() {
-		int result;
-		result = this.getId().getUun().hashCode();
+		int result = 0;
+                
+                if(this.getId() != null && this.getId().getUun() != null)
+		result += this.getId().getUun().hashCode();
+                
+                if(this.getId() != null && this.getId().getNotificationId() != null)
 		result += this.getId().getNotificationId().hashCode();
+                
 		return result;
 	}
 }
