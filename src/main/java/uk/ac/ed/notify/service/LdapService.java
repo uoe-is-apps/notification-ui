@@ -292,11 +292,15 @@ public class LdapService {
                  getOrgUnits().add(nextLevelOfGroupMembers); 
                  //level--;
                 
-                 if (!amendBase.startsWith("ou=SU") &&  getNextLevelGroups(amendBase).size() >0   && level>0) {
+                 try{
+                 if (amendBase != null && !amendBase.startsWith("ou=SU") &&  getNextLevelGroups(amendBase).size() >0   && level>0) {
                     traverseAllNodes(amendBase, getNextLevelGroups(amendBase),level); 
                  }else{
                      //exit recursive
-                 }          
+                 }   
+                 }catch(Exception e){
+                     logger.error("error traverseAllNodes - " + base + e);
+                 }
             }
              
             return getOrgUnits(); 

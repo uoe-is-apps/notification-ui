@@ -98,6 +98,12 @@ public class LdapController {
         for(int i = 0; i < listOfUUNs2.size(); i++){
             System.out.println("listOfUUNs2 - " +i + " " + listOfUUNs2.get(i));                  
         }        
+        
+        
+        List<String> listOfUUNs1 = ldapService.getMembersFromParentGroup("ou=AHSS,ou=UOE,ou=org,ou=grouper2,dc=authorise,dc=ed,dc=ac,dc=uk");
+        for(int i = 0; i < listOfUUNs1.size(); i++){
+            System.out.println("listOfUUNs1 - " + i + " " + listOfUUNs1.get(i));                  
+        }        
         */
         
         return list;
