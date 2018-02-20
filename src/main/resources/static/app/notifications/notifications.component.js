@@ -146,6 +146,9 @@ angular.module('notifications')
             self.save = function(notification) {
                 processingIndicator = true;        
 
+
+
+
 setTimeout(function(){  
                 if (notification) {
                     notification.lastUpdated = new Date();
@@ -154,7 +157,13 @@ setTimeout(function(){
 
                         NotificationService.update(notification).then(function(response) {
 
-                            messenger.setMessage(messenger.types.SUCCESS, "Notification '" + notification.title + "' has been updated.");
+                            if(response.data.title == 'ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER'){
+                                messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "', no group member found.");
+                            }else if(response.data.title == 'ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER'){
+                                messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "', more than 2000 group members found, please contact administrator.");
+                            }else{
+                                messenger.setMessage(messenger.types.SUCCESS, "Notification '" + notification.title + "' has been updated.");
+                            }
 
                             _notification.reset();
                             self.back();
@@ -171,8 +180,14 @@ setTimeout(function(){
 
                         NotificationService.create(notification).then(function(response) {
 
-                            messenger.setMessage(messenger.types.SUCCESS, "Notification '" + notification.title + "' has been saved.");
-
+                            if(response.data.title == 'ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER'){
+                                messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "', no group member found.");
+                            }else if(response.data.title == 'ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER'){
+                                messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "', more than 2000 group members found, please contact administrator.");
+                            }else{
+                                messenger.setMessage(messenger.types.SUCCESS, "Notification '" + notification.title + "' has been created.");
+                            }
+        
                             _notification.reset();
                             self.back();
                         })
@@ -184,7 +199,13 @@ setTimeout(function(){
                             });
                     }
                 }
-}, 1500);                
+}, 1000);                
+                
+                
+                
+                
+                
+                
                 
             };
 

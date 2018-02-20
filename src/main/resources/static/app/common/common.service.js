@@ -9,6 +9,8 @@ angular.module('common')
         return {
             types: {
                 SUCCESS: 'success',
+                DANGER: 'danger',
+                WARNING: 'warning',
                 ERROR: 'error'
             },
 

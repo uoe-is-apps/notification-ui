@@ -99,12 +99,28 @@ public class LdapController {
             System.out.println("listOfUUNs2 - " +i + " " + listOfUUNs2.get(i));                  
         }        
         
-        
+        //too many 200k 
         List<String> listOfUUNs1 = ldapService.getMembersFromParentGroup("ou=AHSS,ou=UOE,ou=org,ou=grouper2,dc=authorise,dc=ed,dc=ac,dc=uk");
         for(int i = 0; i < listOfUUNs1.size(); i++){
             System.out.println("listOfUUNs1 - " + i + " " + listOfUUNs1.get(i));                  
         }        
         */
+        
+        
+        /*
+        //no entries
+        List<String> listOfUUNs1 = ldapService.getMembersFromParentGroup("ou=D339,ou=S31,ou=MVM3,ou=MVM,ou=UOE,ou=org,ou=grouper2,dc=authorise,dc=ed,dc=ac,dc=uk");
+        for(int i = 0; i < listOfUUNs1.size(); i++){
+            System.out.println("listOfUUNs1 - " + i + " " + listOfUUNs1.get(i));                  
+        }  
+        
+        
+        List<String> listOfUUNs2 = ldapService.getMembersFromParentGroup("ou=S31,ou=MVM3,ou=MVM,ou=UOE,ou=org,ou=grouper2,dc=authorise,dc=ed,dc=ac,dc=uk");               
+        for(int i = 0; i < listOfUUNs2.size(); i++){
+            System.out.println("listOfUUNs2 - " +i + " " + listOfUUNs2.get(i));                  
+        }           
+        */
+        
         
         return list;
     }    

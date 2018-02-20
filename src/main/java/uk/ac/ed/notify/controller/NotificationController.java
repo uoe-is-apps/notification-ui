@@ -92,7 +92,22 @@ public class NotificationController {
     public JsonNotification setNotification(HttpServletRequest httpRequest, @RequestBody JsonNotification notification) throws ServletException, JsonProcessingException {              
         logger.info("setNotification called by [" + httpRequest.getRemoteUser() + "]");
         logger.info("notification - " + notification);        
-        notification = constructNotificationWithLdapGroup(notification);        
+        notification = constructNotificationWithLdapGroup(notification);    
+
+        if(notification.getTopic().equals("Group") && notification.getNotificationUsers() != null){
+            if(notification.getNotificationUsers().size() == 0){
+                JsonNotification result = new JsonNotification();
+                result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");
+                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");      
+                return result;
+            }else if(notification.getNotificationUsers().size() > 2000){
+                JsonNotification result = new JsonNotification();
+                result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");
+                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");      
+                return result;
+            }
+        }
+        
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity request= new HttpEntity(notification, headers);
@@ -103,16 +118,32 @@ public class NotificationController {
     }
 
     @RequestMapping(value="/notification/{notification-id}",method=RequestMethod.PUT)
-    public void updateNotification(HttpServletRequest httpRequest, @PathVariable("notification-id") String notificationId, @RequestBody JsonNotification notification) throws ServletException {       
+    public JsonNotification updateNotification(HttpServletRequest httpRequest, @PathVariable("notification-id") String notificationId, @RequestBody JsonNotification notification) throws ServletException {       
         logger.info("updateNotification called by [" + httpRequest.getRemoteUser() + "]");
         logger.info("notificationId - " + notificationId);      
         logger.info("notification - " + notification);      
-        notification = constructNotificationWithLdapGroup(notification);        
+        notification = constructNotificationWithLdapGroup(notification);   
+        
+        if(notification.getTopic().equals("Group") && notification.getNotificationUsers() != null){
+            if(notification.getNotificationUsers().size() == 0){
+                JsonNotification result = new JsonNotification();
+                result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");
+                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");      
+                return result;
+            }else if(notification.getNotificationUsers().size() > 2000){
+                JsonNotification result = new JsonNotification();
+                result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");
+                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");      
+                return result;
+            }
+        }
+                        
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity request= new HttpEntity(notification, headers);
         ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/"+notificationId, HttpMethod.PUT, request, JsonNotification.class);
-        logger.info("response - " + response);
+        logger.info("response - " + response);        
+        return response.getBody();
     }
 
     @RequestMapping(value="/notification/{notification-id}",method=RequestMethod.DELETE)
