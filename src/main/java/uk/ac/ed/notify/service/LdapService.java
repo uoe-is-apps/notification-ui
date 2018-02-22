@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.StringTokenizer;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchControls;
@@ -131,6 +132,35 @@ public class LdapService {
             
     public List<String> getMembersFromParentGroup(String base)
     {               
+        /*
+         * input  ou=SU685,ou=D685,ou=P5M,ou=ISG3,ou=ISG,ou=UOE,ou=org,ou=grouper2,dc=authorise,dc=ed,dc=ac,dc=uk
+         * output          ou=D685,ou=P5M,ou=ISG3,ou=ISG,ou=UOE,ou=org,ou=grouper2,dc=authorise,dc=ed,dc=ac,dc=uk
+         */
+        if(base.startsWith("ou=SU")){                
+             String su = "";
+             String ou = "";
+             StringTokenizer st = new StringTokenizer(base, ",");
+             while (st.hasMoreTokens()) {
+                    String nextToken = st.nextToken();
+                    if(nextToken.contains("ou=SU")){
+                        su = nextToken;
+                    }
+                    if(nextToken.contains("ou=D")){
+                        ou = nextToken;
+                    }
+                    
+                    if(!su.equals("") && !ou.equals("")){
+                        
+                        if(su.replace("ou=SU", "").equals(ou.replace("ou=D", ""))){
+                            base = base.substring(base.indexOf(",") + 1);
+                        }
+                        
+                        break;
+                    }
+            }
+        }        
+        
+            
         //always clear the array before each invocation 
         results = new ArrayList<String>();
 
@@ -212,16 +242,19 @@ public class LdapService {
 		getOrgUnits().add(orgUnit);
 
 		
-		 List<LdapGroup> groups = getNextLevelGroups(basePath); 
-                 if(level==1) {
-		 return getOrgUnits(); 
-                 } 
-                 //level= level-1;
-		 if(groups.size() > 0 ) { 
-                 if (groups != null && groups.size() > 0) { 
-                     traverseAllNodes(basePath, groups, level);
-                 }
-                 }
+		List<LdapGroup> groups = getNextLevelGroups(basePath); 
+                if(level==1) {
+		return getOrgUnits(); 
+                } 
+                 
+                 
+                 
+                //level= level-1;
+		if(groups != null && groups.size() > 0 ) { 
+                   if (groups != null && groups.size() > 0) { 
+                       traverseAllNodes(basePath, groups, level);
+                   }
+                }
 
 		return getOrgUnits();
 	}

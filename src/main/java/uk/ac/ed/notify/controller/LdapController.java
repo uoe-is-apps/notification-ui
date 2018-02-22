@@ -122,6 +122,14 @@ public class LdapController {
         */
         
         
+        /*
+        List<String> listOfUUNs3 = ldapService.getMembersFromParentGroup("ou=SU685,ou=D685,ou=P5M,ou=ISG3,ou=ISG,ou=UOE,ou=org,ou=grouper2,dc=authorise,dc=ed,dc=ac,dc=uk");               
+        for(int i = 0; i < listOfUUNs3.size(); i++){
+            System.out.println("listOfUUNs3 - " +i + " " + listOfUUNs3.get(i));                  
+        }         
+        */
+        
+        
         return list;
     }    
  
