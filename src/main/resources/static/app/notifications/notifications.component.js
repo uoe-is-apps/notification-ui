@@ -157,7 +157,9 @@ setTimeout(function(){
 
                         NotificationService.update(notification).then(function(response) {
 
-                            if(response.data.title == 'ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER'){
+                            if(response.data.title == 'ERROR_GROUP_NOTIFICATION_CREATION_INCORRECT_LEVEL'){
+                                messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "', incorrect orgunit level selected, only level 4, 5, 6 are allowed.");
+                            }else if(response.data.title == 'ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER'){
                                 messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "', no group member found.");
                             }else if(response.data.title == 'ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER'){
                                 messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "', more than 2000 group members found, please contact administrator.");
@@ -180,7 +182,9 @@ setTimeout(function(){
 
                         NotificationService.create(notification).then(function(response) {
 
-                            if(response.data.title == 'ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER'){
+                            if(response.data.title == 'ERROR_GROUP_NOTIFICATION_CREATION_INCORRECT_LEVEL'){
+                                messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "', incorrect orgunit level selected, only level 4, 5, 6 are allowed.");
+                            }else if(response.data.title == 'ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER'){
                                 messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "', no group member found.");
                             }else if(response.data.title == 'ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER'){
                                 messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "', more than 2000 group members found, please contact administrator.");

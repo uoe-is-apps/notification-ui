@@ -9,6 +9,8 @@ import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.web.bind.annotation.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import uk.ac.ed.notify.entity.JsonNotification;
 
@@ -91,7 +93,20 @@ public class NotificationController {
     @RequestMapping(value="/notification/", method=RequestMethod.POST)
     public JsonNotification setNotification(HttpServletRequest httpRequest, @RequestBody JsonNotification notification) throws ServletException, JsonProcessingException {              
         logger.info("setNotification called by [" + httpRequest.getRemoteUser() + "]");
-        logger.info("notification - " + notification);        
+        logger.info("notification - " + notification);       
+                
+        if(notification.getNotificationGroup() != null){
+            String ldapGroup = notification.getNotificationGroup();
+            int numOfLevel = countNumberOfOccurrences("ou=",ldapGroup);
+            if(numOfLevel <= 5){
+                JsonNotification result = new JsonNotification();
+                result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_INCORRECT_LEVEL");
+                logger.error("ladp group - " + ldapGroup + " num of ou: " + numOfLevel);
+                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_INCORRECT_LEVEL");      
+                return result;                
+            }
+        }
+
         notification = constructNotificationWithLdapGroup(notification);    
 
         if(notification.getTopic().equals("Group") && notification.getNotificationUsers() != null){
@@ -100,7 +115,7 @@ public class NotificationController {
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");
                 logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");      
                 return result;
-            }else if(notification.getNotificationUsers().size() > 2000){
+            }else if(notification.getNotificationUsers().size() > 15000){
                 JsonNotification result = new JsonNotification();
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");
                 logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");      
@@ -130,7 +145,7 @@ public class NotificationController {
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");
                 logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");      
                 return result;
-            }else if(notification.getNotificationUsers().size() > 2000){
+            }else if(notification.getNotificationUsers().size() > 15000){
                 JsonNotification result = new JsonNotification();
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");
                 logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");      
@@ -167,7 +182,7 @@ public class NotificationController {
     }
 
     @RequestMapping(value = "/checkIfLdapGroupContainMember/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String checkIfLdapGroupContainMember(@RequestBody JsonNotification notification) {
+    public @ResponseBody String checkIfLdapGroupContainMember(@RequestBody JsonNotification notification) {        
         if(notification.getNotificationGroup() != null){
             List<String> ldapUsers = ldapService.getMembers(notification.getNotificationGroup());
             if(ldapUsers.size() > 0){
@@ -227,4 +242,14 @@ public class NotificationController {
     }
     
         
+    private int countNumberOfOccurrences(String source, String sentence) {
+        String in = sentence;
+        int i=0;
+        Pattern p = Pattern.compile(source);
+        Matcher m = p.matcher(in);
+        while (m.find()) {
+            i++;
+        }        
+        return i;
+    }    
 }
