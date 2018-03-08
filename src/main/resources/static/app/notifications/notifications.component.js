@@ -218,10 +218,8 @@ setTimeout(function(){
             };
 
             // date time picker settings
-
             self.startDatePickerOptions = {
-                format: 'DD-MM-YYYYTHH:mm:ssZ',
-                minDate: (self.notification.startDate != null) ? self.notification.startDate : new Date()
+                format: 'DD-MM-YYYYTHH:mm:ssZ'
             };
 
             self.endDatePickerOptions = {
@@ -229,15 +227,7 @@ setTimeout(function(){
                 useCurrent: false
             };
 
-            self.updateRange = function() {
-
-                self.startDatePickerOptions.maxDate = self.notification.endDate;
-                self.endDatePickerOptions.minDate = self.notification.startDate;
-
-            };
-
-            // js tree settings
-            // TODO: CONVERT INTO ANGULAR DIRECTIVE (ngJsTree not working)
+            self.updateRange = function() {};
 
             self.toggle = function() {
                 self.showTree = !self.showTree;
