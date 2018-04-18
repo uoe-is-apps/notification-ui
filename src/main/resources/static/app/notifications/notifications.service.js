@@ -36,7 +36,7 @@ angular.module('notifications')
 
             var topic = _topic.charAt(0).toUpperCase() + _topic.slice(1);
 
-            return { publisherId: "notify-ui", topic: topic };
+            return { publisherId: "notify-ui", topic: topic, ifNew: "new" };
         }
 
         this.reset = function() {

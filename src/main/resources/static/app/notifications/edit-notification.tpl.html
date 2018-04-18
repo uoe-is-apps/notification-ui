@@ -112,18 +112,19 @@
                             
                             
                            
-                            <input ng-hide="$ctrl.ifHideStartDate($ctrl.notification.startDate, $ctrl.notification.endDate)" type="text" 
+                            <input ng-hide="$ctrl.ifHideStartDate($ctrl.notification.startDate, $ctrl.notification.endDate, $ctrl.notification.ifNew)" type="text" 
                                    class="form-control" name="startDate" required
                                    datetimepicker
                                    ng-model="$ctrl.notification.startDate"
                                    options="$ctrl.startDatePickerOptions"
-                                   on-change="$ctrl.updateRange()">
+                                   on-change="$ctrl.updateRange($ctrl.notification.startDate, $ctrl.notification.endDate)">
      
-                            <input ng-hide="!$ctrl.ifHideStartDate($ctrl.notification.startDate, $ctrl.notification.endDate)" disabled 
+                            <input ng-hide="!$ctrl.ifHideStartDate($ctrl.notification.startDate, $ctrl.notification.endDate, $ctrl.notification.ifNew)" disabled 
                                    name="startDate" type="text" class="form-control" ng-model="$ctrl.notification.startDate" placeholder="Start Date" required 
+                                   options="$ctrl.startDatePickerOptions"
                                    size="200"/>
                                     
-                            <span  ng-hide="$ctrl.ifHideStartDate($ctrl.notification.startDate, $ctrl.notification.endDate)"  class="input-group-addon" >
+                            <span  ng-hide="$ctrl.ifHideStartDate($ctrl.notification.startDate, $ctrl.notification.endDate, $ctrl.notification.ifNew)"  class="input-group-addon" >
                                 <i class="glyphicon glyphicon-calendar"></i>
                              </span>
                           
@@ -147,7 +148,7 @@
                                    datetimepicker
                                    ng-model="$ctrl.notification.endDate"
                                    options="$ctrl.endDatePickerOptions"
-                                   on-change="$ctrl.updateRange()">
+                                   on-change="$ctrl.updateRange($ctrl.notification.startDate, $ctrl.notification.endDate)">
 
                             <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
                         </div>
@@ -155,6 +156,10 @@
                     <p class="help-block" ng-show="(form.endDate.$touched || form.$submitted) && form.endDate.$invalid">
                         End Date is required.
                     </p>
+                    
+                    <p class="help-block" ng-show="(form.endDate.$touched || form.$submitted) && $ctrl.updateRange($ctrl.notification.startDate, $ctrl.notification.endDate)">
+                        End Date is earlier than Start Date.
+                    </p>                    
                 </div>
             </div>
 

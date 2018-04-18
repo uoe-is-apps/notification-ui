@@ -227,13 +227,33 @@ setTimeout(function(){
                 useCurrent: false
             };
 
-            self.updateRange = function() {};
+            self.updateRange = function(startDate, endDate) {
+                
+                if (typeof startDate === "undefined") {
+                    return true;
+                }
+                if (typeof endDate === "undefined") {
+                    return true;
+                }                
+                                                
+                try{              
+                  if(startDate < endDate){
+                      return false;
+                  }else{                   
+                      //alert('show error');
+                      return true;
+                  }
+                }catch(e){
+                }                                  
+            };
 
             self.toggle = function() {
                 self.showTree = !self.showTree;
             };
 
-            self.ifHideStartDate = function(startDate, endDate) {
+            self.ifHideStartDate = function(startDate, endDate, ifNew) {
+                if(ifNew === 'new'){return false;}
+                
                 var currentTime = (new Date()).getTime();
                 try{              
                   if(startDate < currentTime && currentTime < endDate){
