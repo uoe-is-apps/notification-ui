@@ -76,20 +76,21 @@ angular.module('notifications')
                 
                 var now;
                 if(isBST(new Date())){                    
-                    now = new Date().toISOString();
-                    console.log("isBST - yes - " + new Date());
-                }else{                    
                     var nowDate = new Date();
-                    nowDate.setHours(nowDate.getHours() - 1);
+                    nowDate.setHours(nowDate.getHours() + 1);
                     now = nowDate.toISOString();
-                    console.log("isBST - no - " + nowDate);
+                    console.log("isBST - yes - " + nowDate);                                   
+                }else{                    
+                    now = new Date().toISOString();
+                    console.log("isBST - no - " + new Date());     
                 }
                 
-                console.log("new Date() - " + new Date());  
                 
+                console.log("new Date() - " + new Date());                  
                 var nowDate2 = new Date();
                 nowDate2.setHours(nowDate2.getHours() - 1);
                 console.log("minus 1 hour - " + nowDate2);  
+                
                 
                 for (var i = 0; i < data.length; i++) {
 
