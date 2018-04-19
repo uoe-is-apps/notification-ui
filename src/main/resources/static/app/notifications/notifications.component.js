@@ -84,14 +84,7 @@ angular.module('notifications')
                     now = new Date().toISOString();
                     console.log("isBST - no - " + new Date());     
                 }
-                
-                
-                console.log("new Date() - " + new Date());                  
-                var nowDate2 = new Date();
-                nowDate2.setHours(nowDate2.getHours() - 1);
-                console.log("minus 1 hour - " + nowDate2);  
-                
-                
+                                
                 for (var i = 0; i < data.length; i++) {
 
                     if (data[i].topic.toLowerCase() == self.topic) {

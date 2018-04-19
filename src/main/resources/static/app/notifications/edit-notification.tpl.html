@@ -164,7 +164,7 @@
             </div>
 
 
-            <button ng-hide="$ctrl.ifShowProcessingIndicator()" type="button" ng-disabled="form.$invalid" ng-click="$ctrl.save($ctrl.notification)" class="btn btn-primary">Save</button>
+            <button ng-hide="$ctrl.ifShowProcessingIndicator()" type="button" ng-disabled="form.$invalid || (form.endDate.$touched || form.$submitted) && !form.endDate.$invalid && $ctrl.updateRange($ctrl.notification.startDate, $ctrl.notification.endDate)" ng-click="$ctrl.save($ctrl.notification)" class="btn btn-primary">Save</button>
             <button ng-hide="$ctrl.ifShowProcessingIndicator()" type="button" ng-click="$ctrl.back()" class="btn btn-default">Cancel</button>
 
             <div ng-show="$ctrl.ifShowProcessingIndicator()">Processing... this may take a few seconds to complete</div>
