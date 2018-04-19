@@ -252,16 +252,20 @@ setTimeout(function(){
             };
 
             self.ifHideStartDate = function(startDate, endDate, ifNew) {
-                if(ifNew === 'new'){return true;}
+                if(ifNew === 'new'){
+                    return false;
+                }else{
+                    return true;
+                }
                 
                 var currentTime = (new Date()).getTime();
                 try{              
-                  if(startDate < currentTime && currentTime < endDate){
+                  if(startDate < currentTime && currentTime < endDate){                  
                       return true;
                   } 
                   return false;
                 }catch(e){
-                    return false;
+                  return false;
               }              
             };
 
