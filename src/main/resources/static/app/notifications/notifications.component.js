@@ -53,12 +53,36 @@ angular.module('notifications')
                 ]
             };
 
+            function lastSunday(month, year) {
+              var d = new Date();
+              var lastDayOfMonth = new Date(Date.UTC(year || d.getFullYear(), month+1, 0));
+              var day = lastDayOfMonth.getDay();
+              return new Date(Date.UTC(lastDayOfMonth.getFullYear(), lastDayOfMonth.getMonth(), lastDayOfMonth.getDate() - day));
+            }
+
+            function isBST(date) {
+              var d = date || new Date();
+              var starts = lastSunday(2, d.getFullYear());
+              starts.setHours(1);
+              var ends = lastSunday(9, d.getFullYear());
+              starts.setHours(1);
+              return d.getTime() >= starts.getTime() && d.getTime() < ends.getTime();
+            }
+
             NotificationService.all().then(function(response) {
 
                 var data = response.data;
                 var list = [];
-                var now = new Date().toISOString();
-
+                
+                var now;
+                if(isBST(new Date())){
+                    var nowDate = new Date();
+                    nowDate.setHours(nowDate.getHours() - 1);
+                    now = nowDate.toISOString();
+                }else{
+                    now = new Date().toISOString();
+                }
+                                
                 for (var i = 0; i < data.length; i++) {
 
                     if (data[i].topic.toLowerCase() == self.topic) {
