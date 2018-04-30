@@ -239,15 +239,17 @@ public class NotificationController {
             
             ArrayList<NotificationUser> userList = new ArrayList<NotificationUser>();
             for(int i = 0; i < ldapUsers.size(); i++){
-               NotificationUser user = new NotificationUser();
+               if(!ldapUsers.get(i).contains("/") && !ldapUsers.get(i).contains("_")){
+                    NotificationUser user = new NotificationUser();
 
-               NotificationUserPK nupk = new NotificationUserPK();
-               nupk.setNotificationId(notification.getNotificationId());
-               nupk.setUun(ldapUsers.get(i));
-               user.setId(nupk);
-               user.setNotification(dbNotification);
+                    NotificationUserPK nupk = new NotificationUserPK();
+                    nupk.setNotificationId(notification.getNotificationId());
+                    nupk.setUun(ldapUsers.get(i));
+                    user.setId(nupk);
+                    user.setNotification(dbNotification);
 
-               userList.add(user);
+                    userList.add(user);
+               }
             }
             notification.setNotificationUsers(userList);
 
