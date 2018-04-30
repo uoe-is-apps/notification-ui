@@ -38,6 +38,10 @@ import uk.ac.ed.notify.entity.AuditActions;
 /**
  * Created by rgood on 06/11/2015.
  */
+//DTI020-109 Remove Learn Integration
+public class LearnServiceTest {}
+
+/*
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = TestApplication.class)
 public class LearnServiceTest {
@@ -380,3 +384,4 @@ public class LearnServiceTest {
     }
     
 }
+*/

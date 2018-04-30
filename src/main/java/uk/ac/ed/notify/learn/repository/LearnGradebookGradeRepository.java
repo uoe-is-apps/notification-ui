@@ -12,8 +12,13 @@ import uk.ac.ed.notify.learn.entity.GradebookGrade;
  *
  * @author hsun1
  */
+//DTI020-109 Remove Learn Integration
+public interface LearnGradebookGradeRepository{}
+
+/*
 public interface LearnGradebookGradeRepository extends JpaRepository<GradebookGrade, Long>{
     
     List<GradebookGrade> findByGradebookMainPk1(Integer gradebookMainPk1);
     
 }
+*/

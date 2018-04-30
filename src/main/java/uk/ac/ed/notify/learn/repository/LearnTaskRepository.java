@@ -12,8 +12,13 @@ import uk.ac.ed.notify.learn.entity.Tasks;
  *
  * @author hsun1
  */
+//DTI020-109 Remove Learn Integration
+public interface LearnTaskRepository{}
+
+/*
 public interface LearnTaskRepository extends JpaRepository<Tasks, Long>{
     
        List<Tasks> findTasks();
     
 }
+*/
