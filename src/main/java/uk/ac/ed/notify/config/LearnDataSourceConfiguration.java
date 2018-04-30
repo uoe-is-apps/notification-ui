@@ -20,6 +20,10 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 
+//DTI020-109 Remove Learn Integration
+public class LearnDataSourceConfiguration{}
+
+/*
 @Configuration
 @EnableJpaRepositories(basePackages = "uk.ac.ed.notify.learn.repository", entityManagerFactoryRef = "learnEntityManagerFactory", transactionManagerRef = "learnTransactionManager")
 @EnableTransactionManagement
@@ -51,3 +55,4 @@ public class LearnDataSourceConfiguration
     return new JpaTransactionManager(factory);
   }
 }
+*/

@@ -9,11 +9,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ed.notify.service.LearnService;
 
+//DTI020-109 Remove Learn Integration
+public class LearnSystemPullJob{}
 
-/**
- * Job to implement the Learn pull
- * Created by rgood on 05/10/15.
- */
+/*
 @DisallowConcurrentExecution
 public class LearnSystemPullJob implements Job {
     private static final Logger logger = LoggerFactory.getLogger(LearnSystemPullJob.class);
@@ -29,3 +28,4 @@ public class LearnSystemPullJob implements Job {
         logger.info ("LearnSystemPullJob finished successfully............................................scheduled jobs completes");
     }
 }
+*/
