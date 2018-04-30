@@ -188,8 +188,10 @@ setTimeout(function(){
                             }else if(response.data.title == 'ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER'){
                                 messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "', no group member found.");
                             }else if(response.data.title == 'ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER'){
-                                messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "', more than 2000 group members found, please contact administrator.");
-                            }else{
+                                messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "', more than 5000 group members found, please contact administrator.");
+                            }else if(response.data.title == 'ERROR_NOTIFICATION_CREATION'){
+                                messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "'");                                                                                    
+                            }else{                            
                                 messenger.setMessage(messenger.types.SUCCESS, "Notification '" + notification.title + "' has been updated.");
                             }
 
@@ -213,7 +215,9 @@ setTimeout(function(){
                             }else if(response.data.title == 'ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER'){
                                 messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "', no group member found.");
                             }else if(response.data.title == 'ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER'){
-                                messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "', more than 2000 group members found, please contact administrator.");
+                                messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "', more than 5000 group members found, please contact administrator.");                            
+                            }else if(response.data.title == 'ERROR_NOTIFICATION_CREATION'){
+                                messenger.setMessage(messenger.types.DANGER, "Error creating notification '" + notification.title + "'");                                                                                    
                             }else{
                                 messenger.setMessage(messenger.types.SUCCESS, "Notification '" + notification.title + "' has been created.");
                             }

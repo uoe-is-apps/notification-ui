@@ -115,7 +115,7 @@ public class NotificationController {
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");
                 logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");      
                 return result;
-            }else if(notification.getNotificationUsers().size() > 15000){
+            }else if(notification.getNotificationUsers().size() > 5000){
                 JsonNotification result = new JsonNotification();
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");
                 logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");      
@@ -123,12 +123,19 @@ public class NotificationController {
             }
         }
         
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity request= new HttpEntity(notification, headers);
-        ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/", HttpMethod.POST, request, JsonNotification.class);
-        logger.info("response - " + response);
-        return response.getBody();
+        try{
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity request= new HttpEntity(notification, headers);
+            ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/", HttpMethod.POST, request, JsonNotification.class);
+            logger.info("response - " + response);
+            return response.getBody();
+        }catch(Exception e){
+            JsonNotification result = new JsonNotification();
+            result.setTitle("ERROR_NOTIFICATION_CREATION");
+            logger.error("notification - ERROR_NOTIFICATION_CREATION - " + e.toString());      
+            return result;
+        }        
 
     }
 
@@ -145,7 +152,7 @@ public class NotificationController {
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");
                 logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");      
                 return result;
-            }else if(notification.getNotificationUsers().size() > 15000){
+            }else if(notification.getNotificationUsers().size() > 5000){
                 JsonNotification result = new JsonNotification();
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");
                 logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");      
@@ -153,12 +160,19 @@ public class NotificationController {
             }
         }
                         
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity request= new HttpEntity(notification, headers);
-        ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/"+notificationId, HttpMethod.PUT, request, JsonNotification.class);
-        logger.info("response - " + response);        
-        return response.getBody();
+        try{
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity request= new HttpEntity(notification, headers);
+            ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/"+notificationId, HttpMethod.PUT, request, JsonNotification.class);
+            logger.info("response - " + response);        
+            return response.getBody();
+        }catch(Exception e){
+            JsonNotification result = new JsonNotification();
+            result.setTitle("ERROR_NOTIFICATION_CREATION");
+            logger.error("notification - ERROR_NOTIFICATION_CREATION - " + e.toString());      
+            return result;
+        }
     }
 
     @RequestMapping(value="/notification/{notification-id}",method=RequestMethod.DELETE)
