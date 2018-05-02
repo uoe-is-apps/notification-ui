@@ -146,4 +146,14 @@
                  stripComments="true"/>
     </changeSet>       
     
+    <changeSet id="delete_learn_job_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/delete_learn_job_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>      
+    
+    
+    
+    
 </databaseChangeLog>
