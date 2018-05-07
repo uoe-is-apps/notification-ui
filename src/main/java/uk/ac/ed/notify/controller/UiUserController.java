@@ -11,13 +11,17 @@ import uk.ac.ed.notify.repository.UiUserRoleRepository;
 
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Created by rgood on 29/10/2015.
  */
 @RestController
 public class UiUserController {
-
+    
+    protected final Log logger = LogFactory.getLog(this.getClass());
+    
     @Autowired
     UiUserRepository uiUserRepository;
 
@@ -62,11 +66,31 @@ public class UiUserController {
         return (List<UiRole>)uiRoleRepository.findAll();
     }
 
+
+    /*
+      User retrieval based on single sign on
+     */
     @RequestMapping(value="/user-role", method = RequestMethod.GET)
     public UiUser getUserRole(HttpServletRequest request)
     {
        String uun = request.getRemoteUser();
        return uiUserRepository.findOne(uun); 
     }
+    
+    
+    /*
+      Invalidate session
+     */
+    @RequestMapping(value="/invalidate-session", method = RequestMethod.GET)
+    public void invalidateSession(HttpServletRequest request)
+    {       
+       request.getSession().setAttribute("test", "test1");
+       logger.info("invalidate");
+       request.getSession().invalidate();
+       logger.info("remote user - " + request.getRemoteUser());
+       logger.info("session - " + request.getSession().getAttribute("test") );
+
+    }    
+    
     
 }

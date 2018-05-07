@@ -2,172 +2,227 @@
 <html>
 <head>
     <title>Notification Backbone</title>
-   <!-- <link href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">-->
-    <!--<link href="/webjars/edgel-webjar/2.0.0/gel/css/edgel.min.css" rel="stylesheet">-->
-    <!--<link href="/webjars/edgel-webjar/1.1.0/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">-->
-    <link href="/webjars/edgel-webjar/2.0.1/gel/css/edgel-green-dark.min.css" rel="stylesheet">
+    <link href="/webjars/edgel-webjar/2.0.1/gel/css/edgel-green-dark.min.css" rel="stylesheet" />
+    <link href="css/angular-addons.css" rel="stylesheet" />
+    <link href="css/ui-addons.css" rel="stylesheet" />
+
+    <style>
+        <!-- set width and height of grid here-->
+        .grid {
+            width: auto;
+            height: auto;
+        }
+
+        .ui-grid-viewport .ui-grid-cell-contents {
+          word-wrap: break-word;
+          white-space: normal !important;
+        }
+
+        .ui-grid-row, .ui-grid-cell {
+          height: auto !important;
+        }
+
+        .ui-grid-row div[role=row] {
+          display: flex ;
+          align-content: stretch;
+        }            
+    </style>
 </head>
 
-<body ng-app="notify-ui-app" ng-cloak class="ng-cloak">
-<nav class="navbar navbar-default" role="navigation">
-<div ng-controller="navigation" class="container">
-    <div class="navbar-header">
-        <button class="navbar-toggle collapsed" aria-expanded="false" type="button" data-toggle="collapse" data-target="#uoe-navbar-collapse">
-            <span class="sr-only">Toggle section links</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
-    </div>
-    <div class="navbar-collapse collapse" id="uoe-navbar-collapse" aria-expanded="false" style="height: 1px;">
-        <ul class="menu nav navbar-nav" role="tablist">
-            <li ng-class="{active:route.current.activetab=='group-notifications'}"><a href="#/list-group-notification">Group Notification</a></li>
-            <li ng-class="{active:route.current.activetab=='emergency-notifications'}"><a href="#/list-emergency-notification">Emergency Notification</a></li>
-            <li ng-class="{active:route.current.activetab=='publisher-subscriber'}"><a href="#/publisher-subscriber">Publisher Subscriber Details</a></li>
-            <li ng-class="{active:route.current.activetab=='user-notifications'}"><a href="#/user-notifications">User Notifications</a></li>
-            <li ng-class="{active:route.current.activetab=='scheduled-tasks'}"><a href="#/scheduled-tasks">Scheduled Tasks</a></li>
-            <li ng-class="{active:route.current.activetab=='user-administration'}"><a href="#/user-administration">User Administration</a></li>
-            <li ng-show="authenticated"><a href="cgi-bin/cosign-logout.pl" >Logout</a></li>
-        </ul>
-    </div>
-
-</div>
-</nav>
-
-<div class="jumbotron headercontainer">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-7 col-md-8">
-                <a href="http://www.ed.ac.uk/">
-                    <img src="../webjars/edgel-webjar/2.0.1/gel/images/logo.png" alt="The University of Edinburgh home" />
-                </a>
+<body ng-app="notify-ui-app">
+    <nav class="navbar navbar-default" role="navigation">
+        <div ng-controller="navigation" class="container">
+            <div class="navbar-header">
+                <button class="navbar-toggle collapsed" aria-expanded="false" type="button" data-toggle="collapse" data-target="#uoe-navbar-collapse">
+                    <span class="sr-only">Toggle section links</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
             </div>
+            <div class="navbar-collapse collapse" id="uoe-navbar-collapse" aria-expanded="false" style="height: 1px;">
+                <ul class="menu nav navbar-nav" role="tablist">
+                    <li ng-class="{active:isActiveTab('/home')}"><a href="#!/home">Home</a></li>
+                    <li ng-show="GROUP" ng-class="{active:isActiveTab('/notifications/group')}"><a href="#!/notifications/group">Group Notifications</a></li>
+                    <li ng-show="EMERGENCY" ng-class="{active:isActiveTab('/notifications/emergency')}"><a href="#!/notifications/emergency">Emergency Notifications</a></li>
+                    <li ng-show="USRSUPPORT" ng-class="{active:isActiveTab('/user-notifications')}"><a href="#!/user-notifications">User Notifications</a></li>
+                    <li ng-show="SYSSUPPORT" ng-class="{active:isActiveTab('/publisher-subscriber')}"><a href="#!/publisher-subscriber">Publisher Subscriber</a></li>
+                    <li ng-show="SYSSUPPORT" ng-class="{active:isActiveTab('/scheduled-jobs')}"><a href="#!/scheduled-jobs">Scheduled Jobs</a></li>                    
+                    <li ng-show="USERADMIN" ng-class="{active:isActiveTab('/user-administration')}"><a href="#!/user-administration">User Administration</a></li>                    
+                    <li ng-class="{active:isActiveTab('/logout')}"><a href="#!/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
 
-            <div role="search" class="col-sm-5 col-md-4 uoe-search-block">
-                <p>
-                    <a href="//www.ed.ac.uk/schools-departments/">
-                        <span class="glyphicon glyphicon-chevron-right"></span>
-                        Schools &amp; departments
+    </nav>
+
+    <div class="jumbotron headercontainer">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-7 col-md-8">
+                    <a href="http://www.ed.ac.uk/">
+                        <img src="../webjars/edgel-webjar/2.0.1/gel/images/logo.png" alt="The University of Edinburgh home" />
                     </a>
-                </p>
-                <form class="form-inline uoe-search-form" action="//www.ed.ac.uk/search" method="get">
-                    <div class="form-group">
-                        <label for="uoe-search" class="sr-only">Search:</label>
-                        <div class="input-group">
-                            <input type="text" placeholder="Search"
-                                   class="form-control" data-items="4"
-                                   data-provide="typeahead" name="q" id="uoe-search">
-                            <span class="input-group-btn">
+                </div>
+
+                <div role="search" class="col-sm-5 col-md-4 uoe-search-block">
+                    <p>
+                        <a href="//www.ed.ac.uk/schools-departments/">
+                            <span class="glyphicon glyphicon-chevron-right"></span>
+                            Schools &amp; departments
+                        </a>
+                    </p>
+                    <form class="form-inline uoe-search-form" action="//www.ed.ac.uk/search" method="get">
+                        <div class="form-group">
+                            <label for="uoe-search" class="sr-only">Search:</label>
+                            <div class="input-group">
+                                <input type="text" placeholder="Search"
+                                       class="form-control" data-items="4"
+                                       data-provide="typeahead" name="q" id="uoe-search">
+                                <span class="input-group-btn">
                   <button class="btn btn-uoe">
                       <span class="glyphicon glyphicon-search"></span>
                       <span class="sr-only">Search</span>
                   </button>
                 </span>
+                            </div>
                         </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="jumbotron home-hero" >
+
+        <div class="container">
+            <div class="titleblock">
+                <h1 class="sr-only">
+                    <a href="#">ED: Notification Backbone</a>
+                </h1>
+
+                <h1 class="site-section-heading" aria-hidden="true">
+                    <a href="#">ED: Notification Backbone</a>
+                </h1>
+            </div>
+        </div>
+    </div>
+
+    <div ng-view class="container content"></div>
+
+    <footer>
+
+        <div class="discover-uni">
+            <div class="container">
+                <h3>The University of Edinburgh</h3>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-4 col-md-4">
+                        <ul>
+                            <li><a href="http://www.ed.ac.uk/about/website/website-terms-conditions">Terms
+                                &amp; conditions</a></li>
+                            <li><a href="http://www.ed.ac.uk/about/website/privacy">Privacy
+                                &amp; cookies</a></li>
+                        </ul>
                     </div>
-                </form>
+
+                    <div class="col-sm-4 col-md-4">
+                        <ul>
+                            <li><a href="http://www.ed.ac.uk/about/website/accessibility">Website
+                                accessibility</a></li>
+                            <li><a href="http://www.ed.ac.uk/about/website/freedom-information">Freedom
+                                of information publication scheme</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-4 col-md-4 col-xs-6">
+                        <a href="//www.ed.ac.uk/about/mission-governance/affiliations">
+                            <img class="pull-right img-responsive"
+                                 alt="University affiliations"
+                                 src="../webjars/edgel-webjar/2.0.1/gel/images/footer-affiliations.png" />
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-4 col-md-4 col-sm-push-8">
+                        <a class="btn btn-uoe btn-sm pull-right"
+                           href="http://www.myed.ed.ac.uk/"> MyEd login <span
+                                class="glyphicon glyphicon-chevron-right"></span></a>
+                    </div>
+                    <div class="col-sm-8 col-md-8 col-sm-pull-4">
+                        <p>
+                            The University of Edinburgh is a charitable body,
+                            registered in Scotland, with registration number SC005336,
+                            VAT Registration Number GB&nbsp;592&nbsp;9507&nbsp;00, and is
+                            acknowledged by the UK authorities as a
+                            &ldquo;<a href="https://www.gov.uk/guidance/recognised-uk-degrees">Recognised body</a>&rdquo;
+                            which has been granted degree awarding powers.
+                        </p>
+                    </div>
+                </div>
             </div>
-
         </div>
-    </div>
-</div>
-<div class="jumbotron home-hero" >
 
-    <div class="container">
-        <div class="titleblock">
-            <h1 class="sr-only">
-                <a href="#">ED: Notification Backbone</a>
-            </h1>
-
-            <h1 class="site-section-heading" aria-hidden="true">
-                <a href="#">ED: Notification Backbone</a>
-            </h1>
-        </div>
-    </div>
-</div>
-<div ng-view class="container content"></div>
-<footer>
-
-    <div class="discover-uni">
-        <div class="container">
-            <h3>The University of Edinburgh</h3>
-        </div>
-    </div>
-
-    <div class="footer">
-        <div class="container">
+        <div class="container footer-copyright">
             <div class="row">
-                <div class="col-sm-4 col-md-4">
-                    <ul>
-                        <li><a href="http://www.ed.ac.uk/about/website/website-terms-conditions">Terms
-                            &amp; conditions</a></li>
-                        <li><a href="http://www.ed.ac.uk/about/website/privacy">Privacy
-                            &amp; cookies</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-sm-4 col-md-4">
-                    <ul>
-                        <li><a href="http://www.ed.ac.uk/about/website/accessibility">Website
-                            accessibility</a></li>
-                        <li><a href="http://www.ed.ac.uk/about/website/freedom-information">Freedom
-                            of information publication scheme</a></li>
-                    </ul>
-                </div>
-                <div class="col-sm-4 col-md-4 col-xs-6">
-                    <a href="//www.ed.ac.uk/about/mission-governance/affiliations">
-                        <img class="pull-right img-responsive"
-                             alt="University affiliations"
-                             src="../webjars/edgel-webjar/2.0.1/gel/images/footer-affiliations.png" />
-                    </a>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-sm-4 col-md-4 col-sm-push-8">
-                    <a class="btn btn-uoe btn-sm pull-right"
-                       href="http://www.myed.ed.ac.uk/"> MyEd login <span
-                            class="glyphicon glyphicon-chevron-right"></span></a>
-                </div>
-                <div class="col-sm-8 col-md-8 col-sm-pull-4">
-                    <p>
-                        The University of Edinburgh is a charitable body,
-                        registered in Scotland, with registration number SC005336,
-                        VAT Registration Number GB&nbsp;592&nbsp;9507&nbsp;00, and is
-                        acknowledged by the UK authorities as a
-                        &ldquo;<a href="https://www.gov.uk/guidance/recognised-uk-degrees">Recognised body</a>&rdquo;
-                        which has been granted degree awarding powers.
-                    </p>
+                <div class="col-md-12 copyright">
+                    <p>Unless explicitly stated otherwise, all material is
+                        copyright &copy; The University of Edinburgh.</p>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="container footer-copyright">
-        <div class="row">
-            <div class="col-md-12 copyright">
-                <p>Unless explicitly stated otherwise, all material is
-                    copyright &copy; The University of Edinburgh.</p>
-            </div>
-        </div>
-    </div>
+    </footer>
 
+    <script src="js/ui-scripts.js" type="text/javascript"></script>
+    <script src="js/angular-scripts.js" type="text/javascript"></script>
+    <script src="js/angular-addons.js" type="text/javascript"></script>
+    <script src="js/ui-addons.js" type="text/javascript"></script>
 
-</footer>
-<script src="js/angular-jquery.js" type="text/javascript"></script>
-<script src="js/angular-sanitize.min.js" type="text/javascript"></script>
+    <script src="app/app.module.js" type="text/javascript"></script>
+    <script src="app/app.config.js" type="text/javascript"></script>
+    <script src="app/app.service.js" type="text/javascript"></script>
+    <script src="app/app.component.js" type="text/javascript"></script>
+    <script src="app/app.controller.js" type="text/javascript"></script>
 
-<script src="js/checklist-model.js" type="text/javascript"></script>
-<script src="js/app.js"></script>
-<!--<script src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>-->
-<script src="/webjars/edgel-webjar/2.0.1/gel/js/edgel.min.js"></script>
-<!--<script src="/webjars/edgel-webjar/1.1.0/gel/js/uoe.js"></script>-->
-<script src="/webjars/ng-ckeditor/0.2/ng-ckeditor.js"></script>
-<script src="/webjars/ckeditor/4.5.3/basic/ckeditor.js"></script>
+    <script src="app/home/home.module.js" type="text/javascript"></script>
+    <script src="app/home/home.component.js" type="text/javascript"></script>
 
-	
-<link href="css/jstree.style.min.css" rel="stylesheet" />
-<script src="js/jstree.min.js"></script>
-	
+    <script src="app/logout/logout.module.js" type="text/javascript"></script>
+    <script src="app/logout/logout.component.js" type="text/javascript"></script>    
+    
+    <script src="app/access/access.module.js" type="text/javascript"></script>
+    <script src="app/access/access.service.js" type="text/javascript"></script>
+
+    <script src="app/forbidden/forbidden.module.js" type="text/javascript"></script>
+    <script src="app/forbidden/forbidden.component.js" type="text/javascript"></script>
+
+    <script src="app/common/common.module.js" type="text/javascript"></script>
+    <script src="app/common/common.service.js" type="text/javascript"></script>
+
+    <script src="app/third-party/checklist-model.directive.js" type="text/javascript"></script>
+
+    <script src="app/notifications/notifications.module.js" type="text/javascript"></script>
+    <script src="app/notifications/notifications.service.js" type="text/javascript"></script>
+    <script src="app/notifications/notifications.component.js" type="text/javascript"></script>
+    <script src="app/notifications/notifications.directive.js" type="text/javascript"></script>
+
+    <script src="app/user-admin/useradmin.module.js" type="text/javascript"></script>
+    <script src="app/user-admin/useradmin.service.js" type="text/javascript"></script>
+    <script src="app/user-admin/useradmin.component.js" type="text/javascript"></script>
+
+    <script src="app/user-notifications/usernotifications.module.js" type="text/javascript"></script>
+    <script src="app/user-notifications/usernotifications.service.js" type="text/javascript"></script>
+    <script src="app/user-notifications/usernotifications.component.js" type="text/javascript"></script>
+
+    <script src="app/publisher-subscriber/publishersubscriber.module.js" type="text/javascript"></script>
+    <script src="app/publisher-subscriber/publishersubscriber.service.js" type="text/javascript"></script>
+    <script src="app/publisher-subscriber/publishersubscriber.component.js" type="text/javascript"></script>
+
 </body>
 </html>

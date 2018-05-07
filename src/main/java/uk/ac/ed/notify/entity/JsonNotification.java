@@ -146,11 +146,18 @@ public class JsonNotification {
                 this.lastUpdated = lastUpdated;
         }
 
-		public List<NotificationUser> getNotificationUsers() {
-			return notificationUsers;
-		}
+	public List<NotificationUser> getNotificationUsers() {
+                return notificationUsers;
+	}
 
-		public void setNotificationUsers(List<NotificationUser> notificationUsers) {
-			this.notificationUsers = notificationUsers;
-		}           
+	public void setNotificationUsers(List<NotificationUser> notificationUsers) {
+                this.notificationUsers = notificationUsers;
+	}   
+
+        @Override
+        public String toString() {
+                return "JsonNotification{" + "notificationId=" + notificationId + ", publisherId=" + publisherId + ", publisherNotificationId=" + publisherNotificationId + ", topic=" + topic + ", title=" + title + ", body=" + body + ", url=" + url + ", startDate=" + startDate + ", endDate=" + endDate + ", lastUpdated=" + lastUpdated + ", notificationUsers=" + notificationUsers + ", notificationGroup=" + notificationGroup + ", notificationGroupName=" + notificationGroupName + '}';
+        }
+                
+                
 }

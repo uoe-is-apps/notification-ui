@@ -110,10 +110,15 @@ public class Office365JsonService {
         }
         
         
-        try {
+        try {        
+            logger.info("parseNotification:");
+            logger.info("json - [" + json + "]");
+            
             content = content.replaceAll("<script type=\"application\\/ld\\+json\">", "");
             content = content.replaceAll("</script>", "");
 
+            logger.info("content - [" + content + "]");
+            
             JSONObject jsonNotification = new JSONObject(content);
 
             notification.setTitle(jsonNotification.getString("title"));

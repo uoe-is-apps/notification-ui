@@ -8,8 +8,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
  *
  * @author hsun1
  */
+//DTI020-109 Remove Learn Integration
+public interface LearnAnnouncementRepository{}
+
+/*
 public interface LearnAnnouncementRepository extends JpaRepository<Announcements, Long>{
     List<Announcements> findCourseAnnouncements();        
     List<Announcements> findSystemAnnouncements();
 }
+*/
 

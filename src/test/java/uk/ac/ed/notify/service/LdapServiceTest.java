@@ -53,6 +53,7 @@ public class LdapServiceTest {
         assertEquals("SCE",ifSCEFound);
     }
     
+    /*
     @Test
     public void ldapGetMembers()
     {
@@ -61,5 +62,6 @@ public class LdapServiceTest {
         
         //test the base group have members in it.
         assertNotSame(new Integer(0), new Integer(memberSize));
-    }       
+    } 
+    */
 }

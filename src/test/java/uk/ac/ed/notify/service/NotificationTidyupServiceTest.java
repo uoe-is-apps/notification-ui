@@ -68,13 +68,7 @@ public class NotificationTidyupServiceTest {
     public void testRepositorySave() {       
         assertEquals(new Integer("3"),new Integer(notificationRepository.count() + ""));
     }
-    	    
-    @Test 
-    public void test() {    
-        List<Notification> list = notificationTidyupService.findDeletableNotification();
-        assertEquals(new Integer("1"), new Integer(list.size() + ""));
-    }    
-            
+    	 
     private Date parseDate(String dateString){
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         try {

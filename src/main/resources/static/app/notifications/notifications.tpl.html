@@ -1,0 +1,37 @@
+<div class="panel panel-default uoe-overview-high">
+    <div class="panel-heading"><h3>Create new notification</h3></div>
+    <div class="panel-body">
+        <button type="button" ng-click="$ctrl.createNotification($ctrl.topic)" class="btn btn-uoe btn-md text-capitalize">Create {{ $ctrl.topic }} Notification</button>
+    </div>
+</div>
+
+<div ng-if="$ctrl.broadcast.type == 'success'" class="alert alert-success" role="alert">
+    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> {{ $ctrl.broadcast.value }}
+</div>
+<div ng-if="$ctrl.broadcast.type == 'danger'" class="alert alert-danger" role="alert">
+    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {{ $ctrl.broadcast.value }}
+</div>
+
+
+
+<div class="panel panel-default uoe-overview-high">
+    <div class="panel-heading"><h3>View {{ $ctrl.topic }} notifications</h3></div>
+    <div class="panel-body">
+
+        <div ng-hide="!$ctrl.loading" class="progress">
+            <div class="progress-bar progress-bar-striped active" role="progressbar"
+                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:90%">
+                Loading ...
+            </div>
+        </div>
+
+        <div ng-if="$ctrl.error" class="alert alert-warning" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> {{ $ctrl.error }}
+        </div>
+
+        <div ng-if="!$ctrl.error && !$ctrl.loading && !$ctrl.gridOptions.data.length">There are no {{ $ctrl.topic }} notifications.</div>
+
+        <div ui-grid="$ctrl.gridOptions" ui-grid-resize-columns class="grid" style="height: 600px;"></div>
+    </div>
+
+</div>

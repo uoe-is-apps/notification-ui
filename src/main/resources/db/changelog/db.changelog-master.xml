@@ -125,4 +125,35 @@
                  stripComments="true"/>
     </changeSet>
     
+    <changeSet id="create_topic_table_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/create_topic_table_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>    
+    
+    <changeSet id="insert_topic_details_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/insert_topic_details_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>     
+    
+    <changeSet id="alter_notification_users_table_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/alter_notification_users_table_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>       
+    
+    <changeSet id="delete_learn_job_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/delete_learn_job_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>      
+    
+    
+    
+    
 </databaseChangeLog>

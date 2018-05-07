@@ -37,6 +37,9 @@ public class QuartzTrigger {
 	@Column(name="times_triggered", table="qrtz_simple_triggers")
 	public int timesExecuted;
 
+	@Column(name="repeat_interval", table="qrtz_simple_triggers")
+	public int repeatInterval;
+
 	public String getTriggerName() {
 		return triggerName;
 	}
@@ -83,5 +86,13 @@ public class QuartzTrigger {
 
 	public void setTimesExecuted(int timesExecuted) {
 		this.timesExecuted = timesExecuted;
+	}
+
+	public int getRepeatInterval() {
+		return repeatInterval;
+	}
+
+	public void setRepeatInterval(int repeatInterval) {
+		this.repeatInterval = repeatInterval;
 	}
 }

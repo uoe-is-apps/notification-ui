@@ -10,4 +10,6 @@ import uk.ac.ed.notify.entity.Notification;
 public interface NotificationRepositoryAddon {
 
 	List<Notification> bulkSave(List<Notification> entities);
+        
+        void bulkDelete(int numOfDays);
 }

@@ -87,6 +87,49 @@ public class LdapController {
                 list.add(ldap);
             }
         }
+
+        /*
+        List<String> listOfUUNs1 = ldapService.getMembersFromParentGroup("ou=D902,ou=P5J,ou=ISG3,ou=ISG,ou=UOE,ou=org,ou=grouper2,dc=authorise,dc=ed,dc=ac,dc=uk");
+        for(int i = 0; i < listOfUUNs1.size(); i++){
+            System.out.println("listOfUUNs1 - " + i + " " + listOfUUNs1.get(i));                  
+        }
+        
+        List<String> listOfUUNs2 = ldapService.getMembersFromParentGroup("ou=P5J,ou=ISG3,ou=ISG,ou=UOE,ou=org,ou=grouper2,dc=authorise,dc=ed,dc=ac,dc=uk");               
+        for(int i = 0; i < listOfUUNs2.size(); i++){
+            System.out.println("listOfUUNs2 - " +i + " " + listOfUUNs2.get(i));                  
+        }        
+        
+        //too many 200k 
+        List<String> listOfUUNs1 = ldapService.getMembersFromParentGroup("ou=AHSS,ou=UOE,ou=org,ou=grouper2,dc=authorise,dc=ed,dc=ac,dc=uk");
+        for(int i = 0; i < listOfUUNs1.size(); i++){
+            System.out.println("listOfUUNs1 - " + i + " " + listOfUUNs1.get(i));                  
+        }        
+        */
+        
+        
+        /*
+        //no entries
+        List<String> listOfUUNs1 = ldapService.getMembersFromParentGroup("ou=D339,ou=S31,ou=MVM3,ou=MVM,ou=UOE,ou=org,ou=grouper2,dc=authorise,dc=ed,dc=ac,dc=uk");
+        for(int i = 0; i < listOfUUNs1.size(); i++){
+            System.out.println("listOfUUNs1 - " + i + " " + listOfUUNs1.get(i));                  
+        }  
+        
+        
+        List<String> listOfUUNs2 = ldapService.getMembersFromParentGroup("ou=S31,ou=MVM3,ou=MVM,ou=UOE,ou=org,ou=grouper2,dc=authorise,dc=ed,dc=ac,dc=uk");               
+        for(int i = 0; i < listOfUUNs2.size(); i++){
+            System.out.println("listOfUUNs2 - " +i + " " + listOfUUNs2.get(i));                  
+        }           
+        */
+        
+        
+        /*
+        List<String> listOfUUNs3 = ldapService.getMembersFromParentGroup("ou=SU685,ou=D685,ou=P5M,ou=ISG3,ou=ISG,ou=UOE,ou=org,ou=grouper2,dc=authorise,dc=ed,dc=ac,dc=uk");               
+        for(int i = 0; i < listOfUUNs3.size(); i++){
+            System.out.println("listOfUUNs3 - " +i + " " + listOfUUNs3.get(i));                  
+        }         
+        */
+        
+        
         return list;
     }    
  

@@ -15,7 +15,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
-import uk.ac.ed.notify.job.LearnPullJob;
 import uk.ac.ed.notify.job.Office365PullJob;
 import uk.ac.ed.notify.spring.AutowiringSpringBeanJobFactory;
 
@@ -42,7 +41,7 @@ public class SchedulerConfig {
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean(@Qualifier("notifyDataSource") DataSource dataSource,
                                                      JobFactory jobFactory,
-                                                     @Qualifier("learnPullJobTrigger") Trigger learnPullJobTrigger,
+                                                     //DTI020-109 Remove Learn Integration @Qualifier("learnSystemPullJobTrigger") Trigger learnSystemPullJobTrigger,
                                                      @Qualifier("notificationTidyupJobTrigger") Trigger notificationTidyupJobTrigger,
                                                      @Qualifier("office365PullJobTrigger") Trigger office365PullJobTrigger                                                     
                                                      //@Qualifier("office365PushSubscriptionJobTrigger") Trigger office365PushSubscriptionJobTrigger
@@ -54,8 +53,7 @@ public class SchedulerConfig {
         factory.setJobFactory(jobFactory);
 
         factory.setQuartzProperties(quartzProperties());
-        factory.setTriggers(new Trigger[] {learnPullJobTrigger,notificationTidyupJobTrigger,office365PullJobTrigger}); //office365PushSubscriptionJobTrigger
-
+        factory.setTriggers(new Trigger[] {notificationTidyupJobTrigger, office365PullJobTrigger}); //learnSystemPullJobTrigger, office365PushSubscriptionJobTrigger
         return factory;
     }
 
@@ -67,18 +65,21 @@ public class SchedulerConfig {
         return propertiesFactoryBean.getObject();
     }
 
+    //DTI020-109 Remove Learn Integration
+    /*
     @Bean
-    public JobDetailFactoryBean learnPullJobDetail() {
-        return createJobDetail(LearnPullJob.class);
+    public JobDetailFactoryBean learnSystemPullJobDetail() {
+        return createJobDetail(LearnSystemPullJob.class);
 
     }
 
-    @Bean(name = "learnPullJobTrigger")
-    public SimpleTriggerFactoryBean learnPullJobTrigger(@Qualifier("learnPullJobDetail") JobDetail jobDetail,
-                                                     @Value("${learnPullJob.frequency}") long frequency) {
+    @Bean(name = "learnSystemPullJobTrigger")
+    public SimpleTriggerFactoryBean learnSystemPullJobTrigger(@Qualifier("learnSystemPullJobDetail") JobDetail jobDetail,
+                                                     @Value("${learnSystemPullJob.frequency}") long frequency) {
         return createTrigger(jobDetail, frequency);
     }
-
+    */
+    
     @Bean
     public JobDetailFactoryBean notificationTidyupJobDetail() {
         return createJobDetail(NotificationTidyupJob.class);

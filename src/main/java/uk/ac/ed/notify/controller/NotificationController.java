@@ -9,6 +9,8 @@ import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.web.bind.annotation.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import uk.ac.ed.notify.entity.JsonNotification;
 
@@ -17,6 +19,7 @@ import javax.servlet.ServletException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.ed.notify.entity.Notification;
@@ -66,9 +69,11 @@ public class NotificationController {
     }
 
     @RequestMapping(value = "/notification/{notification-id}", method = RequestMethod.GET)
-    public JsonNotification getNotification(@PathVariable("notification-id") String notificationId) throws ServletException {
+    public JsonNotification getNotification(HttpServletRequest httpRequest, @PathVariable("notification-id") String notificationId) throws ServletException {
+        logger.info("getNotification called by [" + httpRequest.getRemoteUser() + "]");        
+        logger.info("notificationId - " + notificationId);        
         ResponseEntity<JsonNotification> response = restTemplate.getForEntity(notificationMsUrl + "/notification/" + notificationId, JsonNotification.class);
-
+        logger.info("response - " + response);
         return response.getBody();
     }
 
@@ -76,51 +81,122 @@ public class NotificationController {
     LdapService ldapService;        
 
     @RequestMapping(value = "/notifications/publisher/{publisher-id}", method = RequestMethod.GET)
-    public JsonNotification[] getPublisherNotifications(@PathVariable("publisher-id") String publisherId) throws ServletException {
-
+    public JsonNotification[] getPublisherNotifications(HttpServletRequest httpRequest, @PathVariable("publisher-id") String publisherId) throws ServletException {
+        logger.info("getPublisherNotifications called by [" + httpRequest.getRemoteUser() + "]");
+        logger.info("publisherId - " + publisherId);        
         ResponseEntity<JsonNotification[]> response = restTemplate.getForEntity(notificationMsUrl + "/notifications/publisher/" + publisherId, JsonNotification[].class);
+        logger.info("response - " + response);
         return response.getBody();
     }
 
 
     @RequestMapping(value="/notification/", method=RequestMethod.POST)
-    public JsonNotification setNotification(@RequestBody JsonNotification notification) throws ServletException, JsonProcessingException {              
-        notification = constructNotificationWithLdapGroup(notification);        
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity request= new HttpEntity(notification, headers);
-        ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/", HttpMethod.POST, request, JsonNotification.class);
-        return response.getBody();
+    public JsonNotification setNotification(HttpServletRequest httpRequest, @RequestBody JsonNotification notification) throws ServletException, JsonProcessingException {              
+        logger.info("setNotification called by [" + httpRequest.getRemoteUser() + "]");
+        logger.info("notification - " + notification);       
+                
+        if(notification.getNotificationGroup() != null){
+            String ldapGroup = notification.getNotificationGroup();
+            int numOfLevel = countNumberOfOccurrences("ou=",ldapGroup);
+            if(numOfLevel <= 5){
+                JsonNotification result = new JsonNotification();
+                result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_INCORRECT_LEVEL");
+                logger.error("ladp group - " + ldapGroup + " num of ou: " + numOfLevel);
+                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_INCORRECT_LEVEL");      
+                return result;                
+            }
+        }
+
+        notification = constructNotificationWithLdapGroup(notification);    
+
+        if(notification.getTopic().equals("Group") && notification.getNotificationUsers() != null){
+            if(notification.getNotificationUsers().size() == 0){
+                JsonNotification result = new JsonNotification();
+                result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");
+                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");      
+                return result;
+            }else if(notification.getNotificationUsers().size() > 5000){
+                JsonNotification result = new JsonNotification();
+                result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");
+                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");      
+                return result;
+            }
+        }
+        
+        try{
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity request= new HttpEntity(notification, headers);
+            ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/", HttpMethod.POST, request, JsonNotification.class);
+            logger.info("response - " + response);
+            return response.getBody();
+        }catch(Exception e){
+            JsonNotification result = new JsonNotification();
+            result.setTitle("ERROR_NOTIFICATION_CREATION");
+            logger.error("notification - ERROR_NOTIFICATION_CREATION - " + e.toString());      
+            return result;
+        }        
 
     }
 
     @RequestMapping(value="/notification/{notification-id}",method=RequestMethod.PUT)
-    public void updateNotification(@PathVariable("notification-id") String notificationId, @RequestBody JsonNotification notification) throws ServletException {       
-        notification = constructNotificationWithLdapGroup(notification);        
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity request= new HttpEntity(notification, headers);
-        ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/"+notificationId, HttpMethod.PUT, request, JsonNotification.class);
+    public JsonNotification updateNotification(HttpServletRequest httpRequest, @PathVariable("notification-id") String notificationId, @RequestBody JsonNotification notification) throws ServletException {       
+        logger.info("updateNotification called by [" + httpRequest.getRemoteUser() + "]");
+        logger.info("notificationId - " + notificationId);      
+        logger.info("notification - " + notification);      
+        notification = constructNotificationWithLdapGroup(notification);   
+        
+        if(notification.getTopic().equals("Group") && notification.getNotificationUsers() != null){
+            if(notification.getNotificationUsers().size() == 0){
+                JsonNotification result = new JsonNotification();
+                result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");
+                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");      
+                return result;
+            }else if(notification.getNotificationUsers().size() > 5000){
+                JsonNotification result = new JsonNotification();
+                result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");
+                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");      
+                return result;
+            }
+        }
+                        
+        try{
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity request= new HttpEntity(notification, headers);
+            ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/"+notificationId, HttpMethod.PUT, request, JsonNotification.class);
+            logger.info("response - " + response);        
+            return response.getBody();
+        }catch(Exception e){
+            JsonNotification result = new JsonNotification();
+            result.setTitle("ERROR_NOTIFICATION_CREATION");
+            logger.error("notification - ERROR_NOTIFICATION_CREATION - " + e.toString());      
+            return result;
+        }
     }
 
     @RequestMapping(value="/notification/{notification-id}",method=RequestMethod.DELETE)
-    public void deleteNotification(@PathVariable("notification-id") String notificationId) throws ServletException {
-
+    public void deleteNotification(HttpServletRequest httpRequest, @PathVariable("notification-id") String notificationId) throws ServletException {
+        logger.info("deleteNotification called by [" + httpRequest.getRemoteUser() + "]");
+        logger.info("notificationId - " + notificationId);      
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity request= new HttpEntity("", headers);
         ResponseEntity<String> response = restTemplate.exchange(notificationMsUrl + "/notification/"+notificationId, HttpMethod.DELETE, request, String.class);
+        logger.info("response - " + response);
     }
     
     @RequestMapping(value="/notifications/user/{uun}", method= RequestMethod.GET)
-    public JsonNotification[] getUserNotifications(@PathVariable("uun") String uun) {
-    	
+    public JsonNotification[] getUserNotifications(HttpServletRequest httpRequest, @PathVariable("uun") String uun) {
+        logger.info("getUserNotifications called by [" + httpRequest.getRemoteUser() + "]");
+        logger.info("notificationId - " + uun);      
     	ResponseEntity<JsonNotification[]> response = restTemplate.getForEntity(notificationMsUrl + "/notifications/user/" + uun, JsonNotification[].class);
+        logger.info("response - " + response);
         return response.getBody();
     }
 
     @RequestMapping(value = "/checkIfLdapGroupContainMember/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String checkIfLdapGroupContainMember(@RequestBody JsonNotification notification) {
+    public @ResponseBody String checkIfLdapGroupContainMember(@RequestBody JsonNotification notification) {        
         if(notification.getNotificationGroup() != null){
             List<String> ldapUsers = ldapService.getMembers(notification.getNotificationGroup());
             if(ldapUsers.size() > 0){
@@ -153,21 +229,27 @@ public class NotificationController {
             dbNotification.setNotificationGroup(notification.getNotificationGroup()); 
             dbNotification.setNotificationGroupName(groupName);
 
-            List<String> ldapUsers = ldapService.getMembers(notification.getNotificationGroup());
+            List<String> ldapUsers = ldapService.getMembersFromParentGroup(notification.getNotificationGroup());
 
-            logger.info("user selected ldap group - selected - " + notification.getNotificationGroup()+ " name - " + groupName + " numOfUsers found - " + ldapUsers.size() );
-
+            logger.info("notification will be created for the following users");
+            logger.info("getMembersFromParentGroup - " + notification.getNotificationGroup()+ " name - " + groupName + " numOfUsers found - " + ldapUsers.size() );
+            for(int i = 0; i < ldapUsers.size(); i++){
+                logger.info("ldapUsers - " + i + " " + ldapUsers.get(i));                  
+            } 
+            
             ArrayList<NotificationUser> userList = new ArrayList<NotificationUser>();
             for(int i = 0; i < ldapUsers.size(); i++){
-               NotificationUser user = new NotificationUser();
+               if(!ldapUsers.get(i).contains("/") && !ldapUsers.get(i).contains("_")){
+                    NotificationUser user = new NotificationUser();
 
-               NotificationUserPK nupk = new NotificationUserPK();
-               nupk.setNotificationId(notification.getNotificationId());
-               nupk.setUun(ldapUsers.get(i));
-               user.setId(nupk);
-               user.setNotification(dbNotification);
+                    NotificationUserPK nupk = new NotificationUserPK();
+                    nupk.setNotificationId(notification.getNotificationId());
+                    nupk.setUun(ldapUsers.get(i));
+                    user.setId(nupk);
+                    user.setNotification(dbNotification);
 
-               userList.add(user);
+                    userList.add(user);
+               }
             }
             notification.setNotificationUsers(userList);
 
@@ -176,4 +258,14 @@ public class NotificationController {
     }
     
         
+    private int countNumberOfOccurrences(String source, String sentence) {
+        String in = sentence;
+        int i=0;
+        Pattern p = Pattern.compile(source);
+        Matcher m = p.matcher(in);
+        while (m.find()) {
+            i++;
+        }        
+        return i;
+    }    
 }

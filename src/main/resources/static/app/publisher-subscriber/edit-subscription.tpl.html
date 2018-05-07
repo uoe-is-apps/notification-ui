@@ -1,0 +1,39 @@
+<div class="panel panel-default uoe-overview-high">
+    <div class="panel-heading"><h3>Create/Edit Subscription</h3></div>
+    <div class="panel-body">
+        
+        <form name="form" novalidate class="form-horizontal">
+              
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Topics:</label>
+                <div class="col-sm-10">
+                <select ng-model="$ctrl.subscription.topic" required>
+                        <option ng-repeat="topic in $ctrl.topics" value="{{topic.topicId}}">{{topic.topicId}}</option>
+                </select>
+                </div>
+            </div>            
+            
+            
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Subscribers:</label>
+                <div class="col-sm-10">
+                <select ng-model="$ctrl.subscription.subscriberId" required>
+                        <option ng-repeat="subscriber in $ctrl.subscribers" value="{{subscriber.subscriberId}}">{{subscriber.description}}</option>
+                </select>
+                </div>
+            </div>
+                
+            
+            
+            <div class="form-group">  
+                <label class="col-sm-2 control-label"></label>  
+                <div class="col-sm-10">
+                <button type="button" ng-disabled="form.$invalid" ng-click="$ctrl.saveSubscription($ctrl.subscription)" class="btn btn-primary">Save</button>
+                <button type="button" ng-click="$ctrl.cancel()" class="btn btn-default">Cancel</button>
+                </div>
+            </div>
+        </form>
+        
+    </div>
+</div>
+

@@ -9,5 +9,6 @@ import uk.ac.ed.notify.entity.TopicSubscription;
 public interface TopicSubscriptionRepository extends CrudRepository<TopicSubscription, String> {
 	
 	List<TopicSubscription> findAll();
+        List<TopicSubscription> findBySubscriberIdAndTopic(String subscriberId, String topic);
 
 }

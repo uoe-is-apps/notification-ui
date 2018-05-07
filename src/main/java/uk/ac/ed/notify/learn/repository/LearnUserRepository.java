@@ -12,6 +12,10 @@ import uk.ac.ed.notify.learn.entity.Users;
  *
  * @author hsun1
  */
+//DTI020-109 Remove Learn Integration
+public interface LearnUserRepository{}
+
+/*
 public interface LearnUserRepository extends JpaRepository<Users, Long>{
     
     List<Users> findByPk1(Integer uun);
@@ -20,3 +24,4 @@ public interface LearnUserRepository extends JpaRepository<Users, Long>{
     
     
 }
+*/
