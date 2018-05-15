@@ -62,7 +62,26 @@ public class NotificationController {
         return resource;
     }
 
-
+    @RequestMapping(value = "/healthcheck", method = RequestMethod.GET)
+    public JsonNotification healthcheck(HttpServletRequest httpRequest) throws ServletException {
+        logger.info("healthcheck");             
+        JsonNotification result = new JsonNotification();
+     
+        String serverHostname = "Unknown";        
+        try
+        {
+           java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
+           serverHostname = localMachine.getHostName();
+        }
+        catch(Exception e)
+        {
+           serverHostname = "Unknown";
+        }        
+        
+        result.setUrl(serverHostname);      
+        return result;     
+    }
+        
     @RequestMapping("/user")
     public Principal user(Principal user) {
         return user;
