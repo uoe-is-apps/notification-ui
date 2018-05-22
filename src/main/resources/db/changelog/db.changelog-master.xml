@@ -162,6 +162,11 @@
                  stripComments="true"/>
     </changeSet>       
     
-    
+    <changeSet id="insert_deny_access_role_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/insert_deny_access_role_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>    
     
 </databaseChangeLog>
