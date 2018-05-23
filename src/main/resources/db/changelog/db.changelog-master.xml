@@ -187,4 +187,12 @@
                  stripComments="true"/>
     </changeSet>   
 
+
+    <changeSet id="insert_publisher_topic_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/insert_publisher_topic_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet> 
+
 </databaseChangeLog>
