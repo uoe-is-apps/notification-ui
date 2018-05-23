@@ -179,4 +179,12 @@
                  stripComments="true"/>
     </changeSet>    
 
+
+    <changeSet id="insert_ui_user_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/insert_ui_user_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>   
+
 </databaseChangeLog>
