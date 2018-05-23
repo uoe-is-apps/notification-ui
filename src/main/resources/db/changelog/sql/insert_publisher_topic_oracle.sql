@@ -12,8 +12,3 @@ values ('Group',	'Group Topic',	'notify-ui',	'A', sysdate);
 
 insert into TOPIC_DETAILS (TOPIC_ID,TOPIC_DESCRIPTION,PUBLISHER_ID,STATUS,LAST_UPDATED)
 values ('Student',	'Student Topic',	'euclid',	'A', sysdate);
-
-
-
-
-
