@@ -1,0 +1,10 @@
+drop table publisher_details;
+drop table notifications;
+drop table notification_push_status;
+drop table subscriber_details;
+drop table topic_subscriptions;
+drop table notification_errors;
+drop table notification_ui_roles;
+drop table notification_ui_user_roles;
+drop table notification_ui_users;
+drop table user_notification_audit;

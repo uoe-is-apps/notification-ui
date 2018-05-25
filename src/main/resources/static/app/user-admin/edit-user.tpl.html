@@ -1,0 +1,52 @@
+<div class="panel panel-default uoe-overview-high">
+    <div class="panel-heading"><h3>Create/Edit User</h3></div>
+    <div class="panel-body">
+        <form name="form" novalidate class="form-horizontal">
+
+            <div class="form-group" ng-class="{ 'has-error': form.uun.$touched && form.uun.$invalid }" >
+                <label class="col-sm-2 control-label">UUN:</label>
+                <div class="col-sm-10">
+                    <input name="uun" type="text" ng-model="$ctrl.user.uun" placeholder="UUN" ng-required="true"/>
+                    <p class="help-block" ng-show="form.uun.$touched && form.uun.$invalid">
+                        UUN is required.
+                    </p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Group:</label>
+                <div class="col-sm-10">
+
+                    <p class="form-control-static">{{ $ctrl.user.orgGroupDN }}</p>
+
+                    <button type="button" ng-click="$ctrl.toggle()">Select Group</button>
+
+                    <div ng-show="$ctrl.showTree">
+                        <div id="groupTree"></div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div ng-repeat="role in $ctrl.roles" class="form-group" >
+                <label class="col-sm-2 control-label">{{role.roleDescription}}</label>
+
+                <div  class="col-sm-10">
+                    <input type="checkbox" checklist-model="$ctrl.user.uiRoles" checklist-value="role">
+                </div>
+            </div>
+
+            
+            <div class="form-group">  
+                <label class="col-sm-2 control-label"></label>  
+                <div class="col-sm-10">
+                <button type="button" ng-disabled="form.$invalid" ng-click="$ctrl.saveUser($ctrl.user)" class="btn btn-primary">Save</button>
+                <button type="button" ng-click="$ctrl.cancel()" class="btn btn-default">Cancel</button>
+                </div>
+            </div>
+            
+            
+        </form>
+    </div>
+</div>

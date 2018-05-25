@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.7"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.7
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.7.xsd">
+    <changeSet id="office365_tables_oracle" author="hsun1" dbms="oracle" runOnChange="true">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/create_office365_table_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+        <rollback>
+            <sqlFile encoding="utf8"
+                     path="db/changelog/sql/office365_table_rollback_oracle.sql"
+                     splitStatements="true"
+                     stripComments="true"/>
+        </rollback>        
+    </changeSet>    
+    <changeSet id="quartz_tables_oracle" author="rgood" dbms="oracle">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/quartz_tables_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+    <changeSet id="notification_tables_oracle" author="rgood" dbms="oracle">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/notification_tables_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/notification_table_grants_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+        <rollback>
+            <sqlFile encoding="utf8"
+                     path="db/changelog/sql/notification_tables_rollback_oracle.sql"
+                     splitStatements="true"
+                     stripComments="true"/>
+        </rollback>
+    </changeSet>
+    <changeSet id="add_audit_description_column" dbms="oracle" author="rgood">
+        <addColumn tableName="USER_NOTIFICATION_AUDIT">
+            <column name="AUDIT_DESCRIPTION" type="NVARCHAR2(255)" remarks="Description of the audit entry"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="create_synonyms_oracle" dbms="oracle" author="rgood">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/create_synonyms_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+    <changeSet id="quartz_grants_oracle" dbms="oracle" author="rgood">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/quartz_grants_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+    <changeSet id="insert_myed_subscriber_oracle" dbms="oracle" author="rgood">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/insert_myed_subscriber_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+    
+    <changeSet id="ui_roles_insert_oracle" author="agajda" dbms="oracle">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/insert_notification_ui_roles.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+        <rollback>
+            <sqlFile encoding="utf8"
+                     path="db/changelog/sql/insert_notification_ui_roles_rollback.sql"
+                     splitStatements="true"
+                     stripComments="true"/>
+        </rollback>        
+    </changeSet> 
+      
+    <changeSet id="create_notification_users_table_oracle" dbms="oracle" author="agajda">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/create_notification_users_table_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+
+    <changeSet id="alter_notifications_ui_users_table_oracle" dbms="oracle" author="agajda">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/alter_notifications_ui_users_table_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+    
+    <changeSet id="alter_notifications_table_oracle" dbms="oracle" author="agajda">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/alter_notifications_table_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+    
+    <changeSet id="alter_user_notification_audit_table_oracle" dbms="oracle" author="agajda">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/alter_user_notification_audit_table_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+
+    <changeSet id="alter_user_notification_audit_table_oracle_add_group_name" dbms="oracle" author="agajda">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/alter_notifications_table_oracle_add_group_name.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+
+    <changeSet id="insert_notification_ui_group_role" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/insert_notification_ui_group_role.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+
+    <changeSet id="alter_notification_error_table" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/alter_notification_error_table.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+    
+    <changeSet id="create_topic_table_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/create_topic_table_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>    
+    
+    <!--
+    <changeSet id="insert_topic_details_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/insert_topic_details_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>     
+    -->
+    
+    <changeSet id="alter_notification_users_table_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/alter_notification_users_table_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>       
+    
+    <changeSet id="delete_learn_job_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/delete_learn_job_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>      
+    
+    <changeSet id="delete_learn_reference_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/delete_learn_reference_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>       
+
+
+    <!--
+    <changeSet id="insert_deny_access_role_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/insert_deny_access_role_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>    
+    -->
+
+    <changeSet id="insert_ui_role_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/insert_ui_role_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>    
+
+
+    <changeSet id="insert_ui_user_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/insert_ui_user_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>   
+
+
+    <changeSet id="insert_publisher_topic_oracle" dbms="oracle" author="hsun1">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/sql/insert_publisher_topic_oracle.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet> 
+
+</databaseChangeLog>

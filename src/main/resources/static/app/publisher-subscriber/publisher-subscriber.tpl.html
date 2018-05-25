@@ -1,0 +1,109 @@
+<br/>
+
+<ul class="nav nav-tabs">
+   <li class="active"><a data-toggle="tab" href="#subscriptions"  target="_self">Subscriptions</a></li>
+   <li class=""><a data-toggle="tab" href="#topics"  target="_self">Topics</a></li>
+   <li class=""><a data-toggle="tab" href="#publishers"  target="_self">Publishers</a></li>
+   <li class=""><a data-toggle="tab" href="#subscribers"  target="_self">Subscribers</a></li>
+</ul>
+
+<div class="tab-content">
+
+  <div id="subscriptions" class="tab-pane active fade in">
+
+    <p>Subscriptions specify how a subscriber subscribe to a particular topic</p>
+
+    <div class="panel panel-default uoe-overview-high">
+        <div class="panel-body">
+            <button type="button" ng-click="$ctrl.createSubscription()" class="btn btn-uoe btn-md">Create Topic Subscription</button>
+        </div>
+    </div>
+
+    <div class="panel panel-default uoe-overview-high">
+        <div class="panel-body">
+            <div ng-if="$ctrl.loading" class="progress">
+                <div class="progress-bar progress-bar-striped active" role="progressbar"
+                     aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                    Loading
+                </div>
+            </div>
+            
+            <div ui-grid="$ctrl.gridOptionsSubscriptions"  ui-grid-auto-resize class="grid"></div>       
+        </div>
+    </div>              
+
+  </div>
+    
+    
+    
+  <div id="topics" class="tab-pane fade in">
+
+    <p>Topics are published by publishers</p>
+  
+    <div class="panel panel-default uoe-overview-high">
+
+        <div class="panel-body">
+
+            <div ng-if="$ctrl.loading" class="progress">
+                <div class="progress-bar progress-bar-striped active" role="progressbar"
+                     aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                    Loading
+                </div>
+            </div>
+            
+            <div ui-grid="$ctrl.gridOptionsTopics"  ui-grid-auto-resize class="grid"></div>            
+        </div>
+    </div>
+
+
+  </div>    
+    
+    
+    
+  <div id="publishers" class="tab-pane fade in">
+
+    <p>Publisher publishes notifications into Notification Backbone</p>
+  
+    <div class="panel panel-default uoe-overview-high">
+
+        <div class="panel-body">
+
+            <div ng-if="$ctrl.loading" class="progress">
+                <div class="progress-bar progress-bar-striped active" role="progressbar"
+                     aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                    Loading
+                </div>
+            </div>
+
+            <div ui-grid="$ctrl.gridOptionsPublishers" ui-grid-auto-resize class="grid"></div>            
+        </div>
+    </div>
+
+
+    </div>
+  
+    <div id="subscribers" class="tab-pane fade">
+
+    <p>Subscribers fetches and presents notifications to end users</p>
+    
+    <div class="panel panel-default uoe-overview-high">
+
+        <div class="panel-body">
+
+            <div ng-if="$ctrl.loading" class="progress">
+                <div class="progress-bar progress-bar-striped active" role="progressbar"
+                     aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                    Loading
+                </div>
+            </div>
+
+            <div ui-grid="$ctrl.gridOptionsSubscribers" ui-grid-auto-resize class="grid"></div>    
+        </div>
+    </div>        
+  
+  </div>
+
+</div>   
+        
+<br/>
+

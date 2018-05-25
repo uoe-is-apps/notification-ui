@@ -1,0 +1,174 @@
+<div class="panel panel-default uoe-overview-high">
+    <div class="panel-heading"><h3 class="text-capitalize">Create/Edit {{ $ctrl.topic}} Notification</h3></div>
+    <div class="panel-body">
+
+        <div ng-if="$ctrl.error" class="alert alert-danger alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <span class="glyphicon glyphicon-alert" aria-hidden="true"></span> {{ $ctrl.error }}
+        </div>
+
+        <form name="form" novalidate class="form-horizontal">
+
+            <div class="form-group" ng-class="{'has-error': (form.title.$touched || form.$submitted) && form.title.$invalid }">
+                <label class="col-sm-2 control-label">Title:</label>
+                <div class="col-sm-10">
+                    <input name="title" type="text" class="form-control" ng-model="$ctrl.notification.title" placeholder="Title" required />
+
+                    <p ng-show="(form.title.$touched || form.$submitted) && form.title.$invalid" class="help-block">Title is required.</p>
+                </div>
+            </div>
+
+
+            <div class="form-group" ng-class="{'has-error': (form.body.$touched || form.$submitted) && form.body.$invalid }">
+                <label class="col-sm-2 control-label">Body:</label>
+                <div class="col-sm-10">
+                    <textarea name="body" class="form-control" rows="5" ng-model="$ctrl.notification.body" required></textarea>
+
+                    <p ng-show="(form.body.$touched || form.$submitted) && form.body.$invalid" class="help-block">
+                        Notification Body is required.
+                    </p>
+                </div>
+            </div>
+
+
+            <div class="form-group" ng-class="{'has-error': (form.url.$touched || form.$submitted) && form.url.$invalid }">
+                <label class="col-sm-2 control-label">URL:</label>
+                <div class="col-sm-10">
+                    <input name="url" type="url" class="form-control" ng-model="$ctrl.notification.url" placeholder="URL"
+                    ng-pattern="/^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i"                           
+                    >
+                </div>
+
+                <p ng-show="(form.url.$touched || form.$submitted) && form.url.$invalid" class="help-block">
+                    URL must start with 'http(s)://' and must be a valid URL.
+                </p>
+            </div>
+
+
+            <div class="form-group" ng-show="$ctrl.ifShowGroupSelectionTree($ctrl.notification.topic)">
+                <label class="col-sm-2 control-label">Group:</label>
+                <div class="col-sm-10">
+
+                    <p class="form-control-static">{{ $ctrl.notification.notificationGroupName }}</p>
+                    <input name="group" type="text" class="form-control" 
+                    ng-model="$ctrl.notification.notificationGroupName" style="display:none;" 
+                    ng-required="$ctrl.ifShowGroupSelectionTree($ctrl.notification.topic)" />
+                    
+                    <button type="button" ng-click="$ctrl.toggle()" class="btn btn-default">Select Group</button>
+
+                    <div ng-show="$ctrl.showTree">
+                        <div id="groupTree"></div>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Topic:</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static">{{ $ctrl.notification.topic }}</p>
+                </div>
+            </div>
+
+
+            <div class="form-group" ng-class="{'has-error': (form.startDate.$touched || form.$submitted) && form.startDate.$invalid }">
+                <label class="col-sm-2 control-label">Start Date:</label>
+                <div class="col-sm-10">
+
+                        <div class="input-group">
+                            <!--
+                            <input type="text" class="form-control" name="startDate" required
+                                   datetimepicker
+                                   ng-model="$ctrl.notification.startDate"
+                                   options="$ctrl.startDatePickerOptions"
+                                   on-change="$ctrl.updateRange()">
+
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                            -->
+                            
+                            
+                            
+                     
+                             <!--  
+                            <input ng-hide="$ctrl.ifHideStartDate($ctrl.notification.startDate, $ctrl.notification.endDate)" type="text" class="form-control" name="startDate" required
+                                   datetimepicker
+                                   ng-model="$ctrl.notification.startDate"
+                                   options="$ctrl.startDatePickerOptions"
+                                   on-change="$ctrl.updateRange()">
+                            
+                            <span ng-hide="$ctrl.ifHideStartDate($ctrl.notification.startDate, $ctrl.notification.endDate)" class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                          
+                            
+                           
+                            <input ng-hide="!$ctrl.ifHideStartDate($ctrl.notification.startDate, $ctrl.notification.endDate)" disabled 
+                                   name="startDate" type="text" class="form-control" ng-model="$ctrl.notification.startDate" placeholder="Start Date" required />
+                            
+                            <span ng-hide="!$ctrl.ifHideStartDate($ctrl.notification.startDate, $ctrl.notification.endDate)" disabled class="input-group-addon">
+                                This notification is active, start date is not editable
+                            </span>
+                            -->
+                            
+                            
+                           
+                            <input ng-hide="$ctrl.ifHideStartDate($ctrl.notification.startDate, $ctrl.notification.endDate, $ctrl.notification.ifNew)" type="text" 
+                                   class="form-control" name="startDate" required
+                                   datetimepicker
+                                   ng-model="$ctrl.notification.startDate"
+                                   options="$ctrl.startDatePickerOptions"
+                                   on-change="$ctrl.updateRange($ctrl.notification.startDate, $ctrl.notification.endDate)">
+     
+                            <input ng-hide="!$ctrl.ifHideStartDate($ctrl.notification.startDate, $ctrl.notification.endDate, $ctrl.notification.ifNew)" disabled 
+                                   name="startDate" type="text" class="form-control" ng-model="$ctrl.notification.startDate" placeholder="Start Date" required 
+                                   options="$ctrl.startDatePickerOptions"
+                                   size="200"/>
+                                    
+                            <span  ng-hide="$ctrl.ifHideStartDate($ctrl.notification.startDate, $ctrl.notification.endDate, $ctrl.notification.ifNew)"  class="input-group-addon" >
+                                <i class="glyphicon glyphicon-calendar"></i>
+                            </span>
+                          
+                            
+                        </div>
+
+                    <p class="help-block" ng-show="(form.startDate.$touched || form.$submitted) && form.startDate.$invalid">
+                        Start Date is required.
+                    </p>
+                </div>
+            </div>
+
+
+            <div class="form-group" ng-class="{'has-error': (form.endDate.$touched || form.$submitted) && (form.endDate.$invalid || $ctrl.updateRange($ctrl.notification.startDate, $ctrl.notification.endDate) ) }">
+                <label class="col-sm-2 control-label">End Date:</label>
+                <div class="col-sm-10">
+
+                        <div class="input-group">
+
+                            <input type="text" class="form-control" name="endDate" required
+                                   datetimepicker
+                                   ng-model="$ctrl.notification.endDate"
+                                   options="$ctrl.endDatePickerOptions"
+                                   on-change="$ctrl.updateRange($ctrl.notification.startDate, $ctrl.notification.endDate)">
+
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                        </div>
+
+                    <p class="help-block" ng-show="(form.endDate.$touched || form.$submitted) && form.endDate.$invalid">
+                        End Date is required.
+                    </p>
+                    
+                    <p class="help-block" ng-show="(form.endDate.$touched || form.$submitted) && !form.endDate.$invalid && $ctrl.updateRange($ctrl.notification.startDate, $ctrl.notification.endDate)">
+                        End Date is earlier than Start Date.
+                    </p>                    
+                </div>
+            </div>
+
+
+            <button ng-hide="$ctrl.ifShowProcessingIndicator()" type="button" ng-disabled="form.$invalid || (form.endDate.$touched || form.$submitted) && !form.endDate.$invalid && $ctrl.updateRange($ctrl.notification.startDate, $ctrl.notification.endDate)" ng-click="$ctrl.save($ctrl.notification)" class="btn btn-primary">Save</button>
+            <button ng-hide="$ctrl.ifShowProcessingIndicator()" type="button" ng-click="$ctrl.back()" class="btn btn-default">Cancel</button>
+
+            <div ng-show="$ctrl.ifShowProcessingIndicator()">Processing... this may take a few seconds to complete</div>
+           
+        </form>
+    </div>
+</div>
