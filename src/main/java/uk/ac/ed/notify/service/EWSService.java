@@ -8,24 +8,26 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.util.Iterator;
-import microsoft.exchange.webservices.data.AutodiscoverLocalException;
-import microsoft.exchange.webservices.data.BasePropertySet;
-import microsoft.exchange.webservices.data.DeleteMode;
-import microsoft.exchange.webservices.data.EmailMessage;
-import microsoft.exchange.webservices.data.EmailMessageSchema;
-import microsoft.exchange.webservices.data.ExchangeCredentials;
-import microsoft.exchange.webservices.data.ExchangeVersion;
-import microsoft.exchange.webservices.data.FindItemsResults;
-import microsoft.exchange.webservices.data.IAutodiscoverRedirectionUrl;
-import microsoft.exchange.webservices.data.Item;
-import microsoft.exchange.webservices.data.ItemId;
-import microsoft.exchange.webservices.data.ItemSchema;
-import microsoft.exchange.webservices.data.ItemView;
-import microsoft.exchange.webservices.data.LogicalOperator;
-import microsoft.exchange.webservices.data.PropertySet;
-import microsoft.exchange.webservices.data.SearchFilter;
-import microsoft.exchange.webservices.data.WebCredentials;
-import microsoft.exchange.webservices.data.WellKnownFolderName;
+
+import microsoft.exchange.webservices.data.autodiscover.IAutodiscoverRedirectionUrl;
+import microsoft.exchange.webservices.data.autodiscover.exception.AutodiscoverLocalException;
+import microsoft.exchange.webservices.data.core.ExchangeService;
+import microsoft.exchange.webservices.data.core.PropertySet;
+import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion;
+import microsoft.exchange.webservices.data.core.enumeration.property.BasePropertySet;
+import microsoft.exchange.webservices.data.core.enumeration.property.WellKnownFolderName;
+import microsoft.exchange.webservices.data.core.enumeration.search.LogicalOperator;
+import microsoft.exchange.webservices.data.core.enumeration.service.DeleteMode;
+import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
+import microsoft.exchange.webservices.data.core.service.item.Item;
+import microsoft.exchange.webservices.data.core.service.schema.EmailMessageSchema;
+import microsoft.exchange.webservices.data.core.service.schema.ItemSchema;
+import microsoft.exchange.webservices.data.credential.ExchangeCredentials;
+import microsoft.exchange.webservices.data.credential.WebCredentials;
+import microsoft.exchange.webservices.data.property.complex.ItemId;
+import microsoft.exchange.webservices.data.search.FindItemsResults;
+import microsoft.exchange.webservices.data.search.ItemView;
+import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +47,7 @@ import uk.ac.ed.notify.repository.UserNotificationAuditRepository;
 public class EWSService   implements IAutodiscoverRedirectionUrl { //extends EmailNotificationHandlingService
 
     protected final Log logger = LogFactory.getLog(this.getClass());
-    private microsoft.exchange.webservices.data.ExchangeService exchangeService;
+    private ExchangeService exchangeService;
 
     public class MyAuthenticator extends Authenticator {
 
@@ -109,17 +111,17 @@ public class EWSService   implements IAutodiscoverRedirectionUrl { //extends Ema
     }    
     
     
-    private microsoft.exchange.webservices.data.ExchangeService getExchangeService(String uid) throws Exception {
+    private ExchangeService getExchangeService(String uid) throws Exception {
 
         if (exchangeService == null) {
             if (ewsVersion.equals("2007")) {
-                exchangeService = new microsoft.exchange.webservices.data.ExchangeService(ExchangeVersion.Exchange2007_SP1);
+                exchangeService = new ExchangeService(ExchangeVersion.Exchange2007_SP1);
             } else if (ewsVersion.equals("2010_SP1")) {
-                exchangeService = new microsoft.exchange.webservices.data.ExchangeService(ExchangeVersion.Exchange2010_SP1);
+                exchangeService = new ExchangeService(ExchangeVersion.Exchange2010_SP1);
             } else if (ewsVersion.equals("2010_SP2")) {
-                exchangeService = new microsoft.exchange.webservices.data.ExchangeService(ExchangeVersion.Exchange2010_SP2);
+                exchangeService = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
             } else {
-                exchangeService = new microsoft.exchange.webservices.data.ExchangeService(ExchangeVersion.Exchange2010);
+                exchangeService = new ExchangeService(ExchangeVersion.Exchange2010);
             }
             
             ExchangeCredentials credentials = new WebCredentials(ewsUser + "@ed.ac.uk", ewsPassword, "ed.ac.uk");
@@ -135,15 +137,15 @@ public class EWSService   implements IAutodiscoverRedirectionUrl { //extends Ema
         try{
             logger.info("EWSService processing unread emails from exchange");
             
-            microsoft.exchange.webservices.data.ExchangeService service = this.getExchangeService(ewsUser);
+            ExchangeService service = this.getExchangeService(ewsUser);
 
             ItemView itemView = new ItemView(Integer.MAX_VALUE);
-            SearchFilter unreadFilter = new SearchFilter.SearchFilterCollection(LogicalOperator.And, new SearchFilter.IsEqualTo(EmailMessageSchema.IsRead, false));        
+            SearchFilter unreadFilter = new SearchFilter.SearchFilterCollection(LogicalOperator.And, new SearchFilter.IsEqualTo(EmailMessageSchema.IsRead, false));
             FindItemsResults<Item> findResults = service.findItems(WellKnownFolderName.Inbox, unreadFilter, itemView);
 
             logger.info("Number of email notifications to be processed - " + findResults.getItems().size());
 
-            PropertySet propSet = new PropertySet(BasePropertySet.IdOnly, ItemSchema.Body);   
+            PropertySet propSet = new PropertySet(BasePropertySet.IdOnly, ItemSchema.Body);
             
             Iterator<Item> iterator = findResults.iterator();
             

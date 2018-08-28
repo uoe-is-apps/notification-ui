@@ -27,9 +27,25 @@
         <bootstrap.version>3.3.7</bootstrap.version>
         <momentjs.version>2.18.1</momentjs.version>
 
+        <!-- Version numbers of database driver jars -->
+        <hsqldb.version>2.4.1</hsqldb.version>
+        <ojdbc6.version>11.2.0.3</ojdbc6.version>
     </properties>
 
     <dependencies>
+        <!--
+         | Database Driver Jars
+         |
+         | You must include the proper JDBC driver dependency and version number for your RDBMS
+         | platform.  Removing unused driver jars is not necessary;  they do no harm.
+         +-->
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>${hsqldb.version}</version>
+        </dependency>
+
+        <!-- Other dependencies -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-zuul</artifactId>
@@ -77,11 +93,6 @@
             <version>2.2.1</version>
         </dependency>
         <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>uk.ac.ed.uwp</groupId>
             <artifactId>edgel-webjar</artifactId>
             <version>2.0.1</version>
@@ -90,11 +101,7 @@
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <version>11.2.0.3</version>
-        </dependency>
+
         <!-- for office365 -->
         <dependency>
                 <groupId>com.microsoft.aad</groupId>
@@ -149,9 +156,9 @@
 
         <!-- microsoft ews -->
         <dependency>
-            <groupId>com.microsoft.exchange</groupId>
-            <artifactId>webservices</artifactId>
-            <version>1.2</version>
+            <groupId>com.microsoft.ews-java-api</groupId>
+            <artifactId>ews-java-api</artifactId>
+            <version>2.0</version>
         </dependency>
 
         <!-- front end -->
@@ -408,6 +415,24 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-tomcat</artifactId>
                     <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>oracle</id>
+            <dependencies>
+                <!--
+                 | Oracle Driver Jar
+                 |
+                 | Oracle corp. will neither make their driver jar available in Maven Central nor
+                 | permit redistribution.  To include the Oracle jar in the deployment, you must
+                 | (1) install the jar in a maven repo the build is willing to use and (2) invoke
+                 | the build with '-Poracle'
+                 +-->
+                <dependency>
+                    <groupId>com.oracle</groupId>
+                    <artifactId>ojdbc6</artifactId>
+                    <version>${ojdbc6.version}</version>
                 </dependency>
             </dependencies>
         </profile>
