@@ -29,6 +29,7 @@
 
         <!-- Version numbers of database driver jars -->
         <hsqldb.version>2.4.1</hsqldb.version>
+        <mssql.version>7.0.0.jre8</mssql.version>
         <ojdbc6.version>11.2.0.3</ojdbc6.version>
     </properties>
 
@@ -43,6 +44,11 @@
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <version>${hsqldb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>${mssql.version}</version>
         </dependency>
 
         <!-- Other dependencies -->
