@@ -1,16 +1,10 @@
 package uk.ac.ed.notify.controller;
 
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.quartz.CronScheduleBuilder;
-import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
@@ -40,7 +34,7 @@ import uk.ac.ed.notify.repository.TopicSubscriptionRepository;
 @RestController
 public class SupportController {
 
-        protected final Log logger = LogFactory.getLog(this.getClass());
+	protected final Log logger = LogFactory.getLog(this.getClass());
     
 	@Autowired
 	public QuartzTriggerRepository quartzTriggerRepository;
@@ -98,11 +92,10 @@ public class SupportController {
                 topicSubscriptionRepository.save(topicSubscription);
             }
 	}
-        
-        
-        @Autowired    
-        private SchedulerFactoryBean schedulerFactoryBean;        
-        
+
+	@Autowired(required = false)
+	private SchedulerFactoryBean schedulerFactoryBean;
+
 	@RequestMapping(value="/start-job/{id}", method = RequestMethod.POST)
         public void startJob(@PathVariable("id") String id) {
               try {
