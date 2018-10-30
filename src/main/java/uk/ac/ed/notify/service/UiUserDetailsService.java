@@ -24,8 +24,7 @@ public class UiUserDetailsService implements UserDetailsService {
 
     UiUserRepository uiUserRepository;
 
-    public UiUserDetailsService(UiUserRepository uiUserRepository)
-    {
+    public UiUserDetailsService(UiUserRepository uiUserRepository) {
         this.uiUserRepository = uiUserRepository;
     }
 
@@ -33,9 +32,8 @@ public class UiUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         try {
-            logger.debug("trying to get user"+s);
-            if (uiUserRepository==null)
-            {
+            logger.debug("Trying to load user '{}'", s);
+            if (uiUserRepository == null) {
                 logger.debug("Repo is null");
             }
 
@@ -46,16 +44,15 @@ public class UiUserDetailsService implements UserDetailsService {
                 s = "DenyAccess";
                 user = uiUserRepository.findOne(s);
             }
-            Collection<GrantedAuthority> roles = new ArrayList<GrantedAuthority>();
+            Collection<GrantedAuthority> roles = new ArrayList<>();
             for (UiRole uiRole : user.getUiRoles()) {
-                logger.info("found role:"+uiRole.getRoleDescription());               
+                logger.info("Found role: {}", uiRole.getRoleDescription());
                 roles.add(new SimpleGrantedAuthority(uiRole.getRoleCode()));
             }
             return new User(user.getUun(), "", true, true, true, true, roles);
         }
-        catch (Exception e)
-        {
-            logger.error("Error getting user",e);
+        catch (Exception e) {
+            logger.error("Error getting user", e);
             throw new UsernameNotFoundException("Error getting user information");
         }
     }
