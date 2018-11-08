@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
-import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.web.bind.annotation.*;
 import java.util.regex.Matcher;
@@ -14,6 +13,7 @@ import java.util.regex.Pattern;
 
 import uk.ac.ed.notify.entity.JsonNotification;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.ServletException;
 
 import java.security.Principal;
@@ -38,28 +38,24 @@ public class NotificationController {
     @Value("${zuul.routes.resource.url}")
     private String notificationMsUrl;
 
+    @Value("${spring.oauth2.client.clientSecret}")
     private String clientSecret;
-    private String tokenUrl;
-    private String clientId;
 
-    @Autowired
-    public NotificationController( @Value("${spring.oauth2.client.clientSecret}") String clientSecret,
-                                   @Value("${spring.oauth2.client.accessTokenUri}") String tokenUrl,
-                                   @Value("${spring.oauth2.client.clientId}") String clientId) {
-        this.clientId=clientId;
-        this.clientSecret=clientSecret;
-        this.tokenUrl=tokenUrl;
-        restTemplate = new OAuth2RestTemplate(resource());
-    }
+    @Value("${spring.oauth2.client.accessTokenUri}")
+    private String tokenUrl;
+
+    @Value("${spring.oauth2.client.clientId}")
+    private String clientId;
 
     private OAuth2RestTemplate restTemplate;
 
-    protected OAuth2ProtectedResourceDetails resource() {
-        ClientCredentialsResourceDetails resource = new ClientCredentialsResourceDetails();
+    @PostConstruct
+    public void init() {
+        final ClientCredentialsResourceDetails resource = new ClientCredentialsResourceDetails();
         resource.setAccessTokenUri(tokenUrl);
         resource.setClientSecret(clientSecret);
         resource.setClientId(clientId);
-        return resource;
+        restTemplate = new OAuth2RestTemplate(resource);
     }
 
     @RequestMapping(value = "/healthcheck", method = RequestMethod.GET)
