@@ -32,7 +32,7 @@ public class RemoteUserAuthenticationFilter extends AbstractPreAuthenticatedProc
         //return "hsun1";        
         */
         
-        logger.info("getPreAuthenticatedPrincipal - principal: {}", principal);
+        logger.debug("getPreAuthenticatedPrincipal - remote user='{}'", principal);
 
         if (principal == null) {
             return StringUtils.isBlank(casServer)
