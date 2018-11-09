@@ -28,13 +28,10 @@ import org.springframework.ldap.core.support.LdapContextSource;
  */
 @EnableAutoConfiguration
 
-@EntityScan({"uk.ac.ed.notify.entity","uk.ac.ed.notify.learn.entity", "uk.ac.ed.notify.timetabling.entity","uk.ac.ed.notify.idm.entity"})
+@EntityScan({"uk.ac.ed.notify.entity","uk.ac.ed.notify.timetabling.entity","uk.ac.ed.notify.idm.entity"})
 
 @EnableJpaRepositories(
-        {"uk.ac.ed.notify.repository",
-         "uk.ac.ed.notify.learn.repository",
-         "uk.ac.ed.notify.timetabling.repository",
-         "uk.ac.ed.notify.idm.repository"})
+        {"uk.ac.ed.notify.repository"})
 
 @ComponentScan("uk.ac.ed.notify.service")
 public class TestApplication {

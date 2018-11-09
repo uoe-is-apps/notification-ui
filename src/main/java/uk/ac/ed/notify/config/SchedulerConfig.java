@@ -40,8 +40,7 @@ public class SchedulerConfig {
 
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean(@Qualifier("notifyDataSource") DataSource dataSource,
-                                                     JobFactory jobFactory,
-                                                     //DTI020-109 Remove Learn Integration @Qualifier("learnSystemPullJobTrigger") Trigger learnSystemPullJobTrigger,
+                                                     JobFactory jobFactory,                                                     
                                                      @Qualifier("notificationTidyupJobTrigger") Trigger notificationTidyupJobTrigger,
                                                      @Qualifier("office365PullJobTrigger") Trigger office365PullJobTrigger                                                     
                                                      //@Qualifier("office365PushSubscriptionJobTrigger") Trigger office365PushSubscriptionJobTrigger
@@ -53,7 +52,7 @@ public class SchedulerConfig {
         factory.setJobFactory(jobFactory);
 
         factory.setQuartzProperties(quartzProperties());
-        factory.setTriggers(new Trigger[] {notificationTidyupJobTrigger, office365PullJobTrigger}); //learnSystemPullJobTrigger, office365PushSubscriptionJobTrigger
+        factory.setTriggers(new Trigger[] {notificationTidyupJobTrigger, office365PullJobTrigger}); 
         return factory;
     }
 
@@ -65,21 +64,6 @@ public class SchedulerConfig {
         return propertiesFactoryBean.getObject();
     }
 
-    //DTI020-109 Remove Learn Integration
-    /*
-    @Bean
-    public JobDetailFactoryBean learnSystemPullJobDetail() {
-        return createJobDetail(LearnSystemPullJob.class);
-
-    }
-
-    @Bean(name = "learnSystemPullJobTrigger")
-    public SimpleTriggerFactoryBean learnSystemPullJobTrigger(@Qualifier("learnSystemPullJobDetail") JobDetail jobDetail,
-                                                     @Value("${learnSystemPullJob.frequency}") long frequency) {
-        return createTrigger(jobDetail, frequency);
-    }
-    */
-    
     @Bean
     public JobDetailFactoryBean notificationTidyupJobDetail() {
         return createJobDetail(NotificationTidyupJob.class);
@@ -103,18 +87,6 @@ public class SchedulerConfig {
                                                         @Value("${office365PullJob.frequency}") long frequency) {
         return createTrigger(jobDetail, frequency);
     }
-
-//    @Bean
-//    public JobDetailFactoryBean office365PushSubscriptionJobDetail() {
-//        return createJobDetail(Office365PushSubscriptionJob.class);
-//
-//    }
-
-//    @Bean(name = "office365PushSubscriptionJobTrigger")
-//    public SimpleTriggerFactoryBean office365PushSubscriptionJobTrigger(@Qualifier("office365PushSubscriptionJobDetail") JobDetail jobDetail,
-//                                                        @Value("${office365PushSubscriptionJob.frequency}") long frequency) {
-//        return createTrigger(jobDetail, frequency);
-//    }
 
     private static JobDetailFactoryBean createJobDetail(Class jobClass) {
         JobDetailFactoryBean factoryBean = new JobDetailFactoryBean();
