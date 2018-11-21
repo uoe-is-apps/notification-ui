@@ -1,16 +1,14 @@
 package uk.ac.ed.notify.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.security.oauth2.client.OAuth2RestTemplate;
-import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
+import org.springframework.security.crypto.codec.Base64;
 import org.springframework.web.bind.annotation.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.springframework.web.client.RestTemplate;
 import uk.ac.ed.notify.entity.JsonNotification;
 
 import javax.annotation.PostConstruct;
@@ -38,24 +36,33 @@ public class NotificationController {
     @Value("${zuul.routes.resource.url}")
     private String notificationMsUrl;
 
-    @Value("${spring.oauth2.client.clientSecret}")
-    private String clientSecret;
+    /**
+     * Username for the 'notification-ui' (service) user.
+     */
+    @Value("${uk.ac.ed.notify.security.notificationUiUsername:notification-ui}")
+    private String notificationUiUsername;
 
-    @Value("${spring.oauth2.client.accessTokenUri}")
-    private String tokenUrl;
+    /**
+     * Password for the 'notification-ui' (service) user.
+     */
+    @Value("${uk.ac.ed.notify.security.notificationUiPassword:CHANGEME}")
+    private String notificationUiPassword;
 
-    @Value("${spring.oauth2.client.clientId}")
-    private String clientId;
+    private HttpHeaders basicAuthHeaders;
 
-    private OAuth2RestTemplate restTemplate;
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @PostConstruct
     public void init() {
-        final ClientCredentialsResourceDetails resource = new ClientCredentialsResourceDetails();
-        resource.setAccessTokenUri(tokenUrl);
-        resource.setClientSecret(clientSecret);
-        resource.setClientId(clientId);
-        restTemplate = new OAuth2RestTemplate(resource);
+
+        // Basic AuthN
+        String plainCreds = notificationUiUsername + ":" + notificationUiPassword;
+        byte[] plainCredsBytes = plainCreds.getBytes();
+        byte[] base64CredsBytes = Base64.encode(plainCredsBytes);
+        String base64Creds = new String(base64CredsBytes);
+        basicAuthHeaders = new HttpHeaders();
+        basicAuthHeaders.add("Authorization", "Basic " + base64Creds);
+
     }
 
     @RequestMapping(value = "/healthcheck", method = RequestMethod.GET)
@@ -63,7 +70,7 @@ public class NotificationController {
         logger.info("healthcheck");             
         JsonNotification result = new JsonNotification();
      
-        String serverHostname = "Unknown";        
+        String serverHostname;
         try
         {
            java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
@@ -84,10 +91,15 @@ public class NotificationController {
     }
 
     @RequestMapping(value = "/notification/{notification-id}", method = RequestMethod.GET)
-    public JsonNotification getNotification(HttpServletRequest httpRequest, @PathVariable("notification-id") String notificationId) throws ServletException {
+    public JsonNotification getNotification(HttpServletRequest httpRequest, @PathVariable("notification-id") String notificationId) {
         logger.info("getNotification called by [" + httpRequest.getRemoteUser() + "]");        
-        logger.info("notificationId - " + notificationId);        
-        ResponseEntity<JsonNotification> response = restTemplate.getForEntity(notificationMsUrl + "/notification/" + notificationId, JsonNotification.class);
+        logger.info("notificationId - " + notificationId);
+        final HttpEntity<String> entity = new HttpEntity<>(basicAuthHeaders);
+        ResponseEntity<JsonNotification> response = restTemplate.exchange(
+                notificationMsUrl + "/notification/" + notificationId,
+                HttpMethod.GET,
+                entity,
+                JsonNotification.class);
         logger.info("response - " + response);
         return response.getBody();
     }
@@ -96,17 +108,22 @@ public class NotificationController {
     LdapService ldapService;        
 
     @RequestMapping(value = "/notifications/publisher/{publisher-id}", method = RequestMethod.GET)
-    public JsonNotification[] getPublisherNotifications(HttpServletRequest httpRequest, @PathVariable("publisher-id") String publisherId) throws ServletException {
+    public JsonNotification[] getPublisherNotifications(HttpServletRequest httpRequest, @PathVariable("publisher-id") String publisherId) {
         logger.info("getPublisherNotifications called by [" + httpRequest.getRemoteUser() + "]");
-        logger.info("publisherId - " + publisherId);        
-        ResponseEntity<JsonNotification[]> response = restTemplate.getForEntity(notificationMsUrl + "/notifications/publisher/" + publisherId, JsonNotification[].class);
+        logger.info("publisherId - " + publisherId);
+        final HttpEntity<String> entity = new HttpEntity<>(basicAuthHeaders);
+        ResponseEntity<JsonNotification[]> response = restTemplate.exchange(
+                notificationMsUrl + "/notifications/publisher/" + publisherId,
+                HttpMethod.GET,
+                entity,
+                JsonNotification[].class);
         logger.info("response - " + response);
         return response.getBody();
     }
 
 
     @RequestMapping(value="/notification/", method=RequestMethod.POST)
-    public JsonNotification setNotification(HttpServletRequest httpRequest, @RequestBody JsonNotification notification) throws ServletException, JsonProcessingException {              
+    public JsonNotification setNotification(HttpServletRequest httpRequest, @RequestBody JsonNotification notification) {
         logger.info("setNotification called by [" + httpRequest.getRemoteUser() + "]");
         logger.info("notification - " + notification);       
                 
@@ -191,7 +208,7 @@ public class NotificationController {
     }
 
     @RequestMapping(value="/notification/{notification-id}",method=RequestMethod.DELETE)
-    public void deleteNotification(HttpServletRequest httpRequest, @PathVariable("notification-id") String notificationId) throws ServletException {
+    public void deleteNotification(HttpServletRequest httpRequest, @PathVariable("notification-id") String notificationId) {
         logger.info("deleteNotification called by [" + httpRequest.getRemoteUser() + "]");
         logger.info("notificationId - " + notificationId);      
         HttpHeaders headers = new HttpHeaders();
@@ -204,8 +221,13 @@ public class NotificationController {
     @RequestMapping(value="/notifications/user/{uun}", method= RequestMethod.GET)
     public JsonNotification[] getUserNotifications(HttpServletRequest httpRequest, @PathVariable("uun") String uun) {
         logger.info("getUserNotifications called by [" + httpRequest.getRemoteUser() + "]");
-        logger.info("notificationId - " + uun);      
-    	ResponseEntity<JsonNotification[]> response = restTemplate.getForEntity(notificationMsUrl + "/notifications/user/" + uun, JsonNotification[].class);
+        logger.info("notificationId - " + uun);
+        final HttpEntity<String> entity = new HttpEntity<>(basicAuthHeaders);
+    	ResponseEntity<JsonNotification[]> response = restTemplate.exchange(
+    	        notificationMsUrl + "/notifications/user/" + uun,
+                HttpMethod.GET,
+                entity,
+                JsonNotification[].class);
         logger.info("response - " + response);
         return response.getBody();
     }
@@ -221,7 +243,7 @@ public class NotificationController {
         return "{\"member\": \"no\"}";
     }    
     
-    private JsonNotification constructNotificationWithLdapGroup(JsonNotification notification){
+    private JsonNotification constructNotificationWithLdapGroup(JsonNotification notification) {
         logger.info("constructNotificationWithLdapGroup - " + notification);
         
         if(notification.getNotificationGroup() == null){
@@ -252,19 +274,19 @@ public class NotificationController {
                 logger.info("ldapUsers - " + i + " " + ldapUsers.get(i));                  
             } 
             
-            ArrayList<NotificationUser> userList = new ArrayList<NotificationUser>();
-            for(int i = 0; i < ldapUsers.size(); i++){
-               if(!ldapUsers.get(i).contains("/") && !ldapUsers.get(i).contains("_")){
+            ArrayList<NotificationUser> userList = new ArrayList<>();
+            for (String ldapUser : ldapUsers) {
+                if (!ldapUser.contains("/") && !ldapUser.contains("_")) {
                     NotificationUser user = new NotificationUser();
 
                     NotificationUserPK nupk = new NotificationUserPK();
                     nupk.setNotificationId(notification.getNotificationId());
-                    nupk.setUun(ldapUsers.get(i));
+                    nupk.setUun(ldapUser);
                     user.setId(nupk);
                     user.setNotification(dbNotification);
 
                     userList.add(user);
-               }
+                }
             }
             notification.setNotificationUsers(userList);
 
@@ -274,13 +296,13 @@ public class NotificationController {
     
         
     private int countNumberOfOccurrences(String source, String sentence) {
-        String in = sentence;
         int i=0;
         Pattern p = Pattern.compile(source);
-        Matcher m = p.matcher(in);
+        Matcher m = p.matcher(sentence);
         while (m.find()) {
             i++;
         }        
         return i;
     }    
+
 }
