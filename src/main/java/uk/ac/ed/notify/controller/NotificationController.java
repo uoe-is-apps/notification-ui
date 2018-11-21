@@ -77,13 +77,10 @@ public class NotificationController {
         JsonNotification result = new JsonNotification();
      
         String serverHostname;
-        try
-        {
+        try {
            java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
            serverHostname = localMachine.getHostName();
-        }
-        catch(Exception e)
-        {
+        } catch(Exception e) {
            serverHostname = "Unknown";
         }        
         
@@ -130,10 +127,10 @@ public class NotificationController {
         logger.info("setNotification called by [" + httpRequest.getRemoteUser() + "]");
         logger.info("notification - " + notification);       
                 
-        if(notification.getNotificationGroup() != null){
+        if(notification.getNotificationGroup() != null) {
             String ldapGroup = notification.getNotificationGroup();
             int numOfLevel = countNumberOfOccurrences("ou=",ldapGroup);
-            if(numOfLevel < minGroupLevel){
+            if(numOfLevel < minGroupLevel) {
                 JsonNotification result = new JsonNotification();
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_INCORRECT_LEVEL");
                 logger.error("ladp group - " + ldapGroup + " num of ou: " + numOfLevel);
@@ -144,13 +141,13 @@ public class NotificationController {
 
         notification = constructNotificationWithLdapGroup(notification);    
 
-        if(notification.getTopic().equals("Group") && notification.getNotificationUsers() != null){
-            if(notification.getNotificationUsers().size() == 0){
+        if(notification.getTopic().equals("Group") && notification.getNotificationUsers() != null) {
+            if(notification.getNotificationUsers().size() == 0) {
                 JsonNotification result = new JsonNotification();
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");
                 logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");      
                 return result;
-            }else if(notification.getNotificationUsers().size() > 5000){
+            }else if(notification.getNotificationUsers().size() > 5000) {
                 JsonNotification result = new JsonNotification();
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");
                 logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");      
@@ -161,11 +158,16 @@ public class NotificationController {
         try{
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity request= new HttpEntity(notification, headers);
-            ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/", HttpMethod.POST, request, JsonNotification.class);
+            headers.putAll(basicAuthHeaders);
+            HttpEntity entity= new HttpEntity(notification, headers);
+            ResponseEntity<JsonNotification> response = restTemplate.exchange(
+                    notificationMsUrl + "/notification/",
+                    HttpMethod.POST,
+                    entity,
+                    JsonNotification.class);
             logger.info("response - " + response);
             return response.getBody();
-        }catch(Exception e){
+        } catch(Exception e) {
             JsonNotification result = new JsonNotification();
             result.setTitle("ERROR_NOTIFICATION_CREATION");
             logger.error("notification - ERROR_NOTIFICATION_CREATION - " + e.toString());      
@@ -181,13 +183,13 @@ public class NotificationController {
         logger.info("notification - " + notification);      
         notification = constructNotificationWithLdapGroup(notification);   
         
-        if(notification.getTopic().equals("Group") && notification.getNotificationUsers() != null){
-            if(notification.getNotificationUsers().size() == 0){
+        if(notification.getTopic().equals("Group") && notification.getNotificationUsers() != null) {
+            if(notification.getNotificationUsers().size() == 0) {
                 JsonNotification result = new JsonNotification();
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");
                 logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");      
                 return result;
-            }else if(notification.getNotificationUsers().size() > 5000){
+            }else if(notification.getNotificationUsers().size() > 5000) {
                 JsonNotification result = new JsonNotification();
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");
                 logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");      
@@ -202,7 +204,7 @@ public class NotificationController {
             ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/"+notificationId, HttpMethod.PUT, request, JsonNotification.class);
             logger.info("response - " + response);        
             return response.getBody();
-        }catch(Exception e){
+        } catch(Exception e) {
             JsonNotification result = new JsonNotification();
             result.setTitle("ERROR_NOTIFICATION_CREATION");
             logger.error("notification - ERROR_NOTIFICATION_CREATION - " + e.toString());      
@@ -237,9 +239,9 @@ public class NotificationController {
 
     @RequestMapping(value = "/checkIfLdapGroupContainMember/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String checkIfLdapGroupContainMember(@RequestBody JsonNotification notification) {        
-        if(notification.getNotificationGroup() != null){
+        if(notification.getNotificationGroup() != null) {
             List<String> ldapUsers = groupService.getMembers(notification.getNotificationGroup());
-            if(ldapUsers.size() > 0){
+            if(ldapUsers.size() > 0) {
                 return "{\"member\": \"yes\"}";
             }
         }
@@ -249,10 +251,10 @@ public class NotificationController {
     private JsonNotification constructNotificationWithLdapGroup(JsonNotification notification) {
         logger.info("constructNotificationWithLdapGroup - " + notification);
         
-        if(notification.getNotificationGroup() == null){
+        if(notification.getNotificationGroup() == null) {
             logger.info("user hasn't selected any ldap group");
             return notification;
-        }else{        
+        } else {
             String groupName = groupService.getGroupName(notification.getNotificationGroup());
             notification.setNotificationGroupName(groupName);
 
@@ -273,12 +275,12 @@ public class NotificationController {
 
             logger.info("notification will be created for the following users");
             logger.info("getMembersFromParentGroup - " + notification.getNotificationGroup()+ " name - " + groupName + " numOfUsers found - " + ldapUsers.size() );
-            for(int i = 0; i < ldapUsers.size(); i++){
+            for(int i = 0; i < ldapUsers.size(); i++) {
                 logger.info("ldapUsers - " + i + " " + ldapUsers.get(i));                  
             } 
             
             ArrayList<NotificationUser> userList = new ArrayList<>();
-            for (String ldapUser : ldapUsers) {
+            for(String ldapUser : ldapUsers) {
                 if (!ldapUser.contains("/") && !ldapUser.contains("_")) {
                     NotificationUser user = new NotificationUser();
 
