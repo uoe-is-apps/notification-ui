@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.ed.notify.entity.Notification;
 import uk.ac.ed.notify.entity.NotificationUser;
 import uk.ac.ed.notify.entity.NotificationUserPK;
-import uk.ac.ed.notify.service.LdapService;
+import uk.ac.ed.notify.service.GroupService;
 
 /**
  * Created by rgood on 28/10/2015.
@@ -47,6 +47,12 @@ public class NotificationController {
      */
     @Value("${uk.ac.ed.notify.security.notificationUiPassword:CHANGEME}")
     private String notificationUiPassword;
+
+    @Value("${uk.ac.ed.notify.groups.minLevel:6}")
+    private int minGroupLevel;
+
+    @Autowired
+    private GroupService groupService;
 
     private HttpHeaders basicAuthHeaders;
 
@@ -104,9 +110,6 @@ public class NotificationController {
         return response.getBody();
     }
 
-    @Autowired
-    LdapService ldapService;        
-
     @RequestMapping(value = "/notifications/publisher/{publisher-id}", method = RequestMethod.GET)
     public JsonNotification[] getPublisherNotifications(HttpServletRequest httpRequest, @PathVariable("publisher-id") String publisherId) {
         logger.info("getPublisherNotifications called by [" + httpRequest.getRemoteUser() + "]");
@@ -130,7 +133,7 @@ public class NotificationController {
         if(notification.getNotificationGroup() != null){
             String ldapGroup = notification.getNotificationGroup();
             int numOfLevel = countNumberOfOccurrences("ou=",ldapGroup);
-            if(numOfLevel <= 5){
+            if(numOfLevel < minGroupLevel){
                 JsonNotification result = new JsonNotification();
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_INCORRECT_LEVEL");
                 logger.error("ladp group - " + ldapGroup + " num of ou: " + numOfLevel);
@@ -235,7 +238,7 @@ public class NotificationController {
     @RequestMapping(value = "/checkIfLdapGroupContainMember/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String checkIfLdapGroupContainMember(@RequestBody JsonNotification notification) {        
         if(notification.getNotificationGroup() != null){
-            List<String> ldapUsers = ldapService.getMembers(notification.getNotificationGroup());
+            List<String> ldapUsers = groupService.getMembers(notification.getNotificationGroup());
             if(ldapUsers.size() > 0){
                 return "{\"member\": \"yes\"}";
             }
@@ -250,7 +253,7 @@ public class NotificationController {
             logger.info("user hasn't selected any ldap group");
             return notification;
         }else{        
-            String groupName = ldapService.getGroupName(notification.getNotificationGroup()); 
+            String groupName = groupService.getGroupName(notification.getNotificationGroup());
             notification.setNotificationGroupName(groupName);
 
             Notification dbNotification = new Notification();
@@ -266,7 +269,7 @@ public class NotificationController {
             dbNotification.setNotificationGroup(notification.getNotificationGroup()); 
             dbNotification.setNotificationGroupName(groupName);
 
-            List<String> ldapUsers = ldapService.getMembersFromParentGroup(notification.getNotificationGroup());
+            List<String> ldapUsers = groupService.getMembersFromParentGroup(notification.getNotificationGroup());
 
             logger.info("notification will be created for the following users");
             logger.info("getMembersFromParentGroup - " + notification.getNotificationGroup()+ " name - " + groupName + " numOfUsers found - " + ldapUsers.size() );

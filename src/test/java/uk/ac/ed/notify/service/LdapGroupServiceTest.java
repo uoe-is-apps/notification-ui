@@ -21,17 +21,17 @@ import uk.ac.ed.notify.entity.LdapGroup;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = TestApplication.class)
-public class LdapServiceTest {
+public class LdapGroupServiceTest {
     
     @Autowired
-    LdapService ldapService;
+    LdapGroupService ldapGroupService;
     
     private final String base = "ou=UOE,ou=org,ou=grouper2,dc=authorise,dc=ed,dc=ac,dc=uk";
     
     @Test
     public void ldapGetGroupName()
     {
-        String name = ldapService.getGroupName(base);
+        String name = ldapGroupService.getGroupName(base);
         
         //test UoE's name
         assertEquals("UoE",name);
@@ -40,7 +40,7 @@ public class LdapServiceTest {
     @Test
     public void ldapGetNextLevelGroups()
     {
-        List<LdapGroup> list = ldapService.getNextLevelGroups(base);
+        List<LdapGroup> list = ldapGroupService.getNextLevelGroups(base);
         String ifSCEFound = "no";
         for(int i = 0; i < list.size(); i++){
             if(list.get(i).getOu().equals("SCE")){
