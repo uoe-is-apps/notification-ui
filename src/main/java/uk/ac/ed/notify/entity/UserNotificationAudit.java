@@ -10,7 +10,7 @@ import java.util.Date;
  * Created by rgood on 20/10/2015.
  */
 @Entity
-@Table(name="USER_NOTIFICATION_AUDIT", schema="NOTIFY")
+@Table(name="USER_NOTIFICATION_AUDIT")
 public class UserNotificationAudit {
 
     @Id
