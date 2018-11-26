@@ -31,19 +31,20 @@ import uk.ac.ed.notify.repository.UserNotificationAuditRepository;
  */
 @Service
 public class EmailNotificationHandlingService {
-    private static final Logger logger = LoggerFactory.getLogger(EmailNotificationHandlingService.class);           
-    
+
     @Autowired
-    PublisherDetailsRepository publisherDetailsRepository;
+    private PublisherDetailsRepository publisherDetailsRepository;
                             
     @Autowired
-    NotificationRepository notificationRepository;
+    private NotificationRepository notificationRepository;
                 
     @Autowired
-    NotificationErrorRepository notificationErrorRepository;    
+    private NotificationErrorRepository notificationErrorRepository;
             
     @Autowired
-    UserNotificationAuditRepository userNotificationAuditRepository;                
+    private UserNotificationAuditRepository userNotificationAuditRepository;
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public void processSingleNotification(Notification notification){
         logger.debug("Handle notification: " + notification);
