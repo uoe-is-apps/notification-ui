@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
-@Table(name="notification_users", schema = "NOTIFY")
+@Table(name="notification_users")
 public class NotificationUser {
 
 	@EmbeddedId

@@ -22,7 +22,7 @@ public class NotificationTidyupJob implements Job {
     private static final Logger logger = LoggerFactory.getLogger(NotificationTidyupJob.class);
      
     @Autowired
-    NotificationTidyupService notificationTidyupService;
+    private NotificationTidyupService notificationTidyupService;
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {

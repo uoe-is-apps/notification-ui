@@ -47,7 +47,7 @@ public class NotificationRepositoryImpl implements NotificationRepositoryAddon {
         
 	@Override
 	public List<Notification> bulkSave(List<Notification> entities) {
-		final List<Notification> savedEntities = new ArrayList<Notification>(entities.size());
+		final List<Notification> savedEntities = new ArrayList<>(entities.size());
 		int count = 0;
 		
 		for (Notification notification : entities) {
