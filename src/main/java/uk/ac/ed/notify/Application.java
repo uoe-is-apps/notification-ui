@@ -12,6 +12,7 @@ import org.springframework.cloud.security.oauth2.resource.EnableOAuth2Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * Created by rgood on 18/09/2015.
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 @SpringBootApplication
 @EntityScan("uk.ac.ed.notify")
 @ComponentScan({"uk.ac.ed.notify"})
+@EnableAsync // For sending emails & SMS
 @EnableOAuth2Resource
 // Prevents ClassNotFoundException: org.apache.velocity.runtime.log.CommonsLogLogChute
 // https://stackoverflow.com/questions/32067759/spring-boot-starter-cache-velocity-is-missing

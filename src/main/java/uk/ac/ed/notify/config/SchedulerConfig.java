@@ -4,6 +4,8 @@ import org.quartz.JobDetail;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.spi.JobFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
@@ -16,6 +18,7 @@ import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 import uk.ac.ed.notify.job.Office365PullJob;
+import uk.ac.ed.notify.job.OutboundEmailJob;
 import uk.ac.ed.notify.spring.AutowiringSpringBeanJobFactory;
 
 import javax.sql.DataSource;
@@ -30,9 +33,10 @@ import uk.ac.ed.notify.job.NotificationTidyupJob;
 @ConditionalOnProperty(name = "quartz.enabled")
 public class SchedulerConfig {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerConfig.class);
+
     @Bean
-    public JobFactory jobFactory(ApplicationContext applicationContext)
-    {
+    public JobFactory jobFactory(ApplicationContext applicationContext) {
         AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
         jobFactory.setApplicationContext(applicationContext);
         return jobFactory;
@@ -42,9 +46,11 @@ public class SchedulerConfig {
     public SchedulerFactoryBean schedulerFactoryBean(@Qualifier("notifyDataSource") DataSource dataSource,
                                                      JobFactory jobFactory,                                                     
                                                      @Qualifier("notificationTidyupJobTrigger") Trigger notificationTidyupJobTrigger,
-                                                     @Qualifier("office365PullJobTrigger") Trigger office365PullJobTrigger                                                     
+                                                     @Qualifier("office365PullJobTrigger") Trigger office365PullJobTrigger,
+                                                     @Qualifier("outboundEmailJobTrigger") Trigger outboundEmailJobTrigger
                                                      //@Qualifier("office365PushSubscriptionJobTrigger") Trigger office365PushSubscriptionJobTrigger
             ) throws IOException {
+
         SchedulerFactoryBean factory = new SchedulerFactoryBean();
         // this allows to update triggers in DB when updating settings in config file:
         factory.setOverwriteExistingJobs(true);
@@ -52,8 +58,9 @@ public class SchedulerConfig {
         factory.setJobFactory(jobFactory);
 
         factory.setQuartzProperties(quartzProperties());
-        factory.setTriggers(new Trigger[] {notificationTidyupJobTrigger, office365PullJobTrigger}); 
+        factory.setTriggers(notificationTidyupJobTrigger, office365PullJobTrigger, outboundEmailJobTrigger);
         return factory;
+
     }
 
     @Bean
@@ -88,7 +95,20 @@ public class SchedulerConfig {
         return createTrigger(jobDetail, frequency);
     }
 
+    @Bean
+    public JobDetailFactoryBean outboundEmailJobDetail() {
+        return createJobDetail(OutboundEmailJob.class);
+
+    }
+
+    @Bean(name = "outboundEmailJobTrigger")
+    public SimpleTriggerFactoryBean outboundEmailJobTrigger(@Qualifier("outboundEmailJobDetail") JobDetail jobDetail,
+                                                                 @Value("${outboundEmailJobDetail.frequency}") long frequency) {
+        return createTrigger(jobDetail, frequency);
+    }
+
     private static JobDetailFactoryBean createJobDetail(Class jobClass) {
+        LOGGER.info("Creating JobDetailFactoryBean based on class '{}'", jobClass);
         JobDetailFactoryBean factoryBean = new JobDetailFactoryBean();
         factoryBean.setJobClass(jobClass);
         // job has to be durable to be stored in DB:
@@ -97,6 +117,7 @@ public class SchedulerConfig {
     }
 
     private static SimpleTriggerFactoryBean createTrigger(JobDetail jobDetail, long pollFrequencyMs) {
+        LOGGER.info("Creating SimpleTriggerFactoryBean based for JobDetail '{}' with frequency '{}'", jobDetail, pollFrequencyMs);
         SimpleTriggerFactoryBean factoryBean = new SimpleTriggerFactoryBean();
         factoryBean.setJobDetail(jobDetail);
         factoryBean.setStartDelay(0L);
