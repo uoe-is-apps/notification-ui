@@ -6,6 +6,7 @@ import org.quartz.Trigger;
 import org.quartz.spi.JobFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
@@ -19,11 +20,14 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 import uk.ac.ed.notify.job.Office365PullJob;
 import uk.ac.ed.notify.job.OutboundEmailJob;
+import uk.ac.ed.notify.job.OutboundSmsJob;
 import uk.ac.ed.notify.spring.AutowiringSpringBeanJobFactory;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.Set;
+
 import uk.ac.ed.notify.job.NotificationTidyupJob;
 
 /**
@@ -35,6 +39,9 @@ public class SchedulerConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerConfig.class);
 
+    @Autowired
+    private Set<Trigger> triggers;
+
     @Bean
     public JobFactory jobFactory(ApplicationContext applicationContext) {
         AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
@@ -43,13 +50,9 @@ public class SchedulerConfig {
     }
 
     @Bean
-    public SchedulerFactoryBean schedulerFactoryBean(@Qualifier("notifyDataSource") DataSource dataSource,
-                                                     JobFactory jobFactory,                                                     
-                                                     @Qualifier("notificationTidyupJobTrigger") Trigger notificationTidyupJobTrigger,
-                                                     @Qualifier("office365PullJobTrigger") Trigger office365PullJobTrigger,
-                                                     @Qualifier("outboundEmailJobTrigger") Trigger outboundEmailJobTrigger
-                                                     //@Qualifier("office365PushSubscriptionJobTrigger") Trigger office365PushSubscriptionJobTrigger
-            ) throws IOException {
+    public SchedulerFactoryBean schedulerFactoryBean(
+            @Qualifier("notifyDataSource") DataSource dataSource,
+            JobFactory jobFactory) throws IOException {
 
         SchedulerFactoryBean factory = new SchedulerFactoryBean();
         // this allows to update triggers in DB when updating settings in config file:
@@ -58,7 +61,7 @@ public class SchedulerConfig {
         factory.setJobFactory(jobFactory);
 
         factory.setQuartzProperties(quartzProperties());
-        factory.setTriggers(notificationTidyupJobTrigger, office365PullJobTrigger, outboundEmailJobTrigger);
+        factory.setTriggers(triggers.stream().toArray(Trigger[]::new));
         return factory;
 
     }
@@ -104,6 +107,18 @@ public class SchedulerConfig {
     @Bean(name = "outboundEmailJobTrigger")
     public SimpleTriggerFactoryBean outboundEmailJobTrigger(@Qualifier("outboundEmailJobDetail") JobDetail jobDetail,
                                                                  @Value("${outboundEmailJobDetail.frequency}") long frequency) {
+        return createTrigger(jobDetail, frequency);
+    }
+
+    @Bean
+    public JobDetailFactoryBean outboundSmsJobDetail() {
+        return createJobDetail(OutboundSmsJob.class);
+
+    }
+
+    @Bean(name = "outboundSmsJobTrigger")
+    public SimpleTriggerFactoryBean outboundSmsJobTrigger(@Qualifier("outboundSmsJobDetail") JobDetail jobDetail,
+                                                            @Value("${outboundSmsJobDetail.frequency}") long frequency) {
         return createTrigger(jobDetail, frequency);
     }
 
