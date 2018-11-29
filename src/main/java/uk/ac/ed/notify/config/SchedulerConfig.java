@@ -20,6 +20,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 import uk.ac.ed.notify.job.Office365PullJob;
 import uk.ac.ed.notify.job.OutboundEmailJob;
+import uk.ac.ed.notify.job.OutboundSmsJob;
 import uk.ac.ed.notify.spring.AutowiringSpringBeanJobFactory;
 
 import javax.sql.DataSource;
@@ -106,6 +107,18 @@ public class SchedulerConfig {
     @Bean(name = "outboundEmailJobTrigger")
     public SimpleTriggerFactoryBean outboundEmailJobTrigger(@Qualifier("outboundEmailJobDetail") JobDetail jobDetail,
                                                                  @Value("${outboundEmailJobDetail.frequency}") long frequency) {
+        return createTrigger(jobDetail, frequency);
+    }
+
+    @Bean
+    public JobDetailFactoryBean outboundSmsJobDetail() {
+        return createJobDetail(OutboundSmsJob.class);
+
+    }
+
+    @Bean(name = "outboundSmsJobTrigger")
+    public SimpleTriggerFactoryBean outboundSmsJobTrigger(@Qualifier("outboundSmsJobDetail") JobDetail jobDetail,
+                                                            @Value("${outboundSmsJobDetail.frequency}") long frequency) {
         return createTrigger(jobDetail, frequency);
     }
 
