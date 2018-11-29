@@ -44,7 +44,6 @@ public class TwillioOutboundSmsService implements OutboundSmsService {
                             "provided in the configuration;  the '{}' bean will be ENABLED",
                     getClass().getSimpleName());
             Twilio.init(accountSid, authToken);
-            enabled = true;
 
         } else {
             logger.info("Ignoring the Twillio API because account credentials WERE NOT " +
