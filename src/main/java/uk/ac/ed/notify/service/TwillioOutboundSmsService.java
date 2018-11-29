@@ -34,9 +34,7 @@ public class TwillioOutboundSmsService implements OutboundSmsService {
     @PostConstruct
     public void init() {
 
-        if (StringUtils.isNotBlank(accountSid)
-                && StringUtils.isNotBlank(authToken)
-                && StringUtils.isNotBlank(fromNumber)) {
+        if (isFullyConfigured()) {
 
             normalizedFromNumber = normalizePhoneNumber(fromNumber);
 
@@ -55,6 +53,12 @@ public class TwillioOutboundSmsService implements OutboundSmsService {
 
     @Override
     public void send(DeliveryAddress deliveryAddress, Notification notification) {
+
+        if (!isFullyConfigured()) {
+            logger.error("Improper attempt to use the {} to send notification '{}' where configuration is missing",
+                    getClass().getSimpleName(), notification.getNotificationId());
+            return;
+        }
 
         final String toNumber = US_DIALING_PREFIX + normalizePhoneNumber(deliveryAddress.getValue());
         final Message message = Message.creator(
@@ -80,6 +84,12 @@ public class TwillioOutboundSmsService implements OutboundSmsService {
                 break;
         }
 
+    }
+
+    private boolean isFullyConfigured() {
+        return StringUtils.isNotBlank(accountSid)
+                && StringUtils.isNotBlank(authToken)
+                && StringUtils.isNotBlank(fromNumber);
     }
 
 }
