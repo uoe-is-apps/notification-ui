@@ -200,8 +200,9 @@ public class NotificationController {
         try{
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity request= new HttpEntity(notification, headers);
-            ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/"+notificationId, HttpMethod.PUT, request, JsonNotification.class);
+            headers.putAll(basicAuthHeaders);
+            HttpEntity entity = new HttpEntity(notification, headers);
+            ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/"+notificationId, HttpMethod.PUT, entity, JsonNotification.class);
             logger.info("response - " + response);        
             return response.getBody();
         } catch(Exception e) {
@@ -218,8 +219,9 @@ public class NotificationController {
         logger.info("notificationId - " + notificationId);      
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity request= new HttpEntity("", headers);
-        ResponseEntity<String> response = restTemplate.exchange(notificationMsUrl + "/notification/"+notificationId, HttpMethod.DELETE, request, String.class);
+        headers.putAll(basicAuthHeaders);
+        HttpEntity entity = new HttpEntity("", headers);
+        ResponseEntity<String> response = restTemplate.exchange(notificationMsUrl + "/notification/"+notificationId, HttpMethod.DELETE, entity, String.class);
         logger.info("response - " + response);
     }
     
