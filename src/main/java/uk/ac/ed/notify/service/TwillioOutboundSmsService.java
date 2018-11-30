@@ -6,8 +6,10 @@ import com.twilio.type.PhoneNumber;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import uk.ac.ed.notify.channel.DeliveryAddress;
 import uk.ac.ed.notify.entity.Notification;
@@ -18,16 +20,17 @@ import javax.annotation.PostConstruct;
 @ConditionalOnProperty("uk.ac.ed.notify.sms.twillio.accountSid")
 public class TwillioOutboundSmsService implements OutboundSmsService {
 
+    private static final String FROM_NUMBER_PROPERTY_PREFIX = "uk.ac.ed.notify.sms.twillio";
+    private static final String FROM_NUMBER_PROPERTY_SUFFIX = "fromNumber";
+
     @Value("${uk.ac.ed.notify.sms.twillio.accountSid:}")
     private String accountSid;
 
     @Value("${uk.ac.ed.notify.sms.twillio.authToken:}")
     private String authToken;
 
-    @Value("${uk.ac.ed.notify.sms.twillio.fromNumber:}")
-    private String fromNumber;
-
-    private String normalizedFromNumber;
+    @Autowired
+    private Environment environment;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -35,8 +38,6 @@ public class TwillioOutboundSmsService implements OutboundSmsService {
     public void init() {
 
         if (isFullyConfigured()) {
-
-            normalizedFromNumber = normalizePhoneNumber(fromNumber);
 
             logger.info("Initializing the Twillio API because account credentials were " +
                             "provided in the configuration;  the '{}' bean will be ENABLED",
@@ -60,10 +61,18 @@ public class TwillioOutboundSmsService implements OutboundSmsService {
             return;
         }
 
+        final String fromNumber = selectFromNumber(notification);
+        logger.debug("Using fromNumber='{}' to send notification='{}' to username='{}'",
+                fromNumber, notification.getNotificationId(), deliveryAddress.getUsername());
+        if (fromNumber == null) {
+            throw new IllegalStateException(
+                    "Could not evaluate a fromNumber for notification:  " + notification.getNotificationId());
+        }
+
         final String toNumber = US_DIALING_PREFIX + normalizePhoneNumber(deliveryAddress.getValue());
         final Message message = Message.creator(
                 new PhoneNumber(toNumber),
-                new PhoneNumber(US_DIALING_PREFIX + normalizedFromNumber),
+                new PhoneNumber(US_DIALING_PREFIX + normalizePhoneNumber(fromNumber)),
                 notification.getBody()
         ).create();
 
@@ -88,8 +97,35 @@ public class TwillioOutboundSmsService implements OutboundSmsService {
 
     private boolean isFullyConfigured() {
         return StringUtils.isNotBlank(accountSid)
-                && StringUtils.isNotBlank(authToken)
-                && StringUtils.isNotBlank(fromNumber);
+                && StringUtils.isNotBlank(authToken);
+    }
+
+    private String selectFromNumber(Notification notification) {
+
+        String rslt; // default
+
+        /*
+         * First try the group-specific fromNumber
+         */
+
+        final String groupPropertyName =
+                FROM_NUMBER_PROPERTY_PREFIX + "." + formatGroupPart(notification) + "." + FROM_NUMBER_PROPERTY_SUFFIX;
+        rslt = environment.getProperty(groupPropertyName);
+
+        /*
+         * If we don't have a specific fromNumber for the group, use the default/general number.
+         */
+
+        if (rslt == null) {
+            rslt = environment.getProperty(FROM_NUMBER_PROPERTY_PREFIX + "." + FROM_NUMBER_PROPERTY_SUFFIX);
+        }
+
+        return rslt;
+
+    }
+
+    private String formatGroupPart(Notification notification) {
+        return notification.getNotificationGroupName().replaceAll("\\W", "");
     }
 
 }
