@@ -1,6 +1,7 @@
 package uk.ac.ed.notify.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ed.notify.entity.UiRole;
 import uk.ac.ed.notify.entity.UiUser;
@@ -9,8 +10,11 @@ import uk.ac.ed.notify.repository.UiRoleRepository;
 import uk.ac.ed.notify.repository.UiUserRepository;
 import uk.ac.ed.notify.repository.UiUserRoleRepository;
 
+import java.io.IOException;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -22,14 +26,17 @@ public class UiUserController {
     
     protected final Log logger = LogFactory.getLog(this.getClass());
     
-    @Autowired
-    UiUserRepository uiUserRepository;
+    @Value("${hub.logoutRedirectLocation}")
+    private String logoutRedirectLocation;
 
     @Autowired
-    UiRoleRepository uiRoleRepository;
+    private UiUserRepository uiUserRepository;
 
     @Autowired
-    UiUserRoleRepository uiUserRoleRepository;
+    private UiRoleRepository uiRoleRepository;
+
+    @Autowired
+    private UiUserRoleRepository uiUserRoleRepository;
 
     @RequestMapping(value="/ui-users",method = RequestMethod.GET)
     public List<UiUser> getUsers()
@@ -76,21 +83,18 @@ public class UiUserController {
        String uun = request.getRemoteUser();
        return uiUserRepository.findOne(uun); 
     }
-    
-    
+
     /*
       Invalidate session
      */
     @RequestMapping(value="/invalidate-session", method = RequestMethod.GET)
-    public void invalidateSession(HttpServletRequest request)
-    {       
-       request.getSession().setAttribute("test", "test1");
-       logger.info("invalidate");
-       request.getSession().invalidate();
-       logger.info("remote user - " + request.getRemoteUser());
-       logger.info("session - " + request.getSession().getAttribute("test") );
+    public void invalidateSession(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        request.getSession().setAttribute("test", "test1");
+        logger.info("invalidate");
+        request.getSession().invalidate();
+        logger.info("remote user - " + request.getRemoteUser());
+        logger.info("session - " + request.getSession().getAttribute("test") );
+        response.sendRedirect(logoutRedirectLocation);
+    }
 
-    }    
-    
-    
 }
