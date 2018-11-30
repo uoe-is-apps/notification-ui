@@ -221,7 +221,7 @@ public class NotificationController {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.putAll(basicAuthHeaders);
         HttpEntity entity = new HttpEntity("", headers);
-        ResponseEntity<String> response = restTemplate.exchange(notificationMsUrl + "/notification/"+notificationId, HttpMethod.DELETE, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(notificationMsUrl + "/notification/" + notificationId, HttpMethod.DELETE, entity, String.class);
         logger.info("response - " + response);
     }
     
