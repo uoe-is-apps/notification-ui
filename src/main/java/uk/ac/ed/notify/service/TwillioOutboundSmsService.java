@@ -68,11 +68,16 @@ public class TwillioOutboundSmsService implements OutboundSmsService {
             throw new IllegalStateException(
                     "Could not evaluate a fromNumber for notification:  " + notification.getNotificationId());
         }
+        final String completeFromNumber = fromNumber.length() < 7
+                ? fromNumber                      // Short code
+                : US_DIALING_PREFIX + normalizePhoneNumber(fromNumber); // Standard U.S. phone number
+        logger.debug("Checked fromNumber for short code.  Using '{}' as 'from' phoneNumber for SMS service",
+                completeFromNumber);
 
         final String toNumber = US_DIALING_PREFIX + normalizePhoneNumber(deliveryAddress.getValue());
         final Message message = Message.creator(
                 new PhoneNumber(toNumber),
-                new PhoneNumber(US_DIALING_PREFIX + normalizePhoneNumber(fromNumber)),
+                new PhoneNumber(completeFromNumber),
                 notification.getBody()
         ).create();
 
