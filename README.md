@@ -14,7 +14,7 @@ You can run the `notification-ui` project locally (for development) or in a serv
 
 Use the following command to run `notification-ui` locally with the Spring Boot Maven Plugin:
 
-```
+```sh
 $ mvn spring-boot:run
 ```
 
@@ -41,13 +41,13 @@ There are a few components to get the 'Notification Hub' up and running.  The fo
 ### Database Setup
 Setup a Docker-based MS SQL Server instance for local development:
 
-```
+```sh
 $ docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=notification-ui@DEV' -p 1433:1433 microsoft/mssql-server-linux:2017-latest
 ```
 
 Configure the Notification Hub to use the Docker-based MS SQL Server instance shown above by configuring `notification-ms/src/main/resources/application.properties` and `notification-ui/src/main/resources/application.properties` with the following JDBC connection settings.
 
-```
+```properties
 # Notify Database connection settings (MS SQL SERVER example)
 datasource.notify.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
 datasource.notify.url=jdbc:sqlserver://localhost:1433;
@@ -61,7 +61,7 @@ CAS has been built into the Notification Hub as a straightforward method to auth
 Configure the Notification Hub to use CAS via
 `notification-ui/src/main/resources/application.properties` .  Locate the `cas.*` properties, and configure them to match your CAS environment.  If running uPortal-start on port 8080 (default settings in uPortal-start), use the following configuration:
 
-```
+```properties
 cas.protocol=http
 cas.server=localhost:8080
 cas.context=/cas
