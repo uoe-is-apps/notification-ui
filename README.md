@@ -36,7 +36,7 @@ settings in `application.properties`.
 The `notification-ui` component logs messages via SLF4J. Enter standard SLF4J configurations in `application.properties`.
 
 ## Running a Complete Notification Hub Example
-There are a few components to get the 'Notification Hub' up and running.  The follow example is meant as a 'local' deployment.
+There are a few components to get the 'Notification Hub' up and running.  The following example is meant as a 'local' deployment.
 
 ### Database Setup
 Setup a Docker-based MS SQL Server instance for local development:
