@@ -130,7 +130,15 @@ public class TwillioOutboundSmsService implements OutboundSmsService {
     }
 
     private String formatGroupPart(Notification notification) {
-        return notification.getNotificationGroupName().replaceAll("\\W", "");
+        if(notification == null) {
+            logger.warn("Notification is null.  Returning an empty string for the group name.");
+            return "";
+        } else if(notification.getNotificationGroupName() == null) {
+            logger.warn("Notification.groupName [{}] is null.  Returning an empty string for the group name.", notification);
+            return "";
+        } else {
+            return notification.getNotificationGroupName().replaceAll("\\W", "");
+        }
     }
 
 }
