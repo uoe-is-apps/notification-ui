@@ -17,6 +17,7 @@
     </parent>
 
     <properties>
+        <packaging.type>jar</packaging.type>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -395,15 +396,6 @@
     <name>notification-ui</name>
 
     <profiles>
-        <profile>
-            <id>jar</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <packaging.type>jar</packaging.type>
-            </properties>
-        </profile>
         <profile>
             <id>server</id>
             <properties>
