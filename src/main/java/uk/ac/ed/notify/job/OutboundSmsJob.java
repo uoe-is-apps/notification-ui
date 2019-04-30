@@ -34,7 +34,7 @@ public class OutboundSmsJob implements Job {
     @Autowired(required = false)
     private DeliveryChannelRecipientStrategy deliveryChannelRecipientStrategy;
 
-    @Autowired
+    @Autowired(required = false)
     private OutboundSmsService smsService;
 
     @Autowired
@@ -65,8 +65,15 @@ public class OutboundSmsJob implements Job {
 
     private void sendOutboundTexts(Notification notification) {
 
+        /*
+         * Verify that we have been configured with the beans we need to succeed in our task.
+         */
         if (deliveryChannelRecipientStrategy == null) {
             logger.warn("Application attempted to send outbound texts, but the communicationPreferencesService bean is null");
+            return;
+        }
+        if (smsService == null) {
+            logger.warn("Application attempted to send outbound texts, but the smsService bean is null");
             return;
         }
 
