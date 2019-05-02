@@ -1,9 +1,12 @@
 package uk.ac.ed.notify.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.crypto.codec.Base64;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.web.bind.annotation.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,16 +40,34 @@ public class NotificationController {
     private String notificationMsUrl;
 
     /**
-     * Username for the 'notification-ui' (service) user.
+     * Username for the 'notification-ui' (service) user for use with HTTP BASIC AuthN.
      */
-    @Value("${uk.ac.ed.notify.security.notificationUiUsername:notification-ui}")
-    private String notificationUiUsername;
+    @Value("${uk.ac.ed.notify.security.basicAuthUsername:notification-ui}")
+    private String basicAuthUsername;
 
     /**
-     * Password for the 'notification-ui' (service) user.
+     * Password for the 'notification-ui' (service) user for use with HTTP BASIC AuthN.
      */
-    @Value("${uk.ac.ed.notify.security.notificationUiPassword:CHANGEME}")
-    private String notificationUiPassword;
+    @Value("${uk.ac.ed.notify.security.basicAuthPassword:}")
+    private String basicAuthPassword;
+
+    /**
+     * Access token URI for use with OAuth2 AuthN.
+     */
+    @Value("${spring.oauth2.client.accessTokenUri}")
+    private String oauthAccessTokenUri;
+
+    /**
+     * Client Id for use with OAuth2 AuthN.
+     */
+    @Value("${spring.oauth2.client.clientId}")
+    private String oauthClientId;
+
+    /**
+     * Client secret for use with OAuth2 AuthN.
+     */
+    @Value("${spring.oauth2.client.clientSecret}")
+    private String oauthClientSecret;
 
     @Value("${uk.ac.ed.notify.groups.minLevel:6}")
     private int minGroupLevel;
@@ -54,40 +75,61 @@ public class NotificationController {
     @Autowired
     private GroupService groupService;
 
-    private HttpHeaders basicAuthHeaders;
+    private HttpHeaders httpHeaders;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private RestTemplate restTemplate;
 
     @PostConstruct
     public void init() {
 
-        // Basic AuthN
-        String plainCreds = notificationUiUsername + ":" + notificationUiPassword;
-        byte[] plainCredsBytes = plainCreds.getBytes();
-        byte[] base64CredsBytes = Base64.encode(plainCredsBytes);
-        String base64Creds = new String(base64CredsBytes);
-        basicAuthHeaders = new HttpHeaders();
-        basicAuthHeaders.add("Authorization", "Basic " + base64Creds);
+        if (StringUtils.isNotBlank(basicAuthPassword)) {
+            /*
+             * If a password has been specified for HTTP BASIC AuthN, use it to access APIs within
+             * the notification-ms component.
+             */
+            final String plainCreds = basicAuthUsername + ":" + basicAuthPassword;
+            byte[] plainCredsBytes = plainCreds.getBytes();
+            byte[] base64CredsBytes = Base64.encode(plainCredsBytes);
+            String base64Creds = new String(base64CredsBytes);
+            httpHeaders = new HttpHeaders();
+            httpHeaders.add("Authorization", "Basic " + base64Creds);
+            restTemplate = new RestTemplate();
+            logger.info("Using HTTP BASIC AuthN to communicate with notification-ms (because uk.ac.ed.notify.security.basicAuthPassword was specified)");
+        } else if (StringUtils.isNotBlank(oauthClientSecret)) {
+            /*
+             * Use OAuth2 AuthN if (instead) a client secret has been specified.
+             */
+            ClientCredentialsResourceDetails resource = new ClientCredentialsResourceDetails();
+            resource.setAccessTokenUri(oauthAccessTokenUri);
+            resource.setClientId(oauthClientId);
+            resource.setClientSecret(oauthClientSecret);
+            logger.info("Using OAuth to communicate with notification-ms (because spring.oauth2.client.clientSecret was specified)");
+            restTemplate = new OAuth2RestTemplate(resource);
+        } else {
+            final String msg = "Neither HTTP BASIC not OAuth2 credentials have been specified " +
+                    "for access to notification-ms APIs";
+            throw new IllegalStateException(msg);
+        }
 
     }
 
     @RequestMapping(value = "/healthcheck", method = RequestMethod.GET)
-    public JsonNotification healthcheck(HttpServletRequest httpRequest) throws ServletException {
-        logger.info("healthcheck");             
+    public JsonNotification healthcheck() {
+        logger.info("healthcheck");
         JsonNotification result = new JsonNotification();
-     
+
         String serverHostname;
         try {
            java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
            serverHostname = localMachine.getHostName();
         } catch(Exception e) {
            serverHostname = "Unknown";
-        }        
-        
-        result.setUrl(serverHostname);      
-        return result;     
+        }
+
+        result.setUrl(serverHostname);
+        return result;
     }
-        
+
     @RequestMapping("/user")
     public Principal user(Principal user) {
         return user;
@@ -95,9 +137,9 @@ public class NotificationController {
 
     @RequestMapping(value = "/notification/{notification-id}", method = RequestMethod.GET)
     public JsonNotification getNotification(HttpServletRequest httpRequest, @PathVariable("notification-id") String notificationId) {
-        logger.info("getNotification called by [" + httpRequest.getRemoteUser() + "]");        
+        logger.info("getNotification called by [" + httpRequest.getRemoteUser() + "]");
         logger.info("notificationId - " + notificationId);
-        final HttpEntity<String> entity = new HttpEntity<>(basicAuthHeaders);
+        final HttpEntity<String> entity = new HttpEntity<>(httpHeaders);
         ResponseEntity<JsonNotification> response = restTemplate.exchange(
                 notificationMsUrl + "/notification/" + notificationId,
                 HttpMethod.GET,
@@ -111,7 +153,7 @@ public class NotificationController {
     public JsonNotification[] getPublisherNotifications(HttpServletRequest httpRequest, @PathVariable("publisher-id") String publisherId) {
         logger.info("getPublisherNotifications called by [" + httpRequest.getRemoteUser() + "]");
         logger.info("publisherId - " + publisherId);
-        final HttpEntity<String> entity = new HttpEntity<>(basicAuthHeaders);
+        final HttpEntity<String> entity = new HttpEntity<>(httpHeaders);
         ResponseEntity<JsonNotification[]> response = restTemplate.exchange(
                 notificationMsUrl + "/notifications/publisher/" + publisherId,
                 HttpMethod.GET,
@@ -125,8 +167,8 @@ public class NotificationController {
     @RequestMapping(value="/notification/", method=RequestMethod.POST)
     public JsonNotification setNotification(HttpServletRequest httpRequest, @RequestBody JsonNotification notification) {
         logger.info("setNotification called by [" + httpRequest.getRemoteUser() + "]");
-        logger.info("notification - " + notification);       
-                
+        logger.info("notification - " + notification);
+
         if(notification.getNotificationGroup() != null) {
             String ldapGroup = notification.getNotificationGroup();
             int numOfLevel = countNumberOfOccurrences("ou=",ldapGroup);
@@ -134,31 +176,31 @@ public class NotificationController {
                 JsonNotification result = new JsonNotification();
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_INCORRECT_LEVEL");
                 logger.error("ladp group - " + ldapGroup + " num of ou: " + numOfLevel);
-                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_INCORRECT_LEVEL");      
-                return result;                
+                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_INCORRECT_LEVEL");
+                return result;
             }
         }
 
-        notification = constructNotificationWithLdapGroup(notification);    
+        notification = constructNotificationWithLdapGroup(notification);
 
         if(notification.getTopic().equals("Group") && notification.getNotificationUsers() != null) {
             if(notification.getNotificationUsers().size() == 0) {
                 JsonNotification result = new JsonNotification();
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");
-                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");      
+                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");
                 return result;
             }else if(notification.getNotificationUsers().size() > 5000) {
                 JsonNotification result = new JsonNotification();
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");
-                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");      
+                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");
                 return result;
             }
         }
-        
+
         try{
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.putAll(basicAuthHeaders);
+            headers.putAll(httpHeaders);
             HttpEntity entity= new HttpEntity(notification, headers);
             ResponseEntity<JsonNotification> response = restTemplate.exchange(
                     notificationMsUrl + "/notification/",
@@ -170,45 +212,45 @@ public class NotificationController {
         } catch(Exception e) {
             JsonNotification result = new JsonNotification();
             result.setTitle("ERROR_NOTIFICATION_CREATION");
-            logger.error("notification - ERROR_NOTIFICATION_CREATION - " + e.toString());      
+            logger.error("notification - ERROR_NOTIFICATION_CREATION - " + e.toString());
             return result;
-        }        
+        }
 
     }
 
     @RequestMapping(value="/notification/{notification-id}",method=RequestMethod.PUT)
-    public JsonNotification updateNotification(HttpServletRequest httpRequest, @PathVariable("notification-id") String notificationId, @RequestBody JsonNotification notification) throws ServletException {       
+    public JsonNotification updateNotification(HttpServletRequest httpRequest, @PathVariable("notification-id") String notificationId, @RequestBody JsonNotification notification) throws ServletException {
         logger.info("updateNotification called by [" + httpRequest.getRemoteUser() + "]");
-        logger.info("notificationId - " + notificationId);      
-        logger.info("notification - " + notification);      
-        notification = constructNotificationWithLdapGroup(notification);   
-        
+        logger.info("notificationId - " + notificationId);
+        logger.info("notification - " + notification);
+        notification = constructNotificationWithLdapGroup(notification);
+
         if(notification.getTopic().equals("Group") && notification.getNotificationUsers() != null) {
             if(notification.getNotificationUsers().size() == 0) {
                 JsonNotification result = new JsonNotification();
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");
-                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");      
+                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");
                 return result;
             }else if(notification.getNotificationUsers().size() > 5000) {
                 JsonNotification result = new JsonNotification();
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");
-                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");      
+                logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");
                 return result;
             }
         }
-                        
+
         try{
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.putAll(basicAuthHeaders);
+            headers.putAll(httpHeaders);
             HttpEntity entity = new HttpEntity(notification, headers);
             ResponseEntity<JsonNotification> response = restTemplate.exchange(notificationMsUrl + "/notification/"+notificationId, HttpMethod.PUT, entity, JsonNotification.class);
-            logger.info("response - " + response);        
+            logger.info("response - " + response);
             return response.getBody();
         } catch(Exception e) {
             JsonNotification result = new JsonNotification();
             result.setTitle("ERROR_NOTIFICATION_CREATION");
-            logger.error("notification - ERROR_NOTIFICATION_CREATION - " + e.toString());      
+            logger.error("notification - ERROR_NOTIFICATION_CREATION - " + e.toString());
             return result;
         }
     }
@@ -216,20 +258,20 @@ public class NotificationController {
     @RequestMapping(value="/notification/{notification-id}",method=RequestMethod.DELETE)
     public void deleteNotification(HttpServletRequest httpRequest, @PathVariable("notification-id") String notificationId) {
         logger.info("deleteNotification called by [" + httpRequest.getRemoteUser() + "]");
-        logger.info("notificationId - " + notificationId);      
+        logger.info("notificationId - " + notificationId);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.putAll(basicAuthHeaders);
+        headers.putAll(httpHeaders);
         HttpEntity entity = new HttpEntity("", headers);
         ResponseEntity<String> response = restTemplate.exchange(notificationMsUrl + "/notification/" + notificationId, HttpMethod.DELETE, entity, String.class);
         logger.info("response - " + response);
     }
-    
+
     @RequestMapping(value="/notifications/user/{uun}", method= RequestMethod.GET)
     public JsonNotification[] getUserNotifications(HttpServletRequest httpRequest, @PathVariable("uun") String uun) {
         logger.info("getUserNotifications called by [" + httpRequest.getRemoteUser() + "]");
         logger.info("notificationId - " + uun);
-        final HttpEntity<String> entity = new HttpEntity<>(basicAuthHeaders);
+        final HttpEntity<String> entity = new HttpEntity<>(httpHeaders);
     	ResponseEntity<JsonNotification[]> response = restTemplate.exchange(
     	        notificationMsUrl + "/notifications/user/" + uun,
                 HttpMethod.GET,
@@ -240,7 +282,7 @@ public class NotificationController {
     }
 
     @RequestMapping(value = "/checkIfLdapGroupContainMember/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String checkIfLdapGroupContainMember(@RequestBody JsonNotification notification) {        
+    public @ResponseBody String checkIfLdapGroupContainMember(@RequestBody JsonNotification notification) {
         if(notification.getNotificationGroup() != null) {
             List<String> ldapUsers = groupService.getMembers(notification.getNotificationGroup());
             if(ldapUsers.size() > 0) {
@@ -248,11 +290,11 @@ public class NotificationController {
             }
         }
         return "{\"member\": \"no\"}";
-    }    
-    
+    }
+
     private JsonNotification constructNotificationWithLdapGroup(JsonNotification notification) {
         logger.info("constructNotificationWithLdapGroup - " + notification);
-        
+
         if(notification.getNotificationGroup() == null) {
             logger.info("user hasn't selected any ldap group");
             return notification;
@@ -270,7 +312,7 @@ public class NotificationController {
             dbNotification.setTitle(notification.getTitle());
             dbNotification.setTopic(notification.getTopic());
             dbNotification.setUrl(notification.getUrl());
-            dbNotification.setNotificationGroup(notification.getNotificationGroup()); 
+            dbNotification.setNotificationGroup(notification.getNotificationGroup());
             dbNotification.setNotificationGroupName(groupName);
 
             List<String> ldapUsers = groupService.getMembersFromParentGroup(notification.getNotificationGroup());
@@ -278,9 +320,9 @@ public class NotificationController {
             logger.info("notification will be created for the following users");
             logger.info("getMembersFromParentGroup - " + notification.getNotificationGroup()+ " name - " + groupName + " numOfUsers found - " + ldapUsers.size() );
             for(int i = 0; i < ldapUsers.size(); i++) {
-                logger.info("ldapUsers - " + i + " " + ldapUsers.get(i));                  
-            } 
-            
+                logger.info("ldapUsers - " + i + " " + ldapUsers.get(i));
+            }
+
             ArrayList<NotificationUser> userList = new ArrayList<>();
             for(String ldapUser : ldapUsers) {
                 if (!ldapUser.contains("/") && !ldapUser.contains("_")) {
@@ -300,16 +342,16 @@ public class NotificationController {
             return notification;
         }
     }
-    
-        
+
+
     private int countNumberOfOccurrences(String source, String sentence) {
         int i=0;
         Pattern p = Pattern.compile(source);
         Matcher m = p.matcher(sentence);
         while (m.find()) {
             i++;
-        }        
+        }
         return i;
-    }    
+    }
 
 }
