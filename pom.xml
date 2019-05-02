@@ -7,7 +7,7 @@
     <groupId>uk.ac.ed.notify</groupId>
     <artifactId>notification-ui</artifactId>
     <version>2.0.0</version>
-    <packaging>${packaging.type}</packaging>
+    <packaging>war</packaging>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -17,7 +17,6 @@
     </parent>
 
     <properties>
-        <packaging.type>jar</packaging.type>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -77,6 +76,21 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.security.oauth</groupId>
             <artifactId>spring-security-oauth2</artifactId>
             <version>2.0.7.RELEASE</version>
@@ -120,7 +134,7 @@
                 <groupId>com.microsoft.aad</groupId>
                 <artifactId>adal4j</artifactId>
                 <version>0.0.2</version>
-        </dependency>           
+        </dependency>
         <!-- for json parsing -->
         <dependency>
             <groupId>org.json</groupId>
@@ -132,7 +146,7 @@
             <artifactId>spring-ldap-core</artifactId>
             <version>2.0.2.RELEASE</version>
             <type>jar</type>
-        </dependency>     
+        </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
@@ -155,7 +169,7 @@
             <artifactId>oro</artifactId>
             <version>2.0.8</version>
         </dependency>
-        
+
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
@@ -396,32 +410,12 @@
     <name>notification-ui</name>
 
     <profiles>
-        <profile>
+        <!-- profile>
             <id>server</id>
-            <properties>
-                <packaging.type>war</packaging.type>
-            </properties>
             <build>
                 <finalName>ROOT</finalName>
             </build>
-            <dependencies>
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-web</artifactId>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-starter-tomcat</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
+        </profile -->
         <profile>
             <id>oracle</id>
             <repositories>
