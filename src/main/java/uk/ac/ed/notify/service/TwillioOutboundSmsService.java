@@ -107,6 +107,8 @@ public class TwillioOutboundSmsService implements OutboundSmsService {
 
     private String selectFromNumber(Notification notification) {
 
+        logger.debug("Selecting fromNumber for notification: {}", notification);
+
         String rslt; // default
 
         /*
@@ -115,6 +117,7 @@ public class TwillioOutboundSmsService implements OutboundSmsService {
 
         final String groupPropertyName =
                 FROM_NUMBER_PROPERTY_PREFIX + "." + formatGroupPart(notification) + "." + FROM_NUMBER_PROPERTY_SUFFIX;
+        logger.debug("Evaluated groupPropertyName='{}'", groupPropertyName);
         rslt = environment.getProperty(groupPropertyName);
 
         /*
@@ -125,12 +128,21 @@ public class TwillioOutboundSmsService implements OutboundSmsService {
             rslt = environment.getProperty(FROM_NUMBER_PROPERTY_PREFIX + "." + FROM_NUMBER_PROPERTY_SUFFIX);
         }
 
+        logger.debug("Selecting fromNumber='{}' for notification: {}", rslt, notification);
+
         return rslt;
 
     }
 
     private String formatGroupPart(Notification notification) {
-        return notification.getNotificationGroupName().replaceAll("\\W", "");
+        if(notification == null) {
+            logger.debug("Notification is null.  Returning 'USE_DEFAULT' for the group name.");
+            return "USE_DEFAULT";
+        }
+        final String groupName = notification.getNotificationGroupName();
+        return StringUtils.isNotBlank(groupName)
+                ? groupName.replaceAll("\\W", "")
+                : "USE_DEFAULT";
     }
 
 }
