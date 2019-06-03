@@ -91,8 +91,10 @@ public class EmailNotificationHandlingService {
                 Notification existingNotification = notificationRepository.findByPublisherIdAndPublisherNotificationId(notification.getPublisherId(), notification.getPublisherNotificationId());
                 if (existingNotification == null) {
                     logger.info("notification not exist in db, ignore");
-                    notification.setNotificationId(null);
-                    handleNotification(AuditActions.CREATE_NOTIFICATION, notification);
+                    /*
+                     * Issue 33
+                     * Do not create a notification if an attempt is made to delete a non-existant one
+                     */
                 } else {
                         notification.setNotificationId(existingNotification.getNotificationId());
                         logger.info("existing notification found, delete");
