@@ -90,7 +90,7 @@ public class EmailNotificationHandlingService {
                 logger.info("action: delete");
                 Notification existingNotification = notificationRepository.findByPublisherIdAndPublisherNotificationId(notification.getPublisherId(), notification.getPublisherNotificationId());
                 if (existingNotification == null) {
-                    logger.info("notification not exist in db, ignore");
+                    logger.warn("notification not exist in db, ignore");
                     /*
                      * Issue 33
                      * Do not create a notification if an attempt is made to delete a non-existant one
