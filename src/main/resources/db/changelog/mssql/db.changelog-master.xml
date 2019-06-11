@@ -13,4 +13,18 @@
                  stripComments="true"/>
     </changeSet>
 
+    <changeSet id="setup_default_deny_access_user" dbms="mssql" author="gvanbre">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/mssql/sql/setup_default_deny_access_user.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+
+    <changeSet id="create_archive_table" dbms="mssql" author="gvanbre">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/mssql/sql/create_archive_table.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+
 </databaseChangeLog>
