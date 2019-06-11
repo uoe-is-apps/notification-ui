@@ -1,16 +1,43 @@
-<div class="panel panel-default uoe-overview-high">
-    <div class="panel-heading"><h3>Scheduled Jobs</h3></div>
-    <div class="panel-body">
-
-        <div ng-if="$ctrl.loading" class="progress">
-            <div class="progress-bar progress-bar-striped active" role="progressbar"
-                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
-                Loading
+<div class="row">
+    <div class="col-md-3">
+        <div class="panel panel-uoe-low">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    General status
+                    <span ng-if="!$ctrl.loading && $ctrl.status == 'ok'" title="OK" class="glyphicon glyphicon-ok text-success"></span>
+                    <span ng-if="!$ctrl.loading && $ctrl.status == 'ok'" class="text-success">(OK)</span>
+                    <span ng-if="!$ctrl.loading && $ctrl.status == 'warning'" title="WARNING" class="glyphicon glyphicon-alert text-warning"></span>
+                    <span ng-if="!$ctrl.loading && $ctrl.status == 'warning'" class="text-warning">(WARNING)</span>
+                    <span ng-if="!$ctrl.loading && $ctrl.status == 'error'" title="ERROR" class="glyphicon glyphicon-remove text-danger"></span>
+                    <span ng-if="!$ctrl.loading && $ctrl.status == 'error'" class="text-danger">(ERROR)</span>
+                </h3>
+            </div>
+            <div ng-if="!$ctrl.loading && $ctrl.status == 'ok'" class="panel-body alert alert-success" role="alert">
+                <p>Notifications appears to be running normally.</p>
+            </div>
+            <div ng-if="!$ctrl.loading && $ctrl.status == 'warning'" class="panel-body alert alert-warning" role="alert">
+                <p>At least one task has been paused, and is not running.</p>
+            </div>
+            <div ng-if="!$ctrl.loading && $ctrl.status == 'error'" class="panel-body alert alert-danger" role="alert">
+                <p>At least one task is not running.</p>
             </div>
         </div>
+    </div>
+    <div class="col-md-9">
+        <div class="panel panel-default uoe-overview-high">
+            <div class="panel-heading">
+                <h3 class="panel-title">Scheduled Jobs</h3>
+            </div>
+            <div class="panel-body">
+                <div ng-if="$ctrl.loading" class="progress">
+                    <div class="progress-bar progress-bar-striped active" role="progressbar"
+                         aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                        Loading
+                    </div>
+                </div>
 
-        <div ui-grid="$ctrl.gridOptions" ui-grid-resize-columns class="grid"></div>
+                <div ui-grid="$ctrl.gridOptions" ui-grid-resize-columns class="grid"></div>
+            </div>
+        </div>
     </div>
 </div>
-
-

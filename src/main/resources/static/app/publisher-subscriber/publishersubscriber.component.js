@@ -213,11 +213,14 @@ angular.module('publishersubscriber')
 
     
   .component('scheduledJobs', {
+        gracePeriod: 60000, // milliseconds
         templateUrl: 'app/publisher-subscriber/scheduled-jobs.tpl.html',
         controller: ['scheduledjob', 'ScheduledTaskService', '$location', 'messenger', '$scope',
                     function(_scheduledjob, ScheduledTaskService, $location, messenger, $scope) {
 
             var self = this;
+
+            self.status = '';
 
             self.gridOptions = {
                 enableSorting: true,
@@ -234,11 +237,42 @@ angular.module('publishersubscriber')
                     {
                         field: 'nextRun',
                         cellFilter: 'date: "dd/MM/yyyy H:mm"',
-                        width: '*'
+                        width: '*',
+                        cellClass: function(grid, row, col, rowRenderIndex, colRenderIndex) {
+                            var normalizedCellDate = grid.getCellValue(row,col).replace(/[^a-zA-Z0-9]/g, '-');
+                            if (normalizedCellDate === '') return '';
+                            var dateItems       = normalizedCellDate.split('-');
+                            if (dateItems.length !== 6) return '';
+                            var now = new Date(),
+                                cellDate;
+                            if (dateItems[0] > 1000) {
+                                // Year first, assume YYYY/MM/DD HH:MM:SS
+                                cellDate = Date(dateItems[0], dateItems[1], dateItems[2],
+                                                dateItems[3], dateItems[4], dateItems[5]);
+                            } else {
+                                // Year first, assume DD/MM/YYYY HH:MM:SS
+                                cellDate = Date(dateItems[2], dateItems[1], dateItems[1],
+                                                dateItems[3], dateItems[4], dateItems[5]);
+                            }
+                            return cellDate.getTime() + self.gracePeriod > now.getTime() ?
+                                '' : 'glyphicon glyphicon-remove text-danger';
+                        }
                     },
                     {
                         field: 'triggerState',
-                        width: '*'
+                        width: '*',
+                        cellClass: function(grid, row, col, rowRenderIndex, colRenderIndex) {
+                            var cellText = grid.getCellValue(row,col);
+                            switch (cellText) {
+                                case 'ERROR' :
+                                case 'BLOCKED' : return 'glyphicon glyphicon-remove text-danger';
+                                case 'PAUSED_BLOCKED' :
+                                case 'PAUSED' : return 'glyphicon glyphicon-alert text-warning';
+                                default :
+                            }
+                            return '';
+                        },
+                        cellTemplate: "<div class=\"ui-grid-cell-contents\" title=\"TOOLTIP\"><span>{{COL_FIELD CUSTOM_FILTERS}}</span></div>"
                     },
                     {
                         field: 'repeatInterval',
@@ -260,10 +294,39 @@ angular.module('publishersubscriber')
 
             self.refresh = function() {
                 self.loading  = true;
+                self.status  = 'loading';
 
                 ScheduledTaskService.all().then(function (response) {
                     self.jobs = response.data;
                     self.gridOptions.data = response.data;
+                    var status = 'ok';
+                    for(i=0; i<response.data; i++) {
+                        if (response.data[i].triggerState === 'ERROR' || response.data[i].triggerState === 'BLOCKED') {
+                            status = 'error';
+                            break;
+                        }
+                        if (response.data[i].triggerState === 'PAUSED' || response.data[i].triggerState === 'PAUSED_BLOCKED') {
+                            status = 'warning';
+                        }
+                        var normalizedCellDate = response.data[i].nextRun.replace(/[^a-zA-Z0-9]/g, '-');
+                        if (normalizedCellDate === '') continue;
+                        var dateItems       = normalizedCellDate.split('-');
+                        if (dateItems.length !== 6) continue;
+                        var now = new Date(),
+                            cellDate;
+                        if (dateItems[0] > 1000) {
+                            // Year first, assume YYYY/MM/DD HH:MM:SS
+                            cellDate = Date(dateItems[0], dateItems[1], dateItems[2], dateItems[3], dateItems[4], dateItems[5]);
+                        } else {
+                            // Year first, assume DD/MM/YYYY HH:MM:SS
+                            cellDate = Date(dateItems[2], dateItems[1], dateItems[1], dateItems[3], dateItems[4], dateItems[5]);
+                        }
+                        if (cellDate.getTime() + self.gracePeriod  >= now.getTime()) {
+                            status = 'error';
+                            break;
+                        }
+                    }
+                    self.status  = status;
                 })
                 .catch(function(response) {
                     console.error(response.status, response.data);
@@ -418,5 +481,5 @@ angular.module('publishersubscriber')
                 $location.path('/scheduled-jobs');
             };
         }]
-    }) 
-;    
+    })
+;
