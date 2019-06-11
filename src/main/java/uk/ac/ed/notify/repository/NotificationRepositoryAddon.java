@@ -11,5 +11,5 @@ public interface NotificationRepositoryAddon {
 
 	List<Notification> bulkSave(List<Notification> entities);
         
-        void bulkDelete(int numOfDays);
+	void bulkPurgeArchive(int archiveNumOfDays, int purgeNumOfDays, int archiveRecordLimit);
 }

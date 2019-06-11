@@ -4,15 +4,11 @@
  */
 package uk.ac.ed.notify.service;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.ac.ed.notify.entity.Notification;
 import uk.ac.ed.notify.repository.NotificationRepository;
 
 @Service
@@ -20,11 +16,17 @@ public class NotificationTidyupService {
     private static final Logger logger = LoggerFactory.getLogger(NotificationTidyupService.class);
          
     @Autowired
-    NotificationRepository notificationRepository;    
-         
-    @Value("${notification.purge}")
-    int purge;
-     
+    NotificationRepository notificationRepository;
+
+    @Value("${notification.archive:92}")
+    int archive;
+
+    @Value("${notification.purgeArchive:1096}")
+    int purgeArchive;
+
+    @Value("${notification.archiveRecordLimit:1000}")
+    int archiveRecordLimit;
+
     /*
     public List<Notification> findDeletableNotification(){
         Date now = new Date();
@@ -52,7 +54,7 @@ public class NotificationTidyupService {
     */
     
     public void tidyupNotification(){
-        notificationRepository.bulkDelete(purge);
+        notificationRepository.bulkPurgeArchive(archive, purgeArchive, archiveRecordLimit);
     }
     
 }

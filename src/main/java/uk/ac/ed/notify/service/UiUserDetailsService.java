@@ -31,18 +31,23 @@ public class UiUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+
         try {
             logger.debug("Trying to load user '{}'", s);
             if (uiUserRepository == null) {
-                logger.debug("Repo is null");
+                throw new UsernameNotFoundException("Error getting user : uiUserRepository is null");
             }
 
             UiUser user = uiUserRepository.findOne(s);
+
             if (user == null) {
                 //fix for DTI020-11
                 //throw new UsernameNotFoundException(s + "was not found.");
                 s = "DenyAccess";
                 user = uiUserRepository.findOne(s);
+                if (user == null) {
+                    throw new UsernameNotFoundException("No default " + s + " user");
+                }
             }
             Collection<GrantedAuthority> roles = new ArrayList<>();
             for (UiRole uiRole : user.getUiRoles()) {

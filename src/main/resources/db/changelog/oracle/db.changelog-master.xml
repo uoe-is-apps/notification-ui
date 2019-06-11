@@ -193,6 +193,13 @@
                  path="db/changelog/oracle/sql/insert_publisher_topic_oracle.sql"
                  splitStatements="true"
                  stripComments="true"/>
-    </changeSet> 
+    </changeSet>
+
+    <changeSet id="create_archive_table" dbms="oracle" author="gvanbre">
+        <sqlFile encoding="utf8"
+                 path="db/changelog/oracle/sql/create_archive_table.sql"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
 
 </databaseChangeLog>
