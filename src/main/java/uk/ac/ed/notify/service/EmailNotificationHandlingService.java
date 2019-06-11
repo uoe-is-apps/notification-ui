@@ -59,8 +59,13 @@ public class EmailNotificationHandlingService {
 
             if (action.equalsIgnoreCase("insert")) {
                 logger.info("action: insert");
-                notification.setNotificationId(null);
-                handleNotification(AuditActions.CREATE_NOTIFICATION, notification);
+                Notification existingNotification = notificationRepository.findByPublisherIdAndPublisherNotificationId(notification.getPublisherId(), notification.getPublisherNotificationId());
+                if (existingNotification == null) {
+                    notification.setNotificationId(null);
+                    handleNotification(AuditActions.CREATE_NOTIFICATION, notification);
+                } else {
+                    logger.warn("Existing notification found, ignoring attempt to create a duplicate");
+                }
             } else if (action.equalsIgnoreCase("update")) {
                 logger.info("action: update");
                 /*
