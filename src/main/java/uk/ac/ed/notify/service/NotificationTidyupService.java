@@ -24,7 +24,7 @@ public class NotificationTidyupService {
     @Value("${notification.purgeArchive:1096}")
     int purgeArchive;
 
-    @Value("${notification.archiveRecordLimit:1000}")
+    @Value("${notification.archiveRecordLimit:100}")
     int archiveRecordLimit;
 
     /*

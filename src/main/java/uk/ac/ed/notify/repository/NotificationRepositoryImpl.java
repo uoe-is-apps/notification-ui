@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.ed.notify.entity.Notification;
-import uk.ac.ed.notify.entity.NotificationArchiveItem;
 
 @Transactional(value="notifyTransactionManager")
 public class NotificationRepositoryImpl implements NotificationRepositoryAddon {
@@ -30,103 +29,108 @@ public class NotificationRepositoryImpl implements NotificationRepositoryAddon {
 	@Value("${hibernate.jdbc.batch_size:25}")
 	private int batchSize;
 
-	@Autowired
-	NotificationArchiveItemRepository notificationArchiveItemRepository;
 
 	public void bulkPurgeArchive(int archiveNumOfDays, int purgeNumOfDays, int archiveRecordLimit){
-        logger.info("bulkPurgeArchive start...");
+		int resultNotificationUsers;
+		int resultNotifications;
 
-		entityManager.createNativeQuery("TRUNCATE TABLE notification_archive_items").executeUpdate();
-		logger.info("Truncate notification_archive_items");
+		logger.info("bulkPurgeArchive start... archive after " + archiveNumOfDays + " days : purge after " +
+				purgeNumOfDays + " days : " + archiveRecordLimit + " notifications per cycle");
 
-		// @todo begin transaction
+		// do the purge first.
 
 		Calendar c = Calendar.getInstance();
-		c.setTime(new Date()); // Now use today date.
-		c.add(Calendar.DATE, -archiveRecordLimit); // Adding 5 days
+		c.setTime(new Date()); // Now use today's date.
+		c.add(Calendar.DATE, -purgeNumOfDays);
 		Timestamp to = new Timestamp(c.getTime().getTime());
 
-		Query query = entityManager.createQuery("SELECT n "
+		Query query = entityManager.createNativeQuery("SELECT na.notification_id "
+				+ " FROM notifications_archive na"
+				+ " WHERE na.end_date < :timestampTo");
+		query.setParameter("timestampTo", to);
+		if (archiveRecordLimit > 0) {
+			query.setMaxResults(archiveRecordLimit);
+		}
+
+		@SuppressWarnings("unchecked")
+		List<String> nail = (List<String>)query.getResultList();
+
+		logger.info("Set up notifications to purge from archive - " + nail.size());
+
+		if (nail.size() > 0) {
+			query = entityManager.createNativeQuery(
+					"DELETE FROM notification_users_archive WHERE notification_id in :idList"
+			);
+			query.setParameter("idList", nail);
+			resultNotificationUsers = query.executeUpdate();
+			logger.info("Purged from notification_users_archive - " + resultNotificationUsers);
+
+			query = entityManager.createNativeQuery(
+					"DELETE FROM notifications_archive WHERE notification_id in :idList"
+			);
+			query.setParameter("idList", nail);
+			resultNotifications = query.executeUpdate();
+			logger.info("Purged from notifications_archive - " + resultNotifications);
+		}
+
+
+		// Then move records from notification(_user)s to equivalent archive tables.
+
+		c = Calendar.getInstance();
+		c.setTime(new Date()); // Again use today's date.
+		c.add(Calendar.DATE, -archiveNumOfDays);
+		to = new Timestamp(c.getTime().getTime());
+
+		query = entityManager.createNativeQuery("SELECT n.notification_id "
 				+ " FROM notifications n"
 				+ " WHERE n.end_date < :timestampTo");
 		query.setParameter("timestampTo", to);
-		query.setMaxResults(archiveRecordLimit);
+		if (archiveRecordLimit > 0) {
+			query.setMaxResults(archiveRecordLimit);
+		}
 
-		@SuppressWarnings("unchecked")
-		List<NotificationArchiveItem> nail = (List<NotificationArchiveItem>)query.getResultList();
+		nail = (List<String>)query.getResultList();
 
-		notificationArchiveItemRepository.bulkSave(nail);
-		logger.info("Set up records to archive - " + nail.size());
+		logger.info("Set up notifications to archive - " + nail.size());
 
-		int resultNotifications = entityManager.createNativeQuery(
-			"INSERT INTO notifications_archive "
-				+ "(notification_id,  publisher_id, topic, publisher_notification_id, title, notification_body, "
-				+ "notification_url, start_date, end_date, last_updated, notification_group, notification_group_name)"
-				+ " SELECT notification_id,  publisher_id, topic, publisher_notification_id, title, notification_body, "
-				+ "notification_url, start_date, end_date, last_updated, notification_group, notification_group_name "
-				+ " FROM notifications WHERE notification_id in "
-				+ " (SELECT notification_id FROM notification_archive_items)"
-		)
-				.executeUpdate();
-		logger.info("Move notifications to archive - " + resultNotifications);
+		if (nail.size() > 0) {
 
-		int resultNotificationUsers = entityManager.createNativeQuery(
-			"INSERT INTO notification_users_archive (notification_id, uun, last_updated)"
-				+ " SELECT notification_id, uun, last_updated FROM notification_users WHERE notification_id in "
-				+ " (SELECT notification_id FROM notification_archive_items)"
-		)
-				.executeUpdate();
-		logger.info("Move notification_users to archive - " + resultNotificationUsers);
+			query = entityManager.createNativeQuery(
+					"INSERT INTO notifications_archive "
+							+ "(notification_id, publisher_id, topic, publisher_notification_id, title, notification_body, "
+							+ " notification_url, start_date, end_date, last_updated, notification_group, notification_group_name)"
+							+ " SELECT notification_id, publisher_id, topic, publisher_notification_id, title, notification_body, "
+							+ " notification_url, start_date, end_date, last_updated, notification_group, notification_group_name "
+							+ " FROM notifications WHERE notification_id  in :idList ");
+			query.setParameter("idList", nail);
+			resultNotifications = query.executeUpdate();
+			logger.info("Copied notifications - " + resultNotifications);
 
-		resultNotificationUsers = entityManager.createNativeQuery(
-			"DELETE FROM notification_users WHERE notification_id in "
-				+ " (SELECT notification_id FROM notification_archive_items)"
-		)
-				.executeUpdate();
-		logger.info("Deleted from notification_users - " + resultNotificationUsers);
+			query = entityManager.createNativeQuery(
+					"INSERT INTO notification_users_archive "
+							+ "(notification_id, uun, last_updated)"
+							+ " SELECT notification_id, uun, last_updated "
+							+ " FROM notification_users WHERE notification_id in :idList ");
+			query.setParameter("idList", nail);
+			resultNotifications = query.executeUpdate();
+			logger.info("Copied notification_users - " + resultNotifications);
 
-		resultNotifications = entityManager.createNativeQuery(
-			"DELETE FROM notifications WHERE notification_id in "
-				+ " (SELECT notification_id FROM notification_archive_items)"
-		)
-				.executeUpdate();
-		logger.info("Deleted from notifications - " + resultNotifications);
+			query = entityManager.createNativeQuery(
+					"DELETE FROM notification_users WHERE notification_id in :idList"
+			);
+			query.setParameter("idList", nail);
+			resultNotificationUsers = query.executeUpdate();
+			logger.info("Removed from notification_users - " + resultNotificationUsers);
 
-		// @todo Commit TRansaction
-
-		entityManager.createNativeQuery("TRUNCATE TABLE notification_archive_items").executeUpdate();
-		logger.info("Truncate notification_archive_items");
-
-		// @todo Begin Transaction
-
-		int resultNotificationList = entityManager.createNativeQuery(
-			"INSERT INTO notification_archive_items (notification_id) "
-				+ " SELECT notification_id FROM notifications_archive WHERE end_date < (sysdate-" + archiveRecordLimit + ") LIMIT 1000"
-		)
-				.executeUpdate();
-		logger.info("Set up archive records to delete - " + resultNotificationList);
-
-		resultNotificationUsers = entityManager.createNativeQuery(
-			"DELETE FROM notification_users_archive WHERE notification_id in "
-				+ " (SELECT notification_id FROM notification_archive_items)"
-		)
-				.executeUpdate();
-		logger.info("Deleted from notification_users_archive - " + resultNotificationUsers);
-
-		resultNotifications = entityManager.createNativeQuery(
-			"DELETE FROM notifications_archive WHERE notification_id in "
-				+ " (SELECT notification_id FROM notification_archive_items)"
-		)
-				.executeUpdate();
-		logger.info("Deleted from notifications_archive - " + resultNotifications);
-
-		// @todo Commit TRansaction
-
-		entityManager.createNativeQuery("TRUNCATE TABLE notification_archive_items").executeUpdate();
-		logger.info("Truncate notification_archive_items");
+			query = entityManager.createNativeQuery(
+					"DELETE FROM notifications WHERE notification_id in :idList"
+			);
+			query.setParameter("idList", nail);
+			resultNotifications = query.executeUpdate();
+			logger.info("Removed from notifications - " + resultNotifications);
+		}
 
 		logger.info("bulkPurgeArchive complete...");
-
     }
         
         
