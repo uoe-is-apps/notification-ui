@@ -213,7 +213,6 @@ angular.module('publishersubscriber')
 
     
   .component('scheduledJobs', {
-        gracePeriod: 60000, // milliseconds
         templateUrl: 'app/publisher-subscriber/scheduled-jobs.tpl.html',
         controller: ['scheduledjob', 'ScheduledTaskService', '$location', 'messenger', '$scope',
                     function(_scheduledjob, ScheduledTaskService, $location, messenger, $scope) {
@@ -223,6 +222,7 @@ angular.module('publishersubscriber')
             self.status = '';
 
             self.gridOptions = {
+                gracePeriod: 120000, // milliseconds
                 enableSorting: true,
                 columnDefs: [
                     {
@@ -239,23 +239,22 @@ angular.module('publishersubscriber')
                         cellFilter: 'date: "dd/MM/yyyy H:mm"',
                         width: '*',
                         cellClass: function(grid, row, col, rowRenderIndex, colRenderIndex) {
-                            var normalizedCellDate = grid.getCellValue(row,col).replace(/[^a-zA-Z0-9]/g, '-');
-                            if (normalizedCellDate === '') return '';
-                            var dateItems       = normalizedCellDate.split('-');
-                            if (dateItems.length !== 6) return '';
-                            var now = new Date(),
+                            var normalizedCellDate = grid.getCellValue(row,col).replace(/[^a-zA-Z0-9]/g, '-'),
+                                dateItems       = normalizedCellDate.split('-'),
+                                now = new Date(),
                                 cellDate;
+                            if (normalizedCellDate === '' || dateItems.length !== 6) return '';
                             if (dateItems[0] > 1000) {
                                 // Year first, assume YYYY/MM/DD HH:MM:SS
-                                cellDate = Date(dateItems[0], dateItems[1], dateItems[2],
+                                cellDate = new Date(dateItems[0], dateItems[1]-1, dateItems[2],
                                                 dateItems[3], dateItems[4], dateItems[5]);
                             } else {
                                 // Year first, assume DD/MM/YYYY HH:MM:SS
-                                cellDate = Date(dateItems[2], dateItems[1], dateItems[1],
+                                cellDate = new Date(dateItems[2], dateItems[1]-1, dateItems[0],
                                                 dateItems[3], dateItems[4], dateItems[5]);
                             }
-                            return cellDate.getTime() + self.gracePeriod > now.getTime() ?
-                                '' : 'glyphicon glyphicon-remove text-danger';
+                            return cellDate.getTime() + grid.options.gracePeriod < now.getTime() ?
+                                'glyphicon glyphicon-remove text-danger' : '';
                         }
                     },
                     {
@@ -297,36 +296,39 @@ angular.module('publishersubscriber')
                 self.status  = 'loading';
 
                 ScheduledTaskService.all().then(function (response) {
+                    var normalizedCellDate,
+                        dateItems,
+                        now = new Date(),
+                        cellDate;
+
+                    self.status  = 'ok';
                     self.jobs = response.data;
                     self.gridOptions.data = response.data;
                     var status = 'ok';
-                    for(i=0; i<response.data; i++) {
+                    for(i=0; i<response.data.length; i++) {
                         if (response.data[i].triggerState === 'ERROR' || response.data[i].triggerState === 'BLOCKED') {
-                            status = 'error';
-                            break;
+                            self.status = 'error';
+                            return; // error state: no need to check anything else.
                         }
                         if (response.data[i].triggerState === 'PAUSED' || response.data[i].triggerState === 'PAUSED_BLOCKED') {
-                            status = 'warning';
+                            self.status = 'warning';
+                            continue; // don't check the dates on a paused task.
                         }
-                        var normalizedCellDate = response.data[i].nextRun.replace(/[^a-zA-Z0-9]/g, '-');
-                        if (normalizedCellDate === '') continue;
-                        var dateItems       = normalizedCellDate.split('-');
-                        if (dateItems.length !== 6) continue;
-                        var now = new Date(),
-                            cellDate;
+                        normalizedCellDate = response.data[i].nextRun.replace(/[^a-zA-Z0-9]/g, '-');
+                        dateItems = normalizedCellDate.split('-');
+                        if (normalizedCellDate === '' || dateItems.length !== 6) continue;
                         if (dateItems[0] > 1000) {
                             // Year first, assume YYYY/MM/DD HH:MM:SS
-                            cellDate = Date(dateItems[0], dateItems[1], dateItems[2], dateItems[3], dateItems[4], dateItems[5]);
+                            cellDate = new Date(dateItems[0], dateItems[1]-1, dateItems[2], dateItems[3], dateItems[4], dateItems[5]);
                         } else {
                             // Year first, assume DD/MM/YYYY HH:MM:SS
-                            cellDate = Date(dateItems[2], dateItems[1], dateItems[1], dateItems[3], dateItems[4], dateItems[5]);
+                            cellDate = new Date(dateItems[2], dateItems[1]-1, dateItems[0], dateItems[3], dateItems[4], dateItems[5]);
                         }
-                        if (cellDate.getTime() + self.gracePeriod  >= now.getTime()) {
-                            status = 'error';
-                            break;
+                        if (cellDate.getTime() + self.gridOptions.gracePeriod  < now.getTime()) {
+                            self.status = 'error'; // error state: no need to check anything else.
+                            return;
                         }
                     }
-                    self.status  = status;
                 })
                 .catch(function(response) {
                     console.error(response.status, response.data);
