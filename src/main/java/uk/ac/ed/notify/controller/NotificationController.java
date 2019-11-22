@@ -51,6 +51,13 @@ public class NotificationController {
     @Value("${uk.ac.ed.notify.groups.minLevel:6}")
     private int minGroupLevel;
 
+    /**
+     * Maximum number of users for a given notification.
+     */
+    @Value("${org.apereo.fiosan.ui.controller.notification.maxusersize:5000}")
+    private int maxUserSize;
+
+
     @Autowired
     private GroupService groupService;
 
@@ -141,13 +148,15 @@ public class NotificationController {
 
         notification = constructNotificationWithLdapGroup(notification);    
 
+	logger.debug("Notification maxUserSize: ["+maxUserSize+"]");    
+                
         if(notification.getTopic().equals("Group") && notification.getNotificationUsers() != null) {
             if(notification.getNotificationUsers().size() == 0) {
                 JsonNotification result = new JsonNotification();
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");
                 logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_NO_MEMBER");      
                 return result;
-            }else if(notification.getNotificationUsers().size() > 5000) {
+            }else if(notification.getNotificationUsers().size() > maxUserSize) {
                 JsonNotification result = new JsonNotification();
                 result.setTitle("ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");
                 logger.error("notification - ERROR_GROUP_NOTIFICATION_CREATION_TOO_MANY_MEMBER");      
